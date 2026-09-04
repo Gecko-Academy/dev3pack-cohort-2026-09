@@ -12,3 +12,10 @@ certificate.svg
 cookbook/integrations/petshop_out/
 .bootcamp/
 progress.db
+
+# Cohort operations — instructor control, never committed. The invite tooling
+# and any roster (names + emails, personal data) stay local. invite_cohort.py
+# already refuses a roster inside the repo; this is the belt to that braces.
+scripts/invite_cohort.py
+*roster*.csv
+*cohort*.csv

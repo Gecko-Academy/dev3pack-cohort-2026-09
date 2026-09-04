@@ -31,6 +31,7 @@ against a cooperating cohort, not a control. It stops accidents, not people.
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import subprocess
 import sys
@@ -90,8 +91,61 @@ NEVER = {
 }
 
 
+#: Solutions are withheld and released one session at a time, so a learner meets
+#: an exercise before its answer is a folder away — the whole point of the priced
+#: hint tier. The set of released chapters is recorded in the student repo, so a
+#: rebuild never silently un-releases one. Week-0 units and the depth track keep
+#: their own solutions; this gate is the fifteen graded sessions.
+SOLUTIONS = "solutions"
+RELEASED_SOLUTIONS_FILE = ".solutions-released"
+
+
 class PublishError(Exception):
     """The publish was refused. Nothing was written."""
+
+
+def solution_dir_for(token: str) -> str:
+    """The solutions directory a release token names, relative to the repo.
+
+    A chapter id (`ch03`, `3`) resolves through the curriculum, the single source
+    of where a chapter lives. Anything else is taken as the path to a solutions
+    parent directory (`modules/module-0/unit-01-environment`), so week-0 units
+    stay releasable without inventing a second id scheme.
+    """
+    stripped = token.strip()
+    if re.fullmatch(r"(ch)?0*\d+", stripped.lower()):
+        from bootcamp_agent.curriculum import get_chapter
+
+        chapter = get_chapter(stripped)
+        return f"modules/module-{chapter.module}/chapter-{chapter.number:02d}/{SOLUTIONS}"
+    return f"{stripped.rstrip('/')}/{SOLUTIONS}"
+
+
+def read_released_solutions(destination: Path) -> set[str]:
+    """Which solution directories the student repo has already released."""
+    marker = destination / RELEASED_SOLUTIONS_FILE
+    if not marker.is_file():
+        return set()
+    return {line.strip() for line in marker.read_text().splitlines() if line.strip()}
+
+
+def write_released_solutions(destination: Path, released: set[str]) -> None:
+    (destination / RELEASED_SOLUTIONS_FILE).write_text(
+        "".join(f"{entry}\n" for entry in sorted(released))
+    )
+
+
+def _is_module_solution(relative: Path) -> bool:
+    """A solutions directory (or a file inside one) under a module chapter."""
+    parts = relative.parts
+    return len(parts) >= 2 and parts[0] == "modules" and SOLUTIONS in parts
+
+
+def _solution_owner(relative: Path) -> str:
+    """The `<...>/solutions` path a module-solution file belongs to."""
+    parts = relative.parts
+    cut = parts.index(SOLUTIONS)
+    return Path(*parts[: cut + 1]).as_posix()
 
 
 def released_paths(week: int) -> list[str]:
@@ -103,7 +157,9 @@ def released_paths(week: int) -> list[str]:
     return paths
 
 
-def _forbidden(relative: Path, week: int) -> str | None:
+def _forbidden(
+    relative: Path, week: int, released_solutions: frozenset[str] = frozenset()
+) -> str | None:
     """Why this path must not be published, or None if it may be."""
     parts = relative.parts
     for denied, reason in NEVER.items():
@@ -113,6 +169,8 @@ def _forbidden(relative: Path, week: int) -> str | None:
     for number, directory in WEEK_MODULES.items():
         if number > week and parts[: len(Path(directory).parts)] == Path(directory).parts:
             return f"week {number} has not been released yet"
+    if _is_module_solution(relative) and _solution_owner(relative) not in released_solutions:
+        return "solutions are released per session; this chapter's has not been"
     return None
 
 
@@ -124,20 +182,37 @@ def audit(tree: Path, week: int) -> list[str]:
     anything if it can catch a mistake in the copying itself.
     """
     problems: list[str] = []
+    released = frozenset(read_released_solutions(tree))
     for path in sorted(tree.rglob("*")):
         if not path.is_file():
             continue
         relative = path.relative_to(tree)
         if ".git" in relative.parts:
             continue  # the student repo's own checkout, not published content
-        reason = _forbidden(relative, week)
+        reason = _forbidden(relative, week, released)
         if reason:
             problems.append(f"{relative}: {reason}")
     return problems
 
 
-def build(source: Path, destination: Path, week: int) -> tuple[list[str], list[str]]:
-    """Copy the released set into `destination`. Returns (copied, skipped)."""
+#: Copied but never carried into a module chapter — solutions are added back
+#: only for the released chapters, one at a time.
+_COPY_IGNORE = ("__pycache__", "*.pyc", ".ipynb_checkpoints", ".venv", "*.egg-info")
+
+
+def build(
+    source: Path,
+    destination: Path,
+    week: int,
+    released_solutions: frozenset[str] = frozenset(),
+) -> tuple[list[str], list[str]]:
+    """Copy the released set into `destination`. Returns (copied, skipped).
+
+    Module solutions are withheld: the module trees copy without them, then each
+    released chapter's solutions are copied back. Any module solution already in
+    the student repo but not released is pruned, so tightening the policy reaches
+    a student who pulled under the old one.
+    """
     copied: list[str] = []
     skipped: list[str] = []
     for entry in released_paths(week):
@@ -148,18 +223,47 @@ def build(source: Path, destination: Path, week: int) -> tuple[list[str], list[s
         target = destination / entry
         target.parent.mkdir(parents=True, exist_ok=True)
         if origin.is_dir():
+            # A module tree copies without any solutions; every other tree (depth,
+            # workspaces) keeps its own.
+            ignore = _COPY_IGNORE + (SOLUTIONS,) if entry.startswith("modules/") else _COPY_IGNORE
             shutil.copytree(
                 origin,
                 target,
                 dirs_exist_ok=True,
-                ignore=shutil.ignore_patterns(
-                    "__pycache__", "*.pyc", ".ipynb_checkpoints", ".venv", "*.egg-info"
-                ),
+                ignore=shutil.ignore_patterns(*ignore),
             )
         else:
             shutil.copy2(origin, target)
         copied.append(entry)
+
+    for owner in sorted(released_solutions):
+        origin = source / owner
+        if not origin.exists():
+            skipped.append(owner)
+            continue
+        shutil.copytree(
+            origin,
+            destination / owner,
+            dirs_exist_ok=True,
+            ignore=shutil.ignore_patterns(*_COPY_IGNORE),
+        )
+        copied.append(owner)
+
+    _prune_unreleased_solutions(destination, released_solutions)
     return copied, skipped
+
+
+def _prune_unreleased_solutions(destination: Path, released_solutions: frozenset[str]) -> None:
+    """Remove any module solutions directory the release set does not name."""
+    modules = destination / "modules"
+    if not modules.is_dir():
+        return
+    for candidate in modules.rglob(SOLUTIONS):
+        if not candidate.is_dir():
+            continue
+        owner = candidate.relative_to(destination).as_posix()
+        if owner not in released_solutions:
+            shutil.rmtree(candidate)
 
 
 def _stale(destination: Path, week: int) -> list[Path]:
@@ -174,6 +278,8 @@ def _stale(destination: Path, week: int) -> list[Path]:
         if not path.is_file() or ".git" in path.parts:
             continue
         relative = path.relative_to(destination)
+        if relative == Path(RELEASED_SOLUTIONS_FILE):
+            continue  # the release ledger, generated here, not course content
         if not any(relative == entry or entry in relative.parents for entry in allowed):
             stale.append(relative)
     return stale
@@ -188,11 +294,31 @@ def main(argv: list[str] | None = None) -> int:
         help="checkout of the student repo (default: ../dev3pack-cohort-2026-09)",
     )
     parser.add_argument(
+        "--release-solutions",
+        nargs="+",
+        default=[],
+        metavar="CHAPTER",
+        help="also release these chapters' solutions (e.g. ch03), added to any already released",
+    )
+    parser.add_argument(
         "--commit", action="store_true", help="actually write and commit; otherwise dry run"
     )
     args = parser.parse_args(argv)
 
     destination = args.into or ROOT.parent / "dev3pack-cohort-2026-09"
+
+    # Resolve the requested solutions and refuse any whose week is not open — a
+    # solution cannot ship before the exercise it answers.
+    newly = {solution_dir_for(token) for token in args.release_solutions}
+    for owner in sorted(newly):
+        module = Path(owner).parts[1]  # module-N
+        number = int(module.split("-")[1])
+        if number > args.week:
+            raise PublishError(
+                f"{owner}: its week ({number}) is not released yet, so its solutions cannot be"
+            )
+    already = read_released_solutions(destination) if destination.exists() else set()
+    released_solutions = frozenset(already | newly)
 
     print(f"publishing week {args.week} -> {destination}")
     print(
@@ -201,6 +327,10 @@ def main(argv: list[str] | None = None) -> int:
     withheld = [WEEK_MODULES[n] for n in sorted(WEEK_MODULES) if n > args.week]
     print(f"  withheld: {', '.join(withheld) or 'nothing'}")
     print(f"  excluded always: {', '.join(sorted(NEVER))}")
+    print(
+        "  solutions released: "
+        + (", ".join(sorted(released_solutions)) if released_solutions else "none")
+    )
 
     if not args.commit:
         print("\nDry run. Nothing written. Re-run with --commit to publish.")
@@ -212,7 +342,8 @@ def main(argv: list[str] | None = None) -> int:
             f"  git clone git@github.com:{STUDENT_REPO}.git {destination}"
         )
 
-    copied, missing = build(ROOT, destination, args.week)
+    write_released_solutions(destination, set(released_solutions))
+    copied, missing = build(ROOT, destination, args.week, released_solutions)
     if missing:
         print(f"\n  not present in source, skipped: {', '.join(missing)}")
 
@@ -242,8 +373,11 @@ def main(argv: list[str] | None = None) -> int:
     if not status.stdout.strip():
         print("  nothing changed; the student repo is already at this week")
         return 0
+    message = f"week {args.week}"
+    if newly:
+        message += f" + solutions: {', '.join(sorted(newly))}"
     subprocess.run(
-        ["git", "commit", "-m", f"week {args.week}"],
+        ["git", "commit", "-m", message],
         cwd=destination,
         check=True,
     )
