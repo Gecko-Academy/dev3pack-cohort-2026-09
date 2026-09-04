@@ -1,0 +1,60 @@
+openapi: 3.0.3
+info:
+  title: Weather Mini
+  version: 1.0.0
+  description: A second tiny surface, for multi-API exercises.
+servers:
+  - url: https://weather-mini.example.com/v1
+paths:
+  /current:
+    get:
+      operationId: getCurrentWeather
+      summary: Current weather for a city
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema: { type: string }
+        - name: units
+          in: query
+          required: false
+          schema: { type: string, enum: [metric, imperial], default: metric }
+      responses:
+        "200":
+          description: Current conditions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [city, temperature, conditions]
+                properties:
+                  city: { type: string }
+                  temperature: { type: number }
+                  conditions: { type: string }
+  /forecast:
+    get:
+      operationId: getForecast
+      summary: Multi-day forecast for a city
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema: { type: string }
+        - name: days
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 7, default: 3 }
+      responses:
+        "200":
+          description: Forecast entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [date, high, low]
+                  properties:
+                    date: { type: string, format: date }
+                    high: { type: number }
+                    low: { type: number }

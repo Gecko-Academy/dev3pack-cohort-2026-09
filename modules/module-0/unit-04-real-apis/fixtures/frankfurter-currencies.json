@@ -1,0 +1,42 @@
+{
+  "_provenance": {
+    "recorded": "2026-09-04",
+    "url": "https://api.frankfurter.dev/v1/currencies",
+    "lane": "recorded",
+    "auth_sent": "none",
+    "is_evidence_of": "the set of currency codes the API accepts",
+    "is_not_evidence_of": "what the API returns today. Rates and token lists change by the minute; re-record rather than trust this."
+  },
+  "response": {
+    "AUD": "Australian Dollar",
+    "BRL": "Brazilian Real",
+    "CAD": "Canadian Dollar",
+    "CHF": "Swiss Franc",
+    "CNY": "Chinese Renminbi Yuan",
+    "CZK": "Czech Koruna",
+    "DKK": "Danish Krone",
+    "EUR": "Euro",
+    "GBP": "British Pound",
+    "HKD": "Hong Kong Dollar",
+    "HUF": "Hungarian Forint",
+    "IDR": "Indonesian Rupiah",
+    "ILS": "Israeli New Shekel",
+    "INR": "Indian Rupee",
+    "ISK": "Icelandic Kr\u00f3na",
+    "JPY": "Japanese Yen",
+    "KRW": "South Korean Won",
+    "MXN": "Mexican Peso",
+    "MYR": "Malaysian Ringgit",
+    "NOK": "Norwegian Krone",
+    "NZD": "New Zealand Dollar",
+    "PHP": "Philippine Peso",
+    "PLN": "Polish Z\u0142oty",
+    "RON": "Romanian Leu",
+    "SEK": "Swedish Krona",
+    "SGD": "Singapore Dollar",
+    "THB": "Thai Baht",
+    "TRY": "Turkish Lira",
+    "USD": "United States Dollar",
+    "ZAR": "South African Rand"
+  }
+}

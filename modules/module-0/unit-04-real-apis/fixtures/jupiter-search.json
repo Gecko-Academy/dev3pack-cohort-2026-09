@@ -1,0 +1,33 @@
+{
+  "_provenance": {
+    "recorded": "2026-09-04",
+    "url": "https://api.jup.ag/tokens/v2/search?query=JUP",
+    "lane": "recorded",
+    "auth_sent": "none",
+    "is_evidence_of": "that this path answered 200 with NO key, while its spec declares ApiKeyAuth",
+    "is_not_evidence_of": "a claim that no path ever requires a key, and not a security finding: a public read API being keyless is a product choice. what the API returns today. Rates and token lists change by the minute; re-record rather than trust this."
+  },
+  "response": [
+    {
+      "id": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+      "name": "Jupiter",
+      "symbol": "JUP",
+      "decimals": 6,
+      "circSupply": 3320312968.08
+    },
+    {
+      "id": "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D",
+      "name": "Jupiter Lend USDC",
+      "symbol": "jlUSDC",
+      "decimals": 6,
+      "circSupply": 426393375.868787
+    },
+    {
+      "id": "jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v",
+      "name": "Jupiter Staked SOL",
+      "symbol": "JupSOL",
+      "decimals": 9,
+      "circSupply": 4278277.252229522
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "_provenance": {
+    "recorded": "2026-09-04",
+    "url": "https://api.frankfurter.dev/v1/latest?base=USD&symbols=BRL,EUR,GBP",
+    "lane": "recorded",
+    "auth_sent": "none",
+    "is_evidence_of": "the response shape of a keyless public API",
+    "is_not_evidence_of": "what the API returns today. Rates and token lists change by the minute; re-record rather than trust this."
+  },
+  "response": {
+    "amount": 1.0,
+    "base": "USD",
+    "date": "2026-09-03",
+    "rates": {
+      "BRL": 5.074,
+      "EUR": 0.86096,
+      "GBP": 0.7409
+    }
+  }
+}

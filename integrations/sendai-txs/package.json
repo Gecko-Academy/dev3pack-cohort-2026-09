@@ -1,0 +1,18 @@
+{
+  "name": "sendai-txs",
+  "private": true,
+  "type": "commonjs",
+  "description": "SendAI Solana Agent Kit driving real devnet transactions — bootcamp integration example",
+  "scripts": {
+    "demo": "tsx index.ts"
+  },
+  "dependencies": {
+    "@solana-agent-kit/plugin-token": "^2.0.5",
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^6.0.0",
+    "solana-agent-kit": "^2.0.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}

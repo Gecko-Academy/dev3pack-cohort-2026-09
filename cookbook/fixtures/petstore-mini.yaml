@@ -1,0 +1,89 @@
+openapi: 3.0.3
+info:
+  title: Petstore Mini
+  version: 1.0.0
+  description: A deliberately tiny OpenAPI surface for Gecko comprehension exercises.
+servers:
+  - url: https://petstore-mini.example.com/api
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      summary: List pets, optionally filtered by status
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [available, pending, sold]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 50
+      responses:
+        "200":
+          description: A list of pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pet"
+  /pets/{petId}:
+    get:
+      operationId: getPetById
+      summary: Fetch one pet by its id
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The pet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "404":
+          description: Pet not found
+  /orders:
+    post:
+      operationId: placeOrder
+      summary: Place an order for a pet
+      security:
+        - api_key: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      responses:
+        "201":
+          description: Order created
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-Api-Key
+      in: header
+  schemas:
+    Pet:
+      type: object
+      required: [id, name, status]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        status: { type: string, enum: [available, pending, sold] }
+        tags: { type: array, items: { type: string } }
+    Order:
+      type: object
+      required: [petId, quantity]
+      properties:
+        petId: { type: integer }
+        quantity: { type: integer, minimum: 1, maximum: 5 }

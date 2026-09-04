@@ -1,0 +1,14 @@
+{
+  "$schema": "https://code.claude.com/schemas/plugin.json",
+  "name": "dev3pack-builder-kit",
+  "version": "1.0.0",
+  "description": "Skills and commands from the Dev3Pack AI-Engineering Bootcamp: build bounded, citation-verified, receipt-checked agents (Waiter/Manager/Delivery store pattern included).",
+  "author": {
+    "name": "Dev3Pack",
+    "url": "https://github.com/ernanibmurtinho"
+  },
+  "homepage": "https://github.com/ernanibmurtinho/Dev3Pack-bootcamp-AI-Engineering",
+  "repository": "https://github.com/ernanibmurtinho/Dev3Pack-bootcamp-AI-Engineering",
+  "license": "MIT",
+  "keywords": ["agents", "bootcamp", "rag", "evals", "solana", "mcp", "gecko"]
+}

@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dev3pack-bootcamp-ai-engineering"
+version = "0.1.0"
+description = "Practice-first AI engineering bootcamp: capstone package, session labs, and Gecko cookbook"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.40"]
+openai = ["openai>=1.40"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+  "nbformat>=5.10",
+  "nbclient>=0.10",
+  "ipykernel>=6.29",
+  "pyyaml>=6.0",
+]
+
+[project.scripts]
+bootcamp-agent = "bootcamp_agent.cli:main"
+bootcamp = "bootcamp_agent.cli:bootcamp"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Notebooks are teaching material with long prose strings; they are validated
+# and executed by scripts/check_notebooks.py instead.
+#
+# The generated indexes are excluded because ruff formats Python inside Markdown
+# fences. That rewrites a file whose whole job is to reproduce a notebook cell
+# verbatim, so the generator and the formatter fight forever and `--check`
+# reports stale on a file nobody touched.
+extend-exclude = ["*.ipynb", "docs/notebook-index.md", "docs/course-index.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# The final assignment bootstraps sys.path so it runs both in-repo and as a
+# standalone HF Space; imports necessarily follow the path setup.
+"final_assignment/*" = ["E402"]
+# The embedded SVG template has intrinsically long markup lines.
+"final_assignment/certificate.py" = ["E402", "E501"]
+"tests/test_final_assignment.py" = ["E402"]

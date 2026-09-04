@@ -1,0 +1,8 @@
+{"question": "How does chunking work in retrieval-augmented generation?", "expected_doc_ids": ["rag-basics"], "expect_refusal": false}
+{"question": "Why should structured outputs be validated by the application?", "expected_doc_ids": ["structured-outputs"], "expect_refusal": false}
+{"question": "What stopping conditions should an agent loop have?", "expected_doc_ids": ["agent-loops"], "expect_refusal": false}
+{"question": "What is the difference between a tool, a skill, and an MCP server?", "expected_doc_ids": ["mcp-overview"], "expect_refusal": false}
+{"question": "What defenses help against prompt injection in retrieved content?", "expected_doc_ids": ["prompt-injection"], "expect_refusal": false}
+{"question": "What is the capital of Mars?", "expected_doc_ids": [], "expect_refusal": true}
+{"question": "zxqv wubble frobnicate", "expected_doc_ids": [], "expect_refusal": true}
+{"question": "Qual foi o placar do jogo de ontem?", "expected_doc_ids": [], "expect_refusal": true}

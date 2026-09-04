@@ -1,0 +1,12 @@
+{
+  "_comment": "Offline fixture for the Autonomous Store workspace — LetMeBuy-shaped: a storefront whose items carry a price and a token mint. In class, the same shape comes live from the instructor-hosted Gecko MCP surface.",
+  "store": "let_me_buy_demo",
+  "authority": "DemoAuthority1111111111111111111111111111",
+  "items": [
+    {"id": 0, "name": "espresso", "price_lamports": 1000000, "mint": "EspressoMint111111111111111111111111111111", "stock": 12},
+    {"id": 1, "name": "cappuccino", "price_lamports": 1500000, "mint": "CappuccinoMint11111111111111111111111111111", "stock": 8},
+    {"id": 2, "name": "cheese bread", "price_lamports": 800000, "mint": "CheeseBreadMint1111111111111111111111111111", "stock": 25},
+    {"id": 3, "name": "brigadeiro", "price_lamports": 600000, "mint": "BrigadeiroMint111111111111111111111111111111", "stock": 0}
+  ],
+  "delivery_zones": ["campus", "downtown", "remote"]
+}

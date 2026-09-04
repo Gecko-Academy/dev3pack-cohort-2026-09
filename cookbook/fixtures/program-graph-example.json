@@ -1,0 +1,73 @@
+{
+  "_comment": "Teaching fixture: a simplified instruction<->account graph in the shape Gecko's comprehension produces for a small storefront program. Provenance tiers: declared (IDL), recovered (program source), measured (execution on a fork), inferred (heuristic).",
+  "program": "StorefrontDemo1111111111111111111111111111",
+  "instructions": [
+    {
+      "name": "initialize_store",
+      "summary": "Create the store account that later purchases read.",
+      "accounts": [
+        {"name": "authority", "kind": "signer", "provenance": "declared"},
+        {
+          "name": "store",
+          "kind": "pda",
+          "seeds": ["'store'", "authority"],
+          "provenance": "declared"
+        },
+        {"name": "system_program", "kind": "program", "provenance": "declared"}
+      ]
+    },
+    {
+      "name": "list_item",
+      "summary": "Add an item with a price and a mint to an existing store.",
+      "accounts": [
+        {"name": "authority", "kind": "signer", "provenance": "declared"},
+        {"name": "store", "kind": "pda", "seeds": ["'store'", "authority"], "provenance": "declared"},
+        {
+          "name": "item",
+          "kind": "pda",
+          "seeds": ["'item'", "store", "item_index"],
+          "provenance": "recovered",
+          "note": "seed order recovered from program source; the IDL omits item_index"
+        },
+        {"name": "mint", "kind": "account", "provenance": "declared"}
+      ]
+    },
+    {
+      "name": "purchase",
+      "summary": "Buy one item: moves lamports to the store authority and mints/transfers the item token to the buyer.",
+      "accounts": [
+        {"name": "buyer", "kind": "signer", "provenance": "declared"},
+        {"name": "store", "kind": "pda", "seeds": ["'store'", "authority"], "provenance": "declared"},
+        {"name": "item", "kind": "pda", "seeds": ["'item'", "store", "item_index"], "provenance": "recovered"},
+        {
+          "name": "buyer_token_account",
+          "kind": "ata",
+          "derived_from": ["buyer", "mint"],
+          "provenance": "recovered",
+          "note": "associated token account; mint must be read from the item account first"
+        },
+        {"name": "mint", "kind": "account", "read_from": "item", "provenance": "measured",
+         "note": "confirmed by executing purchase on a fork and observing the token movement"},
+        {"name": "token_program", "kind": "program", "provenance": "declared"}
+      ],
+      "derivation_order": [
+        "resolve store (needs authority)",
+        "resolve item (needs store + item_index)",
+        "read mint from item account",
+        "derive buyer_token_account (needs buyer + mint)"
+      ],
+      "measured": {
+        "compute_units": 24956,
+        "movement": {
+          "lamports": "buyer -> store authority (price)",
+          "token": "1 item token -> buyer_token_account"
+        }
+      }
+    }
+  ],
+  "intents": [
+    {"intent": "open a shop", "start": "initialize_store"},
+    {"intent": "sell something / add a product", "start": "list_item"},
+    {"intent": "buy a coffee / purchase an item", "start": "purchase"}
+  ]
+}

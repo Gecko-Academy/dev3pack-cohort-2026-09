@@ -1,0 +1,6 @@
+# Space-only dependencies. Local grading needs none of this (uv + the repo suffice).
+gradio>=5.0
+python-dotenv>=1.0.1
+# Uncomment the provider you configured in the Space secrets:
+# anthropic>=0.40
+# openai>=1.40

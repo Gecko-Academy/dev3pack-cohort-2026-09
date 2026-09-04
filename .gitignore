@@ -1,0 +1,14 @@
+.venv/
+.env
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.ipynb_checkpoints/
+dist/
+build/
+final_assignment/score_report.json
+certificate.svg
+cookbook/integrations/petshop_out/
+.bootcamp/
+progress.db

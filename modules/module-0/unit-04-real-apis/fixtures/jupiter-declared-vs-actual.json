@@ -1,0 +1,32 @@
+{
+  "_provenance": {
+    "spec": "https://developers.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml",
+    "probed": "2026-09-04",
+    "auth_sent": "none",
+    "method": "one GET per path with no Authorization header and no api key",
+    "is_evidence_of": "a mismatch between a published spec and a live endpoint, on this date",
+    "is_not_evidence_of": "a defect or a vulnerability. Keys plausibly gate rate tiers rather than access. The point is that a spec records what was documented, not what is enforced."
+  },
+  "paths": [
+    {
+      "path": "/search",
+      "spec_declares": "ApiKeyAuth",
+      "keyless_status": 200
+    },
+    {
+      "path": "/tag",
+      "spec_declares": "ApiKeyAuth",
+      "keyless_status": 200
+    },
+    {
+      "path": "/{category}/{interval}",
+      "spec_declares": "ApiKeyAuth",
+      "keyless_status": 200
+    },
+    {
+      "path": "/recent",
+      "spec_declares": "ApiKeyAuth",
+      "keyless_status": 200
+    }
+  ]
+}
