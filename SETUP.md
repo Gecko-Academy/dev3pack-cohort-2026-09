@@ -50,9 +50,9 @@ cd dev3pack-cohort-2026-09
 
 (HTTPS also works: `git clone https://github.com/Gecko-Academy/dev3pack-cohort-2026-09.git`)
 
-**The repository grows each week.** Week 1 is there on day one; week 2 appears on
-the Monday of week 2, and so on. Run `git pull` at the start of each week to get
-it. Nothing you have written is touched by a pull, because you never push to this
+**The repository grows each week.** Week 0, the prerequisite, is there now.
+Week 1 appears on Monday 14 September, week 2 on the 21st, week 3 on the 28th.
+Run `git pull` at the start of each week to get it. Nothing you have written is touched by a pull, because you never push to this
 repository — see *Saving your own work* below.
 
 ## 4. Install the project

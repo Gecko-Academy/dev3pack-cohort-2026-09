@@ -94,8 +94,10 @@ NEVER = {
 #: Solutions are withheld and released one session at a time, so a learner meets
 #: an exercise before its answer is a folder away — the whole point of the priced
 #: hint tier. The set of released chapters is recorded in the student repo, so a
-#: rebuild never silently un-releases one. Week-0 units and the depth track keep
-#: their own solutions; this gate is the fifteen graded sessions.
+#: rebuild never silently un-releases one. Every tree under `modules/` is gated,
+#: week-0 units included: their worked answer is `hint(reveal=True)`, and a unit's
+#: solutions can still be released by path (`--release-solutions
+#: modules/module-0/unit-01-environment`). The depth track keeps its own.
 SOLUTIONS = "solutions"
 RELEASED_SOLUTIONS_FILE = ".solutions-released"
 
@@ -266,6 +268,13 @@ def _prune_unreleased_solutions(destination: Path, released_solutions: frozenset
             shutil.rmtree(candidate)
 
 
+def _prune_empty_dirs(destination: Path) -> None:
+    """Drop directories a withdrawal emptied, so a withheld week leaves no husk."""
+    for path in sorted(destination.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+        if path.is_dir() and ".git" not in path.parts and not any(path.iterdir()):
+            path.rmdir()
+
+
 def _stale(destination: Path, week: int) -> list[Path]:
     """Files in the student repo that this week's release no longer includes.
 
@@ -347,6 +356,16 @@ def main(argv: list[str] | None = None) -> int:
     if missing:
         print(f"\n  not present in source, skipped: {', '.join(missing)}")
 
+    # Withdraw first, audit second. A previous publish may have left a now-
+    # withheld week on disk (going from week 1 back to week 0), and the audit
+    # must judge what this release leaves behind, not what the last one did.
+    withdrawn = _stale(destination, args.week)
+    for relative in withdrawn:
+        (destination / relative).unlink()
+    _prune_empty_dirs(destination)
+    if withdrawn:
+        print(f"\n  withdrew {len(withdrawn)} file(s) no longer in the release")
+
     problems = audit(destination, args.week)
     if problems:
         raise PublishError(
@@ -354,12 +373,6 @@ def main(argv: list[str] | None = None) -> int:
             + "\n  ".join(problems[:20])
             + (f"\n  ... and {len(problems) - 20} more" if len(problems) > 20 else "")
         )
-
-    withdrawn = _stale(destination, args.week)
-    for relative in withdrawn:
-        (destination / relative).unlink()
-    if withdrawn:
-        print(f"\n  withdrew {len(withdrawn)} file(s) no longer in the release")
 
     print(f"\n  {len(copied)} top-level entries copied, audit clean")
     subprocess.run(["git", "add", "-A"], cwd=destination, check=True)

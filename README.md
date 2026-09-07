@@ -23,6 +23,10 @@ surface through **MCP and Gecko** — safely.
 
 ## What This Is
 
+- **Week 0, self-paced and optional** — four 45-minute units (the fast lane)
+  and three short courses in the DataCamp shape: software-engineering
+  foundations, MCP, and data structures for agents. Offline, ungraded,
+  available now
 - **15 sessions** of 2 hours each, every one with a guide and Marp slides;
   sessions 1–14 add an exercise notebook plus an executable solutions notebook
   (session 15 is demo day)
@@ -48,6 +52,18 @@ surface through **MCP and Gecko** — safely.
 - **A local-model lane** — `BOOTCAMP_PROVIDER=ollama` runs a real model on
   your machine with no key and no SDK (the doctor checks server and model)
 
+## Start Here: Week 0
+
+[`modules/module-0/`](modules/module-0/) is open now. It is the floor session 1
+assumes: which Python is running, how to read a package instead of guessing at
+it, what a typed contract is, and how to make one real API call correctly.
+
+Short on time? Do **units 1–4**, about three hours in total. The three courses
+beside them go deeper — packages and documentation, MCP servers and clients,
+and the data structures an agent loop is made of — and nothing in the fifteen
+sessions waits for you to finish them. Come back to them whenever you like;
+they stay in the repository for the whole course.
+
 ## Quick Start
 
 Do this **before September 14** — full instructions in [`SETUP.md`](SETUP.md):
@@ -70,9 +86,10 @@ every notebook default to a deterministic offline `FakeLLM`.
 **Access and weekly releases.** The repository is private and you are invited by
 email, so send us the address on your GitHub account. You get **read** access,
 which means nothing you do can break the course for anyone else. The repository
-**grows each week**: week 1 is there on day one, week 2 arrives on the Monday of
-week 2. Run `git pull` at the start of each week. Full detail, including how to
-back up your own work, is in [`SETUP.md`](SETUP.md).
+**grows each week**: week 0 is there now, week 1 arrives on Monday 14 September,
+week 2 on the 21st, and week 3 on the 28th. Run `git pull` at the start of each
+week. Full detail, including how to back up your own work, is in
+[`SETUP.md`](SETUP.md).
 
 ## Checking Your Own Work
 
