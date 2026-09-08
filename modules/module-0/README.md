@@ -1,12 +1,15 @@
 # Week 0 — the prerequisite
 
-Four units, self-paced, about **45 minutes each**. Do them before Monday
-14 September. Nothing in the fifteen sessions waits for you to finish, but
-session 1 assumes the floor these units build.
+A fast lane of four units, self-paced, about **45 minutes each**, and beside
+it the long-form courses in the DataCamp lesson shape. Do the fast lane before
+Monday 14 September. Nothing in the fifteen sessions waits for you to finish,
+but session 1 assumes the floor these units build.
 
 Everything runs offline. No API key, no cloud account, no cost.
 
-## The units
+Short on time? Do units 1–4 and come back for the courses.
+
+## The fast lane
 
 | # | Unit | The thing you leave with |
 |---|---|---|
@@ -16,6 +19,44 @@ Everything runs offline. No API key, no cloud account, no cost.
 | 4 | [Calling a real API](unit-04-real-apis/) | A call built right the first time, and what a specification does **not** tell you |
 
 Take them in order. Unit 1 fixes the setup problem that otherwise ruins unit 2.
+
+## Course A — Software engineering foundations
+
+Four units, about **60 minutes each**, one per chapter of the DataCamp course
+*Software Engineering Principles in Python*, translated and pointed at this
+repo. Each unit has slides, a notebook and a solutions notebook.
+
+| # | Unit | The thing you leave with |
+|---|---|---|
+| 5 | [Packages, PyPI and PEP 8](unit-05-packages-and-pep8/) | `help()` before you call, `ruff` before you share, and the three shapes modular Python comes in |
+| 6 | [A portable package](unit-06-portable-packages/) | A requirement that pins and one that floats, a package a script can import, and the docstring `help()` shows |
+| 7 | [Classes in a package](unit-07-classes-in-packages/) | A class that keeps its docstring's promise, inheritance that calls the parent, and the `_` that marks a method non-public |
+| 8 | [Documentation, tests and readability](unit-08-docs-tests-readability/) | A docstring `doctest` can run, a `pytest` file that goes red then green, and a name that says what the function is for |
+
+## Course B — MCP: AI apps as easy as 1, 2, 3
+
+Three units, about **60 minutes each**, one per chapter of the DataCamp course
+*Introduction to Model Context Protocol*. You write a real server and talk to
+it with a real client. Everything runs offline: the conversion behind the tool
+is computed locally from a recorded table of zone offsets, the model in the
+loop is the repo's deterministic fake, and the third-party surface is a
+recorded tool list, so no key and no network are needed.
+
+| # | Unit | The thing you leave with |
+|---|---|---|
+| 9 | [Your first MCP server](unit-09-mcp-first-server/) | A tool whose hints are its schema and whose docstring is its description, a client that starts it over stdio, and one call made with the argument names the schema declares |
+| 10 | [Resources, prompts, and the LLM](unit-10-mcp-resources-prompts-llms/) | A resource that lists one thing per line, a prompt whose name is not its title, a five-step tool call whose result reaches the model, and a clarifying question where a converted time would have been a guess |
+| 11 | [Databases, APIs, and third-party servers](unit-11-mcp-data-apis-third-party/) | A query the caller cannot finish writing, a credential the client never sees, and the three questions to ask a server somebody else runs |
+
+## Course C — Data structures for agents
+
+One unit, about **60 minutes**, four lessons. Every example is the course's
+own data: the corpus, the golden set, the agent loop, and the storefront
+program graph session 13 walks.
+
+| # | Unit | The thing you leave with |
+|---|---|---|
+| 12 | [Data structures for agents](unit-12-dsa-for-agents/) | A lookup you timed before trusting it, a dedupe that keeps the order seen, a tree walk that stops at its budget, and a derive order that is a topological sort, or `None` on a cycle |
 
 ## How to run one
 

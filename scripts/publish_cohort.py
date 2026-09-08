@@ -199,7 +199,16 @@ def audit(tree: Path, week: int) -> list[str]:
 
 #: Copied but never carried into a module chapter — solutions are added back
 #: only for the released chapters, one at a time.
-_COPY_IGNORE = ("__pycache__", "*.pyc", ".ipynb_checkpoints", ".venv", "*.egg-info")
+_COPY_IGNORE = (
+    "__pycache__",
+    "*.pyc",
+    ".ipynb_checkpoints",
+    ".venv",
+    "*.egg-info",
+    # gitignored, tens of thousands of files; copying it is what made a publish crawl
+    "node_modules",
+    ".git",
+)
 
 
 def build(

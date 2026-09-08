@@ -1,0 +1,46 @@
+# Unit 12: Data structures for agents
+
+**Self-paced · about 60 minutes · Course C, one unit**
+
+## Learning objectives
+
+- Measure a lookup with `timeit` before deciding whether it is fast enough, and read the number as the thing that tells you which world you are in.
+- Pick a list, a dict or a set on purpose: one of each, found by key, in the order seen.
+- Write a walk over a tool-call tree that stops at a budget, whatever the tree looks like.
+- Turn "derive X before Y" edges into an order, and recognise a cycle as a gap rather than an order.
+
+## Lessons
+
+| Lesson | What you leave with |
+|---|---|
+| 1. Big-O, then measure | The five shapes of cost with a course example each, and a `timeit` figure for a scan against a dict lookup |
+| 2. list, dict, set | Dedupe with a set, index by doc id with a dict, key a chunk by a tuple; why a list cannot be a key |
+| 3. Stack, queue, recursion | The agent loop as a `deque` of pending tool calls with a budget, and a recursive walk that stops |
+| 4. Trees and graphs | BFS, DFS and topological order over the storefront fixture; derive order is a topological sort |
+
+## Checking your answers
+
+Every exercise in `notebook.ipynb` has the same shape: context, numbered
+instructions, a starter that runs as shipped and gives a wrong or incomplete
+answer (marked `<------ EDIT THIS LINE`), the expected output, and a
+`check(...)` cell that prints ✅ or ❌ with the fix named. The last cell,
+`review("w12")`, is the scorecard.
+
+The checks here judge behaviour, not text. The timing check refuses a pair of
+numbers a scan-versus-lookup measurement cannot produce. The dedupe check runs
+your function on two lists whose first-seen orders differ. The walk runs on a
+node whose children contain itself, under a deadline. The order check hands
+you the fixture's edges reversed, then a cycle.
+
+Working with a coding assistant: give it the exercise's context and
+instructions, let it edit the marked lines, then run the check cell yourself.
+You read the verdict, not the assistant. `solutions/notebook.ipynb` is the
+reference; open it after the check, not before.
+
+## Slides
+
+`slides.md` is a [Marp](https://marp.app) deck. Read it as Markdown, or render it:
+
+```bash
+npx @marp-team/marp-cli slides.md -o slides.pdf
+```

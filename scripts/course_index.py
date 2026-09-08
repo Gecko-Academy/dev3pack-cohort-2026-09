@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from bootcamp_agent.curriculum import (  # noqa: E402
     CHAPTERS,
+    WEEK0_COURSES,
     WEEK0_UNITS,
     WEEK_TITLES,
     exercise_ids,
@@ -45,18 +46,22 @@ def render() -> str:
     lines += [
         "## Week 0: the prerequisite",
         "",
-        "Self-paced, before Monday 14 September. Four units, about 45 minutes each,",
-        "all offline. No date: these are done when you do them.",
+        f"Self-paced, before Monday 14 September. {len(WEEK0_UNITS)} units, all offline.",
+        "No date: these are done when you do them.",
+        "Short on time? The fast lane is the floor session 1 assumes; the courses",
+        "beside it are the long form.",
         "",
-        "| # | Unit | Checks |",
-        "|---|---|---|",
     ]
-    for unit in WEEK0_UNITS:
-        lines.append(
-            f"| {unit.number} | [{unit.title}]({unit.directory.relative_to(ROOT)}/) | "
-            f"{len(unit_exercise_ids(unit.prefix))} |"
-        )
-    lines.append("")
+    for course in WEEK0_COURSES:
+        lines += [f"### {course}", "", "| # | Unit | Checks |", "|---|---|---|"]
+        for unit in WEEK0_UNITS:
+            if unit.course != course:
+                continue
+            lines.append(
+                f"| {unit.number} | [{unit.title}]({unit.directory.relative_to(ROOT)}/) | "
+                f"{len(unit_exercise_ids(unit.prefix))} |"
+            )
+        lines.append("")
 
     for module in sorted(WEEK_TITLES):
         chapters = [chapter for chapter in CHAPTERS if chapter.module == module]

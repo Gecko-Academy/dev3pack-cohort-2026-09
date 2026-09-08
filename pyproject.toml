@@ -24,6 +24,7 @@ dev = [
   "nbclient>=0.10",
   "ipykernel>=6.29",
   "pyyaml>=6.0",
+  "mcp>=2",  # 2.x renamed FastMCP to MCPServer; the deck predates the rename
 ]
 
 [project.scripts]

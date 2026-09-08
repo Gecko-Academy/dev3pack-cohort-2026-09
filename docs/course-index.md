@@ -11,8 +11,12 @@ a README (the session guide), `slides.md`, an exercise `notebook.ipynb` and a
 
 ## Week 0: the prerequisite
 
-Self-paced, before Monday 14 September. Four units, about 45 minutes each,
-all offline. No date: these are done when you do them.
+Self-paced, before Monday 14 September. 12 units, all offline.
+No date: these are done when you do them.
+Short on time? The fast lane is the floor session 1 assumes; the courses
+beside it are the long form.
+
+### The fast lane
 
 | # | Unit | Checks |
 |---|---|---|
@@ -20,6 +24,29 @@ all offline. No date: these are done when you do them.
 | 2 | [Packages and documentation](modules/module-0/unit-02-packages-and-docs/) | 3 |
 | 3 | [Classes and contracts](modules/module-0/unit-03-classes-and-contracts/) | 3 |
 | 4 | [Calling a real API](modules/module-0/unit-04-real-apis/) | 4 |
+
+### Course A — Software engineering foundations
+
+| # | Unit | Checks |
+|---|---|---|
+| 5 | [Packages, PyPI and PEP 8](modules/module-0/unit-05-packages-and-pep8/) | 3 |
+| 6 | [A portable package](modules/module-0/unit-06-portable-packages/) | 3 |
+| 7 | [Classes in a package](modules/module-0/unit-07-classes-in-packages/) | 4 |
+| 8 | [Documentation, tests and readability](modules/module-0/unit-08-docs-tests-readability/) | 3 |
+
+### Course B — MCP: AI apps as easy as 1, 2, 3
+
+| # | Unit | Checks |
+|---|---|---|
+| 9 | [Your first MCP server](modules/module-0/unit-09-mcp-first-server/) | 3 |
+| 10 | [Resources, prompts, and the LLM](modules/module-0/unit-10-mcp-resources-prompts-llms/) | 4 |
+| 11 | [Databases, APIs, and third-party servers](modules/module-0/unit-11-mcp-data-apis-third-party/) | 3 |
+
+### Course C — Data structures for agents
+
+| # | Unit | Checks |
+|---|---|---|
+| 12 | [Data structures for agents](modules/module-0/unit-12-dsa-for-agents/) | 4 |
 
 ## Week 1: Foundations and coding-assistant setup
 
@@ -59,7 +86,7 @@ Mon 28 Sep to Fri 02 Oct
 
 ## Totals
 
-- 4 week-0 units, then 15 sessions, 12 of them running unattended in CI.
+- 12 week-0 units, then 15 sessions, 12 of them running unattended in CI.
 - 31 scored exercises across the course.
 - Three chapters need a human or a hosted surface, and each says which in the
   table above. That is a property of the lesson, not a gap in the tooling.

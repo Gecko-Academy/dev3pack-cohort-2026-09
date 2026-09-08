@@ -1,0 +1,23 @@
+{
+  "_provenance": {
+    "computed": "2026-09-07",
+    "source": "Python 3.11 zoneinfo over the IANA database, the UTC offset of each zone on 2025-01-20",
+    "lane": "computed",
+    "is_evidence_of": "the UTC offset of twelve zones in January, which is enough for every example the deck makes",
+    "is_not_evidence_of": "any other month. Seven of these zones move an hour in summer. The deck's public API knows that; this table does not, and the notebooks say so."
+  },
+  "zones": {
+    "Africa/Abidjan": 0,
+    "America/Halifax": -4,
+    "America/New_York": -5,
+    "America/Sao_Paulo": -3,
+    "America/Toronto": -5,
+    "America/Vancouver": -8,
+    "Asia/Tokyo": 9,
+    "Australia/Sydney": 11,
+    "Europe/Berlin": 1,
+    "Europe/Lisbon": 0,
+    "Europe/London": 0,
+    "Europe/Paris": 1
+  }
+}

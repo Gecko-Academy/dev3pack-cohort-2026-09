@@ -106,6 +106,9 @@ class Unit:
     number: int
     slug: str
     title: str
+    #: The course a unit belongs to. Units 1-4 are the fast lane; the three
+    #: courses beside them are the long form, in the DataCamp lesson shape.
+    course: str = "The fast lane"
 
     @property
     def prefix(self) -> str:
@@ -128,7 +131,58 @@ WEEK0_UNITS: tuple[Unit, ...] = (
     Unit(2, "unit-02-packages-and-docs", "Packages and documentation"),
     Unit(3, "unit-03-classes-and-contracts", "Classes and contracts"),
     Unit(4, "unit-04-real-apis", "Calling a real API"),
+    Unit(
+        5,
+        "unit-05-packages-and-pep8",
+        "Packages, PyPI and PEP 8",
+        course="Course A — Software engineering foundations",
+    ),
+    Unit(
+        6,
+        "unit-06-portable-packages",
+        "A portable package",
+        course="Course A — Software engineering foundations",
+    ),
+    Unit(
+        7,
+        "unit-07-classes-in-packages",
+        "Classes in a package",
+        course="Course A — Software engineering foundations",
+    ),
+    Unit(
+        8,
+        "unit-08-docs-tests-readability",
+        "Documentation, tests and readability",
+        course="Course A — Software engineering foundations",
+    ),
+    Unit(
+        9,
+        "unit-09-mcp-first-server",
+        "Your first MCP server",
+        course="Course B — MCP: AI apps as easy as 1, 2, 3",
+    ),
+    Unit(
+        10,
+        "unit-10-mcp-resources-prompts-llms",
+        "Resources, prompts, and the LLM",
+        course="Course B — MCP: AI apps as easy as 1, 2, 3",
+    ),
+    Unit(
+        11,
+        "unit-11-mcp-data-apis-third-party",
+        "Databases, APIs, and third-party servers",
+        course="Course B — MCP: AI apps as easy as 1, 2, 3",
+    ),
+    Unit(
+        12,
+        "unit-12-dsa-for-agents",
+        "Data structures for agents",
+        course="Course C — Data structures for agents",
+    ),
 )
+
+#: Course order for the index: the fast lane first, then the long form.
+WEEK0_COURSES: tuple[str, ...] = tuple(dict.fromkeys(unit.course for unit in WEEK0_UNITS))
 
 
 BY_ID: dict[str, Chapter] = {chapter.chapter_id: chapter for chapter in CHAPTERS}

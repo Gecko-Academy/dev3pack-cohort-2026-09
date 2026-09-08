@@ -1,0 +1,75 @@
+# Unit 11: Databases, APIs, and third-party servers
+
+**Self-paced · about 60 minutes · Course B, chapter 3 of 3**
+
+## Learning objectives
+
+- Open one database connection at startup, reuse it in every handler, and close it when the server stops.
+- Write a query the caller cannot finish writing, and watch what happens when you do not.
+- Read a credential server-side, and keep it out of the schema, out of the result, and out of the source.
+- Ask the three questions before pointing a model at a server somebody else runs.
+
+## Lessons
+
+| Lesson | What you leave with |
+|---|---|
+| 1. MCP database integrations | SQLite behind a tool, `?` placeholders, read-only intent, and a row limit |
+| 2. MCP API integrations | Timeouts, error handling, and a key the client never touches |
+| 3. Third-party MCP servers | Trust, security, surface area, applied to a surface you will actually use |
+| 4. Course recap | What units 9, 10 and 11 each added, and what carries past the course |
+
+## Checking your answers
+
+Every exercise in `notebook.ipynb` has the same shape: context, numbered
+instructions, a starter that runs as shipped and gives a wrong or incomplete
+answer (marked `<------ EDIT THIS LINE`), the expected output, and a
+`check(...)` cell that prints ✅ or ❌ with the fix named. The last cell,
+`review("w11")`, is the scorecard.
+
+Both starters here **work**, and that is the lesson. The first answers `Europe`
+correctly and answers a quoted string with a row that was never in the table.
+The second answers correctly while handing your credential back to whoever
+called it.
+
+So the first two checks read your server file twice. First with `ast`, because
+both mistakes are invisible at runtime on a well-behaved input: the parser is
+where a query built by interpolation and a key in a parameter list can actually
+be seen. Then over the wire, with the same probe unit 9 used, because a file
+that parses is not a server that answers.
+
+The third exercise is prose, and it is checked as prose: no placeholders, a
+finished sentence each, nothing longer than something you would say out loud,
+and the surface-area answer has to name the number it is about.
+
+Working with a coding assistant: give it the exercise's context and
+instructions, let it edit the marked lines, then run the check cell yourself.
+You read the verdict, not the assistant. `solutions/notebook.ipynb` is the
+reference; open it after the check, not before.
+
+## Offline, and honest about it
+
+The **database** is real SQLite, built in a temp directory from unit 9's
+recorded table of twelve January zone offsets. The injection is real too: run
+the starter and read the extra row.
+
+The **API** is not. `requests` is not installed in this repo and this unit does
+not add it, so lesson 2 shows the deck's `requests.post` on a slide as the
+source, and the notebook's tool builds the same headers and payload and then
+does the arithmetic locally. The line the exercise is about, the one that
+decides where the credential comes from, is the real thing.
+
+The **third-party server** is a recorded tool list in
+`fixtures/orquestra-tools.json`: sixteen names read from the hosted surface on
+2026-09-03, copied from `modules/module-3/chapter-13/fixtures/`. It is evidence
+of what that surface listed on that day and nothing else, which its own
+provenance note says out loud. Nothing in this unit installs
+`open-library-server`, and nothing here touches the network. Session 13
+connects to the surface itself.
+
+## Slides
+
+`slides.md` is a [Marp](https://marp.app) deck. Read it as Markdown, or render it:
+
+```bash
+npx @marp-team/marp-cli slides.md -o slides.pdf
+```

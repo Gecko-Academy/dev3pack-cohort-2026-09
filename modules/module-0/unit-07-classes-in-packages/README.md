@@ -1,0 +1,39 @@
+# Unit 7 — Classes in a package
+
+**Self-paced · about 60 minutes · Course A, chapter 3 of 4**
+
+## Learning objectives
+
+- Write a class whose `__init__` keeps the promise its docstring makes.
+- Inherit from a class without losing its state, by calling the parent's `__init__` or `super()`.
+- Mark an internal step non-public with a leading underscore, and compute a public attribute once.
+
+## Lessons
+
+| Lesson | What you leave with |
+|---|---|
+| 1. Adding classes to a package | `__init__`, `self`, and the attribute a docstring promises |
+| 2. Classes and the DRY principle | Inheritance that calls the parent, and the Protocol this repo uses instead |
+| 3. Multilevel inheritance | `super()`, the MRO, and `dir()` for finding where an attribute came from |
+| 4. Leveraging classes | `tokens` set once in `__init__`, `_tokenize` non-public, and why the underscore matters |
+
+## Checking your answers
+
+Every exercise in `notebook.ipynb` has the same shape: context, numbered
+instructions, a starter that runs as shipped and gives a wrong or incomplete
+answer (marked `<------ EDIT THIS LINE`), the expected output, and a
+`check(...)` cell that prints ✅ or ❌ with the fix named. The last cell,
+`review("w07")`, is the scorecard.
+
+Working with a coding assistant: give it the exercise's context and
+instructions, let it edit the marked lines, then run the check cell yourself.
+You read the verdict, not the assistant. `solutions/notebook.ipynb` is the
+reference; open it after the check, not before.
+
+## Slides
+
+`slides.md` is a [Marp](https://marp.app) deck. Read it as Markdown, or render it:
+
+```bash
+npx @marp-team/marp-cli slides.md -o slides.pdf
+```

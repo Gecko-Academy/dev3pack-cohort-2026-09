@@ -1,0 +1,30 @@
+{
+  "_provenance": {
+    "recorded": "2026-09-03",
+    "surface": "https://mcp.geckovision.tech/orquestra/mcp",
+    "lane": "documented",
+    "protocol": "2025-11-25",
+    "count": 16,
+    "copied_from": "modules/module-3/chapter-13/fixtures/orquestra-tools.json",
+    "is_evidence_of": "which tools that surface listed on the day it was read, and nothing about what they do when called",
+    "is_not_evidence_of": "that the surface still lists these sixteen today, or that any of them was called. This is a RECORDED list, not a live claim. Unit 11 uses it to count surface area without asking the network for permission; session 13 connects to the surface itself."
+  },
+  "tools": [
+    "start",
+    "find_start",
+    "list_programs",
+    "comprehend_program",
+    "prepare_purchase",
+    "try_purchase",
+    "list_stores",
+    "plan_payment",
+    "plan_swap",
+    "verify_signed_transaction",
+    "submit_transaction",
+    "read_accounts",
+    "prepare_instruction",
+    "derive_ata",
+    "derive_pda",
+    "program_lifecycle"
+  ]
+}
