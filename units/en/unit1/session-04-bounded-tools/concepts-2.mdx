@@ -1,0 +1,108 @@
+# Boundary tests: oversized input, forbidden targets [[boundary-tests]]
+
+## Never trust an argument the model produced
+
+```python
+print(tools["search_documents"].run(query="prompt injection defenses", max_results=999))
+try:
+    tools["get_document_metadata"].run(doc_id="totally-made-up")
+except ToolError as error:
+    print(f"ToolError: {error}")
+```
+
+```
+[prompt-injection] (score 6.79)
+Any channel that feeds text into the prompt is an injection surface. For a RAG
+assistant that means the corpus itself: a document ...
+...                                      <- 5 results, not 999
+
+ToolError: get_document_metadata: unknown doc_id 'totally-made-up';
+           valid ids: ['agent-loops', 'evaluation-basics', 'mcp-overview', ...]
+```
+
+Two boundaries, two different responses, and the difference matters.
+
+## Clamp or refuse
+
+| Argument | Response | Why |
+|---|---|---|
+| `max_results=999` | **clamp** to 5, answer anyway | the intent was fine, the number was not |
+| `doc_id="totally-made-up"` | **refuse**, and name the valid ids | there is no correct answer to guess at |
+
+```python
+capped = max(1, min(int(max_results), MAX_SEARCH_RESULTS))
+```
+
+That line is the whole oversized-input defense. The cap lives in the app, in a
+constant, applied on every call. It is not in the prompt, not in the tool
+description, not a request. A number in a description is documentation; a number
+in `min()` is a boundary.
+
+## A refusal is a message to a model
+
+`ToolError` messages are written for the caller that will read them next, which
+is a model deciding what to do second:
+
+- names the tool, so a trace is readable
+- names what was wrong with the argument
+- **names the valid options**, so the retry can be correct
+
+A stack trace teaches the model nothing and costs a turn. `unknown doc_id
+'totally-made-up'; valid ids: [...]` gets the next call right. This is the same
+"design the refusal" rule as session 3's `needs_human_review`, one layer down.
+
+## The forbidden target
+
+`convert_currency` reaches the outside world, and that is a different class of
+boundary: not "is this number too big" but "may this tool go there at all".
+
+```python
+ALLOWED_HOSTS = {"api.frankfurter.dev"}
+
+
+def allowed_url(url: str) -> str:
+    parsed = urlparse(url)
+    if parsed.scheme != "https" or parsed.hostname not in ALLOWED_HOSTS:
+        raise ToolError(f"allowed_url: refused {url!r}; allowed: https on {sorted(ALLOWED_HOSTS)}")
+    return url
+```
+
+```
+allowed: https://api.frankfurter.dev/v1/latest?base=USD
+refused: allowed_url: refused 'file:///etc/passwd'; allowed: https on ['api.frankfurter.dev']
+refused: allowed_url: refused 'http://169.254.169.254/latest/meta-data/'; allowed: https on ['api.frankfurter.dev']
+```
+
+An allow-list, not a block-list. A block-list is a list of the attacks you
+thought of. Two targets to know by sight:
+
+| Target | What it is |
+|---|---|
+| `file:///etc/passwd` | the scheme change — same function, no network, your disk |
+| `169.254.169.254` | the cloud metadata address; on a hosted box it hands out credentials |
+
+The same rule covers paths: a tool that takes a filename takes `../../.env`
+unless it resolves the path and checks it is inside the directory you meant.
+Better still, do not take a path — take a `doc_id` from a set you control.
+
+## Refuse first, fetch second
+
+Order is a security property. The check for exercise 2 injects an offline
+`fetch`, so a tool that validates *after* fetching fails it — and in production
+that same tool has already made the call it should have refused.
+
+| Argument | Rule | Before or after the network call |
+|---|---|---|
+| `amount` | positive | before |
+| `source`, `target` | three uppercase letters | before |
+| `target` in rates | known, or name the known ones | after, on the fetched data |
+
+`source` also goes into the URL, so validating its shape before the fetch is
+the argument check and the injection defense at once.
+
+## The failure this lesson must handle
+
+Oversized input, and a forbidden path or domain. Both are exercised in the
+notebook: `max_results=999` returns five results, `file:///etc/passwd` and the
+metadata address return refusals with the reason. Neither one raises a stack
+trace, and neither one gets through.

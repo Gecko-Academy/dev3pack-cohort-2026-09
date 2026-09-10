@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: Why does the lab give `run_loop` a written plan instead of asking a model what to call next?
+
+<Question
+  choices={[
+    { text: "A model would be too slow for a two-hour session", explain: "Speed is not the issue. FakeLLM answers instantly and still could not be made to spin on demand." },
+    { text: "A scripted plan makes every exit reachable on purpose, so the loop is testable", explain: "Correct. You cannot write a test that says 'and now the model repeats itself'. With a plan, the repetition and budget exits are reachable every run.", correct: true },
+    { text: "Because a real agent does not need a model", explain: "It needs one for the decide beat. The plan stands in for that one beat so the other three can be tested." },
+  ]}
+/>
+
+### Q2: A four-step plan runs under `budget=2`. What must be true of the receipt?
+
+<Question
+  choices={[
+    { text: "Two steps recorded, and the third call never reached the tool", explain: "Correct. The budget is checked before the call, so the call you were not allowed to make is never paid for.", correct: true },
+    { text: "Four steps recorded, with the last two marked over budget", explain: "That records four calls, which means four calls ran. The budget is a cap on spending, not a label applied afterwards." },
+    { text: "Two steps recorded, and the third call ran but was discarded", explain: "The result was discarded; the latency and the cost were not. Check before the call." },
+  ]}
+/>
+
+### Q3: The loop sees `list_documents(tag="retrieval")` twice in a row and stops. Why is that its own exit rather than a job for the budget?
+
+<Question
+  choices={[
+    { text: "The budget would eventually stop it too, so either exit is fine", explain: "It would stop it after paying for the whole budget, and the receipt would then blame a budget that was never the problem." },
+    { text: "Repetition names the fault; a budget stop sends the reader to raise a limit that was fine", explain: "Correct. Two exits, two diagnoses. The receipt has to say what actually went wrong.", correct: true },
+    { text: "Repeated calls are always a model bug, and budgets are always an app bug", explain: "Both are the app's to handle. The distinction is what the receipt tells the person reading it." },
+  ]}
+/>
+
+### Q4: A tool raises `ToolError` on the third call of a run. What does the finished loop return?
+
+<Question
+  choices={[
+    { text: "It re-raises, so the caller sees the real error", explain: "The caller sees a traceback and loses the two steps that succeeded. A raised error is not a receipt." },
+    { text: "`stopped_because='tool_error'`, the two earlier steps, and a refusal naming the tool", explain: "Correct. The successful work survives, and whoever reads the receipt knows which tool went away.", correct: true },
+    { text: "`stopped_because='budget'` with `answer` set to the error message", explain: "That reports the wrong exit and puts a failure where an answer belongs. Only an answer step sets `answer`." },
+  ]}
+/>
+
+### Q5: Why does every exit return all four receipt keys, even the ones it does not use?
+
+<Question
+  choices={[
+    { text: "So a caller can read `stopped_because` without branching first", explain: "Correct. A shape that changes with the outcome forces a branch on every read, and the forgotten branch is the one that mattered.", correct: true },
+    { text: "Because JSON requires a fixed schema", explain: "It does not. This is a design choice about the contract, not a serialization constraint." },
+    { text: "To keep the receipt the same length in every run", explain: "`steps` varies with the run. It is the keys that stay fixed, not the size." },
+  ]}
+/>

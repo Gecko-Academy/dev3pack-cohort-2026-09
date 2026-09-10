@@ -1,0 +1,89 @@
+# The loop, and the plan that stands in for a model [[loop-anatomy]]
+
+## An agent is a loop you own
+
+Session 4 gave you tools: bounded functions with contracts, validated at the
+boundary. A tool on its own does nothing. Something has to decide which one to
+call, execute it, look at the result, and decide again. That something is the
+loop, and it is yours.
+
+The model contributes one thing per iteration: a decision. Everything that makes
+the loop safe belongs to the application.
+
+## The four beats
+
+| Beat | Who | In our code |
+|---|---|---|
+| Perceive | you | the question, the retrieved passages, the previous results |
+| **Decide** | **the model** | answer now, or call this tool with these arguments |
+| Act | you | validate at the boundary, then execute |
+| Observe | you | append the result, or the typed error, and go round again |
+
+Three of the four are deterministic. That ratio is why an agent can be tested at
+all.
+
+## Plan → act → observe
+
+`run_loop` walks a list. Each entry is one decision:
+
+```python
+plan = [
+    {"tool": "list_documents", "args": {"tag": "retrieval"}},
+    {"tool": "convert_currency", "args": {"amount": 100, "source": "USD", "target": "EUR"}},
+    {"tool": "answer", "args": {"text": "rag-basics covers retrieval, and 100 USD is 92.00 EUR."}},
+]
+```
+
+Act: `toolsname — opens Fri 18 Sep`. Observe: append `{"tool", "args", "result"}` to
+`steps`. Then the next entry. The `answer` entry is not a call — it is the
+decision to stop, and it carries the text.
+
+## Why a scripted plan is enough
+
+Ask a model for the plan and the loop becomes untestable in the exact places
+that matter. The budget exit only fires when the model happens to want a sixth
+call. The repetition exit only fires when it happens to repeat itself. You
+cannot write a test that says "and now the model spins", so those branches ship
+unexercised.
+
+Write the plan down and every exit becomes reachable on purpose:
+
+| Plan | Exit it reaches |
+|---|---|
+| two calls, then `answer` | `answered` |
+| the same call three times | `repeated_call` |
+| four calls under `budget=2` | `budget` |
+| a call to a tool that raises | `tool_error` |
+
+Those four plans are exactly what `ch05-e2` runs against your loop. No model, no
+network, the same verdict on every machine.
+
+## What the scripted plan is not
+
+It is not a simplification you throw away later. Swapping the list for a model
+call changes one line — where `name` and `args` come from — and nothing else.
+Session 8 makes that swap and measures what it costs. Until then, the four
+safeguards are the whole lesson, and a model in the middle of them would only
+make them harder to see.
+
+There is also a version of this that is not a teaching device at all. When the
+steps are known in advance, a fixed chain is the correct design: fewer failure
+modes, no model spend, a trace you can predict. The professional question is
+never "how autonomous can I make this" but "what is the least autonomy that
+passes the eval."
+
+## The loop you already have
+
+`answer_question` in `src/bootcamp_agent/agent.py` is this shape, one level up.
+Its trace prints its beats:
+
+```
+[retrieve] top_k=3 -> [('prompt-injection', 1), ('prompt-injection', 0), ...
+[llm_call] attempt 1: 121 chars
+[decision] answered with citations []
+```
+
+Read it before you write anything. It already has three designed exits: refuse
+when retrieval comes back empty, retry once when the model breaks the output
+contract, refuse again when the retry breaks it too. Your `run_loop` adds three
+more, on the tool side.

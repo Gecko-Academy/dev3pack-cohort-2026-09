@@ -1,0 +1,145 @@
+# Failing closed [[failing-closed]]
+
+## What "closed" means here
+
+A call through the seam has three honest endings: the text, a named error with
+the fix in it, or a refusal your caller can act on. It has one dishonest
+ending, and that is a plausible answer produced by something other than a
+model. Failing closed is the rule that removes the fourth ending.
+
+Two constraints ride along. An error message may name the environment variable
+and must never print its value. And the failure has to arrive as your type, not
+as whatever the vendor's library happened to raise.
+
+## Failure 1: the credential that is not there
+
+```python
+get_client(Settings(provider="anthropic", model=None, api_key=None, base_url=None))
+```
+
+```
+ConfigError: Provider 'anthropic' needs an API key in the environment;
+see .env.example. (The key itself is never printed.)
+```
+
+It raises before the SDK is constructed and before any request leaves the
+machine, so there is nothing to leak and nothing to bill. The message names
+`.env.example`, which is the file that lists the variable. A message that
+echoed the key, or a prefix of it, would put a secret in a notebook output and
+then in a pull request.
+
+The neighbouring failure is the missing package. `import anthropic` runs inside
+that client's `__init__`, so an uninstalled SDK surfaces as an `ImportError`
+when you ask for that lane, and the preflight turns it into
+`SDK missing; run: uv sync --extra anthropic`.
+
+## Failure 2: the model that lane does not serve
+
+The provider name is checked in your process, at config time:
+
+```python
+load_settings(env={"BOOTCAMP_PROVIDER": "gpt-9"})
+```
+
+```
+ConfigError: Unknown BOOTCAMP_PROVIDER 'gpt-9';
+expected one of ('fake', 'ollama', 'anthropic', 'openai')
+```
+
+The *model* name cannot be checked that way, because only the provider knows
+what it serves. So the local lane asks. `probe()` lists the server's models
+without sending a prompt, and reports a model that is not pulled as a fix
+line: `model 'qwen2.5:7b-instruct' is not pulled; run: ollama pull
+qwen2.5:7b-instruct`. If you skip the probe and send the prompt anyway, the
+server answers `HTTP 404` and `OllamaClient` raises:
+
+```
+OllamaError: Ollama answered HTTP 404 for model 'qwen2.5:7b-instruct'.
+Pull it with: ollama pull qwen2.5:7b-instruct
+```
+
+One rule holds across both: **the error carries the command that fixes it.**
+An error a learner cannot act on costs the same to raise and teaches nothing.
+
+## Failure 3: the call that runs past its deadline
+
+Every adapter that touches the network has a deadline. `OllamaClient` takes
+`timeout: float = 120` and passes it to `urllib`, which raises `TimeoutError`
+when the deadline passes. The adapter catches that, together with the other
+transport errors, and raises `OllamaError`.
+
+Two things follow, and the second one is easy to get wrong.
+
+First, a timeout arrives at your code as an exception, from a thread of control
+you do not own, at the one point where you have no answer to give. Second, the
+local adapter maps "no server", "timed out" and any other `OSError` onto the
+same message. So your refusal should state what you know — the model did not
+answer in time — and not invent a cause it cannot see. Catch both types:
+
+```python
+except (TimeoutError, OllamaError) as error:
+```
+
+## The refusal, as a value
+
+```python
+def answer_with_timeout(question: str) -> AgentResult:
+    try:
+        text = TimeoutLLM().complete(system="You are concise.", user=question)
+    except (TimeoutError, OllamaError) as error:
+        return AgentResult(
+            answer=ResearchAnswer(
+                answer="The model did not respond in time.",
+                citations=(),
+                confidence=0.0,
+                needs_human_review=True,
+            ),
+            trace=(TraceEvent("decision", f"timeout: {error}"),),
+        )
+    ...
+```
+
+`ResearchAnswer` is the course's answer contract; session 3 builds its parser,
+and session 5 builds the agent that returns `AgentResult`. Today you only need
+the refusal shape. Four things make it a refusal rather than a lie:
+
+| Field | Value | Why |
+|---|---|---|
+| `answer` | what happened, in one sentence | the caller can show it to a human |
+| `citations` | empty | a call that never happened supports nothing |
+| `confidence` | `0.0` | there is no answer to be confident about |
+| `needs_human_review` | `True` | this is the flag downstream code routes on |
+
+The trace keeps the cause. The refusal never claims it.
+
+Returning a value rather than re-raising is a decision, not a habit: the caller
+then handles one shape whether the provider answered or not. `ch02-e4` judges
+exactly that. It calls your function and fails you for a `TimeoutError` that
+escaped, for a return value that is not an `AgentResult`, for a missing review
+flag, and for any citation at all.
+
+## The three failures, side by side
+
+| Failure | Caught where | The caller gets |
+|---|---|---|
+| Missing credential | `get_client`, before any request | `ConfigError` naming the file, never the key |
+| Unknown provider | `load_settings`, at config time | `ConfigError` listing the four known lanes |
+| Model not served | the provider, or `probe()` first | `OllamaError` carrying the `ollama pull` command |
+| Deadline exceeded | your `except` around `complete` | an `AgentResult` flagged for review, citing nothing |
+
+## Recap
+
+| Lesson | One line |
+|---|---|
+| The provider seam | `complete(system, user) -> str` is the whole boundary; a Protocol, four clients, one `get_client` |
+| Two lanes | swap the provider, and permissions, grades, redaction, budgets and failure behaviour must not move |
+| Failing closed | a named error with its fix, or a flagged refusal — never a plausible answer |
+
+## Exit ticket and homework
+
+One thing that works, one thing that is unclear, your next action.
+
+Homework: run the same prompt on a second lane — set `BOOTCAMP_PROVIDER=ollama`
+in `.env`, or leave it unset and read the fake's answer again — and write one
+sentence on what changed and one on what did not. Then set a deadline you think
+is right for a chat answer, and say what your code should do when it passes.

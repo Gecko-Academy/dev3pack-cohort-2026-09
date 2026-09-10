@@ -1,0 +1,12 @@
+# Conclusion
+
+You read the tool registry as a contract: a name, a description that is the model's only manual, and a function you control.
+You wrote `list_documents` to four clauses — every id, the filtered ids, an unknown tag refused by name, an empty tag refused — because two of the four clauses are refusals.
+You clamped oversized input in the app, in `min()`, on every call, instead of asking for a smaller number in a description.
+You wrote `convert_currency` so that every bad argument is refused before the network call, and put the network itself behind an allow-list: https, one host, nothing else. `file:///etc/passwd` and `169.254.169.254` came back as refusals with reasons.
+The failure handled: prompt injection in tool output. `guard_tool_output` flags an order aimed at the model, returns the text unchanged, and says which shape it matched.
+It matches the shape of an order, not the topic, because a guard that flags "the setup instructions are in SETUP.md" is a guard somebody switches off.
+The rule underneath all of it: tool output is data, the guard is the boundary, and the agent never executes what a tool returns.
+Every tool you built reads. Nothing writes, spends, or mutates — that is the blast radius, and it is a design decision, not an accident of the corpus.
+Session 5 assumes these five tools exist and that `ToolError` is how a tool says no. It adds the loop around them: `max_tool_calls`, the trace, and the exit conditions you design before you need them.
+Homework: one tool your assistant should never call, and one it should call only after a human says yes. Then add a sixth injection shape and find the ordinary sentence it flags by mistake.

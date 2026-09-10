@@ -1,0 +1,115 @@
+# Safe termination, and the trace as the receipt [[safe-termination]]
+
+## Refusal is the load-bearing path
+
+Design the refusal before the happy path. A loop that cannot refuse will
+fabricate, because the model always has something plausible to say and the code
+always has a value to return.
+
+In `run_loop` three of the four exits are refusals. Only `answered` fills
+`answer`; the other three fill `refusal` and leave `answer` as `None`. That is a
+contract, and `ch05-e2` enforces both halves of it: an answer on a stop that was
+not an answer fails, and a stop with an empty `refusal` fails.
+
+## A refusal is written for a reader
+
+```python
+except ToolError as error:
+    return receipt(steps, "tool_error", refusal=f"stopped: {name} refused ({error})")
+```
+
+The refusal names the tool. Whoever reads the receipt at 3am — a colleague, a
+dashboard, the next agent in a chain — needs to know which tool went away, not
+that "an error occurred". `ch05-e2` looks for the tool's name in the refusal for
+that reason.
+
+`ToolError` is the type session 4 built for exactly this: an error message that
+is safe to show, that names the valid options, and that means "your arguments or
+my dependency, not a bug in the interpreter". Catching that type and nothing
+wider is deliberate. A `KeyError` from your own loop is a defect, and it should
+crash the notebook where you can see it, not arrive dressed as a polite refusal.
+
+## The failure that actually happens
+
+A tool fails halfway through a run far more often than it fails on the first
+call. A rate limit trips on the fourth request. A token expires mid-session. An
+index is rebuilt while you are reading it.
+
+The notebook injects it:
+
+```python
+def flaky_list_documents(tag=None):
+    """Answers twice, then refuses."""
+    calls["n"] += 1
+    if calls["n"] > 2:
+        raise ToolError("list_documents: the corpus index went away mid-run")
+    return list_documents(tag)
+```
+
+Run the four-step plan through the unfinished loop and the `ToolError` escapes
+into the caller's stack. Run it through the finished one:
+
+```
+steps=2  stopped_because='tool_error'
+refusal: stopped: list_documents refused (list_documents: the corpus index went away mid-run)
+```
+
+Same failure, two very different things to hand to whoever called you. The two
+successful steps survive in the receipt either way — that is the point of
+recording as you go rather than at the end.
+
+## The receipt
+
+```python
+{
+  "steps": [{"tool": ..., "args": {...}, "result": ...}, ...],
+  "stopped_because": "answered" | "budget" | "repeated_call" | "tool_error",
+  "answer": str | None,
+  "refusal": str | None,
+}
+```
+
+All four keys, on every exit. A receipt whose shape changes with the outcome
+forces every caller to branch before it can read anything, and the branch it
+forgets is the one that mattered.
+
+`steps` records tool calls only, one entry per executed call. The `answer` step
+is a decision, not a call, so it never becomes a step — and a step for a call
+that raised would be a result that does not exist.
+
+## Why the trace is the artifact
+
+A summary is a claim. A trace is what happened, in order, with the arguments.
+It is the difference between "the agent looked it up" and:
+
+```
+1. list_documents({'tag': 'retrieval'}) -> rag-basics
+2. convert_currency({'amount': 100, 'source': 'USD', 'target': 'EUR'}) -> 100 USD = 92.00 EUR
+stopped_because='answered'  answer='rag-basics covers retrieval, and 100 USD is 92.00 EUR.'
+```
+
+You can audit the second one. You can hand it to a reviewer. You can diff it
+against yesterday's run and see what changed. Sessions 9 and 14 build on exactly
+this: an eval reads traces, and an incident is debugged from them.
+
+## What the two checks judge
+
+| Check | Judges | Fails when |
+|---|---|---|
+| `ch05-e1` | the traces of `answer_question` at `max_tool_calls` 3 and 1 | a trace has more `tool_call` events than its budget, or ends with no `decision` |
+| `ch05-e2` | your `run_loop`, on four plans with its own recording tools | an exit is missing, a refusal is empty, the budget is off by one, or a call ran after the loop said it had stopped |
+
+`ch05-e2` supplies the tools itself and counts what they were called with, so a
+loop that reports the right `stopped_because` while quietly running the next
+step still fails. Reporting a stop and stopping are not the same thing.
+
+## Recap
+
+| Lesson | One line |
+|---|---|
+| The loop | four beats; the model owns one, you own three |
+| The scripted plan | replaces the probabilistic beat, so every exit is reachable on purpose |
+| Budgets | checked before the call, counted in executed calls, set by the app |
+| Repetition | same tool and same arguments, back to back, is spinning |
+| Safe termination | every exit is a designed state, and three of the four are refusals |
+| The receipt | one shape on every exit; the trace, not a summary of it |

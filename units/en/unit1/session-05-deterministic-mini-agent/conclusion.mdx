@@ -1,0 +1,12 @@
+# Conclusion
+
+You wrote `run_loop(plan, tools, budget)`: a tool-calling loop with four designed exits and a receipt that records what ran.
+The plan stood in for the model's one probabilistic beat, which is what made every exit reachable on purpose instead of by luck.
+The budget is checked before the call, counted in executed calls, and set by the application — never read out of the plan.
+The repetition guard compares tool and arguments against the previous call, so a spinning loop reports `repeated_call` and not a budget that was fine.
+The failure handled: a tool that answers twice and then starts refusing. The run ends in `tool_error` with a refusal that names the tool, and the two successful steps survive in the receipt.
+`ch05-e1` proved the budget is visible in the trace at two budgets. `ch05-e2` ran your loop against one plan per exit, with tools that record what they were called with.
+That second check is why "reported a stop" and "stopped" are different verdicts here: a loop that keeps calling after it says it stopped fails.
+The receipt keeps the same four keys on every exit, so a caller reads `stopped_because` without branching first.
+Session 6 assumes you can read a trace and say which exit fired, and it replaces the scripted retrieval with a real retriever you build and measure.
+Homework: write the exit table for a loop you have built or used. An empty row is an unfinished loop. Then read `docs/guides/loop-engineering.md`.

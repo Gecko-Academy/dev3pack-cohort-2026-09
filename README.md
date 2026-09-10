@@ -210,11 +210,11 @@ Each live session is one directory under `units/en/session-NN-*/`.
 
 | # | Day | Session | You leave with |
 |---|---|---|---|
-| 1 | Mon 14 Sep | Configure the assistant — not yet | Repo instructions the assistant must read before it edits |
-| 2 | Tue 15 Sep | Call a model through the adapter — not yet | One adapter, two lanes, failures that refuse instead of traceback |
-| 3 | Wed 16 Sep | Structured outputs — not yet | A typed answer; retry once, then refuse |
-| 4 | Thu 17 Sep | Bounded tools — not yet | Read-only tools whose boundaries you can prove |
-| 5 | Fri 18 Sep | A deterministic mini-agent — not yet | A loop that stops, notices repeats, and exits safely |
+| 1 | Mon 14 Sep | [Configure the assistant](units/en/unit1/session-01-assistant-configuration/) | Repo instructions the assistant must read before it edits |
+| 2 | Tue 15 Sep | [Call a model through the adapter](units/en/unit1/session-02-model-adapter/) | One adapter, two lanes, failures that refuse instead of traceback |
+| 3 | Wed 16 Sep | [Structured outputs](units/en/unit1/session-03-structured-outputs/) | A typed answer; retry once, then refuse |
+| 4 | Thu 17 Sep | [Bounded tools](units/en/unit1/session-04-bounded-tools/) | Read-only tools whose boundaries you can prove |
+| 5 | Fri 18 Sep | [A deterministic mini-agent](units/en/unit1/session-05-deterministic-mini-agent/) | A loop that stops, notices repeats, and exits safely |
 | 6 | Mon 21 Sep | A retrieval baseline — not yet | A corpus loader and lexical retrieval — plus the ways it fails |
 | 7 | Tue 22 Sep | Retrieval and grounding metrics — not yet | Hit rate, grounding rate, and the cost of one fix |
 | 8 | Wed 23 Sep | Loops and graphs — not yet | Chain vs loop vs graph; illegal edges do not move |

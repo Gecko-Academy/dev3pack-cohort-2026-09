@@ -1,0 +1,66 @@
+# A deterministic mini-agent
+
+**Friday, September 18, 2026 · 2h · Thread: loop engineering**
+
+## Outcome
+
+Complete a small tool-calling loop end to end, with `FakeLLM`, and prove three
+things about it: it stops at its budget, it notices a repeated call, and it ends
+safely when a tool refuses. The trace is the receipt. You leave with
+`run_loop(plan, tools, budget)` — four designed exits, one recorded step per
+tool call, and a refusal a caller can read on every exit that is not an answer.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | A question, the bounded tools from session 4, and a **plan**: the sequence of calls a model would have chosen, written down as `{"tool": name, "args": {...}}`. |
+| Output | A receipt — `steps`, `stopped_because`, `answer`, `refusal` — with one of four stop reasons every time: `answered`, `budget`, `repeated_call`, `tool_error`. |
+| Budget | Five tool calls, clamped by the loop and never read from the plan. `answer_question` keeps its one corrective retry on a broken model contract. `run_loop` has no retry: a tool that fails ends the run. |
+| Failures this session must handle | **A plan longer than the budget.** Exactly `budget` calls execute; the next one never reaches the tool. **The same call twice in a row.** Same tool, same arguments, so the loop is spinning: stop. **A tool that raises.** The run ends in `tool_error` with a refusal that names the tool, not in a traceback. |
+
+The threat is not a hostile model. It is a loop with one undesigned exit. A loop
+that can only end by succeeding will spend the whole budget, call the same tool
+until a rate limit stops it, or hand a traceback to whatever called it. Every
+exit here is a state you chose in advance.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. Read
+   the trace of `answer_question` on one question — retrieve, llm_call,
+   decision — and name the three exits it already has.
+2. **Contract and threat boundary (15m).** The exit table, filled in before any
+   code. The four beats of an iteration: perceive, decide, act, observe. Which
+   one the model owns, and what that leaves you.
+3. **Concept and live implementation (30m).** Why a scripted plan is enough to
+   learn the loop: it replaces the one probabilistic beat with a list, so every
+   exit is reachable on purpose. Then `run_loop` written live, exit by exit.
+4. **Guided lab (35m).** The notebook: budgets visible in the trace
+   (`ch05-e1`), then your own `run_loop` over session 4's `list_documents` and
+   `convert_currency` (`ch05-e2`). Read the receipt back afterwards.
+5. **Failure injection (15m).** A tool that answers twice and then starts
+   refusing. Run the plan before you write exit 4, and again after. The first
+   run raises; the second returns a refusal that names the tool.
+6. **Evaluation and artifact receipt (10m).** `check("ch05-e1", traces)`,
+   `check("ch05-e2", run_loop)`, then `review("ch05")`. The receipt of the
+   failing run is the artifact; read one out loud.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: write the exit table for a loop you have built or
+   used, and read `docs/guides/loop-engineering.md`.
+
+## Evidence
+
+This session runs unattended. Both checks are deterministic and model-free:
+
+```bash
+uv run bootcamp check ch05                    # runs your notebook, prints its scorecard
+uv run bootcamp submit ch05 --github <you>    # hands in the notebook as it stands
+```
+
+`ch05-e1` reads the traces of two runs at two budgets. `ch05-e2` runs your
+`run_loop` against four plans, one per exit, with its own recording tools, and
+names the safeguard you still owe it.
+
+<!-- navigation:start -->
+[Previous: Bounded tools](../session-04-bounded-tools/introduction.mdx) · Next: A retrieval baseline — opens Mon 21 Sep
+<!-- navigation:end -->

@@ -1,0 +1,95 @@
+# The task loop, enforced by you [[task-loop]]
+
+## The loop
+
+| Step | You | The assistant |
+|---|---|---|
+| 1. Inspect | name the files | reads them |
+| 2. Plan | read it, restrict files and commands | proposes |
+| 3. Edit | ask for the smallest version | edits |
+| 4. Test | `uv run pytest -q`, read failures yourself | fixes |
+| 5. Review | inspect the diff, **reject what does not belong** | explains |
+
+Convenience is not permission. An assistant that can run any command will run
+any command. The loop is the set of places where you decide.
+
+## Restrict before you approve
+
+The plan step is where the allowed files get named. Say them out loud and write
+them down:
+
+> Allowed: `src/bootcamp_agent/tools.py` and `tests/test_tools.py`. Nothing
+> else. No new dependency. Plan only.
+
+A plan that names a third file is already a rejection. A plan that says "and
+tidy up" is already a rejection. You are not being difficult. You are being
+the verification step.
+
+## Rejecting is the skill
+
+Good rejections from past cohorts:
+
+- "it added a dependency for a 3-line function"
+- "it improved a file I did not ask about"
+- "the test it wrote asserts the mock, not the behaviour"
+
+If you rejected nothing, you were not reviewing.
+
+## The failure this loop must catch
+
+An unauthorized file change. During the failure-injection block you ask for
+one on purpose:
+
+> Also update `.github/workflows/test.yml` so the suite runs on push.
+
+That file is outside the allowed set. Two outcomes count, and you record which:
+
+| Outcome | What you record |
+|---|---|
+| It refuses, citing the restriction | the refusal text, and which line of the policy or plan it cited |
+| It produces the diff | the diff, and your rejection with the reason |
+
+Either is a pass for you. Only silence is a fail: a change outside the allowed
+files that you did not notice. The point of naming the files in the plan is
+that a diff against an unnamed file is visible at a glance.
+
+## Today's lab
+
+Feature: `tags` filter on `search_documents`, in a scratch copy of the
+repository. `search_documents(query, max_results)` returns three fields per hit
+today; documents already carry `tags`. The smallest correct change adds one
+optional argument and filters after retrieval, so the cap still applies.
+
+Required evidence in the notebook:
+
+- the plan you approved
+- the diff you inspected
+- **one rejected change, and why**
+- the risk summary you asked for
+- the ambiguous instruction and what the assistant did with it
+- the out-of-scope request and the refusal, or the diff you rejected
+
+## From tomorrow: the loop applied to every exercise
+
+1. Give the assistant the exercise's **Context** and **Instructions**
+2. Let it fill the `TODO(you)` lines
+3. **You** run the `check(...)` cell and read the verdict
+4. `review("chNN")` at the end is your scorecard
+
+The assistant does not grade its own work. The check cell is the acceptance
+check for a notebook exercise, the same way `uv run pytest -q` is the
+acceptance check for a code change.
+
+## Recap
+
+| Lesson | One line |
+|---|---|
+| The mental model | you own context, tools, and verification; the model fills one gap |
+| Two prompts | the harness, not the model, made the difference |
+| Instructions are code | version it, review it, fix it when it fails |
+| The task loop | plan, restrict, smallest edit, test, review, reject |
+
+## Exit ticket and homework
+
+Fix the instruction that let your assistant assume wrong. Read
+`docs/guides/harness-engineering.md`. This session is its Layer 1.

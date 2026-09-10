@@ -1,0 +1,81 @@
+# Structured outputs
+
+**Wednesday, September 16, 2026 · 2h**
+
+## Outcome
+
+You leave with a typed answer contract and the code that enforces it: the
+`ResearchAnswer` schema (`answer`, `citations`, `confidence`,
+`needs_human_review`), a strict parser that rejects everything else, and the
+retry-once-then-refuse pattern that keeps a bad model reply out of the rest of
+the program. You also write the smallest evaluation there is — three golden
+questions, one answerable, one ambiguous, one unsupported — and watch the agent
+refuse the unsupported one *before* it spends a model call.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | A question, the six-document corpus in `data/corpus/`, and one model behind the `LLMClient` seam: `FakeLLM` offline, your configured lane if you have one. The model returns **text**, and that text is untrusted input. |
+| Output | A `ResearchAnswer` that came through `parse_research_answer`, or a typed refusal with `needs_human_review: true` and no citations. Plus three golden questions, each with the behaviour a correct assistant shows. |
+| Budget | One model call, one corrective retry, then refuse. Two calls, never more. No new dependency: the contract is a frozen dataclass and `json.loads`. |
+| Failures this session must handle | **Malformed JSON.** The model returns prose, or JSON it never finished. **Extra fields.** All four required fields, plus a helpful fifth the schema never promised. **A repair budget that runs out.** The retry fires, the second reply is still unparseable, and the agent has to stop and say so. |
+
+The threat is not a hostile model. It is a helpful one. It opens with "Of
+course! Here is the JSON:", adds a `source_url` it thought you would like, and
+answers `confidence: 7` because seven out of ten felt right. String-parsing
+that is silent breakage: one different phrasing and the value your code reads is
+wrong rather than absent. So the boundary is a parser, it is strict, and it
+fails loudly.
+
+One thing it cannot do: a valid `ResearchAnswer` can still be a wrong answer.
+Schema conformance is necessary, never sufficient. That is why citations are
+verified against what retrieval actually returned, and why session 7 measures
+grounding instead of trusting the shape.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. The
+   same question through two fakes: one answers in prose, one answers in JSON.
+   Find the confidence in the prose. You cannot.
+2. **Contract and threat boundary (15m).** The three parts of a prompt and how
+   far each is trusted. The four fields, and why `needs_human_review` has to
+   exist: a schema that cannot say "I don't know" pushes the model into
+   inventing. The contract table above, read aloud.
+3. **Concept and live implementation (30m).** `src/bootcamp_agent/schema.py`
+   line by line: strict key equality, the type and range checks, the single
+   code fence it tolerates. Then `agent.py`: retrieve, refuse before calling,
+   one call, one corrective retry, flagged refusal.
+4. **Guided lab (35m).** `notebook.ipynb`. Three payloads the parser must
+   reject, three golden questions against the real corpus, then the same agent
+   on your own lane with the trace printed.
+5. **Failure injection (15m).** Section 7 of the notebook, three cells you run
+   and read: truncated JSON, an extra field, and a model that never complies
+   until the repair budget runs out. Say which trace line tells you which.
+6. **Evaluation and artifact receipt (10m).** `review("ch03")` in Jupyter, or
+   `uv run bootcamp check ch03` in the terminal. Then share the best "valid
+   JSON, wrong answer" anybody found.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: two adversarial questions, one of them embedding an
+   instruction inside the question, run unstructured and structured.
+
+## Evidence
+
+This session runs unattended. Every cell works offline on `FakeLLM`, so the
+notebook is its own arbiter:
+
+```bash
+uv run bootcamp check ch03                    # runs the notebook, prints the scorecard
+uv run bootcamp submit ch03 --github <you>    # re-runs it and writes the bundle you hand in
+```
+
+Three checks decide it. `ch03-e1`: three different payloads, and the parser
+rejects all three. `ch03-e2`: three golden questions whose retrieval matches the
+kind you labelled them. `ch03-e3`: what you hand it is a `ResearchAnswer` that
+came through the parser, in range, and carrying no citations if it is a flagged
+refusal. The scorecard reads the lines your notebook printed, never a summary of
+them.
+
+<!-- navigation:start -->
+[Previous: Call a model through the adapter](../session-02-model-adapter/introduction.mdx) · [Next: Bounded tools](../session-04-bounded-tools/introduction.mdx)
+<!-- navigation:end -->

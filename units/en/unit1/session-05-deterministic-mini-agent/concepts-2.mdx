@@ -1,0 +1,94 @@
+# Budgets, and the call that comes round again [[budgets-and-repeats]]
+
+## Write the exits before the body
+
+An unbounded loop is a bug. Before you write the loop, list every way it ends.
+If you cannot fill the table in, the loop is not designed yet.
+
+| Exit | Fires when | `run_loop` returns |
+|---|---|---|
+| Final answer | the step's tool is `answer` | `stopped_because="answered"`, the text in `answer` |
+| Budget exhausted | `budget` calls are already recorded | `stopped_because="budget"` |
+| Repetition | this call equals the one before it | `stopped_because="repeated_call"` |
+| Tool failure | the tool raised `ToolError` | `stopped_because="tool_error"` |
+
+Four rows, four returns, no fall-through. The loop body has no path that ends by
+running off the end without saying why.
+
+## The budget belongs to the app
+
+```python
+if len(steps) >= budget:
+    return receipt(steps, "budget", refusal=f"stopped: the budget of {budget} calls is spent")
+```
+
+Three things about that line.
+
+**It is checked before the call, not after.** After means you already paid for
+the call you were not allowed to make. `ch05-e2` runs a four-step plan at
+`budget=2` and inspects the recording tools: a third call reaching the tool is a
+failure even if the receipt says `budget`.
+
+**It counts executed calls, not plan entries.** The `answer` step is not a call.
+A step that never ran is not a call. The count is what you spent.
+
+**It is a parameter, not a constant.** `budget=5` is a statement about how much
+latency, cost, and blast radius this feature is worth. Session 4 clamped
+`max_results` for the same reason: a cap the caller can raise is not a cap.
+Never read the budget out of the plan — that is the model's side of the
+boundary.
+
+When a budget is hit in production you want a receipt that says
+`search → search → metadata, budget spent`, not a mystery timeout.
+
+## Repetition is the cheap spin detector
+
+A loop that calls `search_documents(query="citations")`, reads a result it does
+not like, and calls `search_documents(query="citations")` again is not
+recovering. It is spinning. The same input produced the same output a moment
+ago, and nothing in between changed it.
+
+```python
+if (name, args) == previous:
+    return receipt(steps, "repeated_call", refusal=f"stopped: {name} was called twice in a row ...")
+```
+
+`previous` holds the last executed call, as a `(name, args)` pair. Same tool and
+same arguments, back to back: stop.
+
+## Two decisions inside that one line
+
+**Tool *and* arguments.** `list_documents(tag="retrieval")` followed by
+`list_documents(tag="security")` is progress: different question, different
+answer. Comparing tool names alone would stop it. Comparing arguments alone
+would stop two different tools that happen to share a payload. The pair is the
+call.
+
+**Back to back, not ever.** A loop may legitimately return to a tool later, with
+the same arguments, after something changed. Blocking every repeat forever is a
+cache with a rude error message. The signal here is *immediate* repetition,
+which is why `previous` is one call deep and not a set of everything seen.
+
+Both decisions are defensible and both are yours. What is not defensible is
+leaving the check out and calling the resulting rate-limit error a tool problem.
+
+## The budget does not cover this
+
+It is tempting to think the budget already handles a spinning loop: five
+identical calls, then it stops. It does stop — after paying for five calls and
+returning nothing. Worse, the receipt then says `budget`, and whoever reads it
+goes looking for a budget that is too small. The real fault was a loop repeating
+itself, and only the repetition exit says so.
+
+Two exits, two different diagnoses. That is the point of having both.
+
+## Order matters when both are true
+
+Most runs trip one exit. Some trip two at once: three identical calls under
+`budget=1` is both a repeating loop and an exhausted budget on the second
+iteration. `run_loop` checks repetition first, so it reports `repeated_call`.
+
+Either receipt would be honest. Only one is useful. `budget` sends the reader to
+raise a limit that was never the problem; `repeated_call` sends them to the loop
+that asked the same question twice. When two exits are true, return the one that
+names the fault.

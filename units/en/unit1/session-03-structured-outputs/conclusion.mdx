@@ -1,0 +1,12 @@
+# Conclusion
+
+You turned model text into data: `ResearchAnswer` with four fields, and `parse_research_answer` as the only way in.
+The parser is strict on purpose — malformed JSON, a missing field, an unknown field, a confidence of `7` — and every rejection names what was wrong.
+You wrote three payloads it had to reject, and the check confirmed all three failed rather than taking your word for it.
+You wrote three golden questions against the real corpus, one answerable, one ambiguous, one unsupported, each with the behaviour a correct assistant shows.
+You ran the agent on your own lane and read the trace: retrieval first, then the call, then the decision.
+The failure handled: a repair budget that runs out. One call, one corrective retry, then a typed refusal with `needs_human_review: true` and no citations. Never an unbounded loop.
+Nothing raised in that last case, and that is the point — the flag and the two `llm_call` lines are the only evidence, which is why both exist.
+You also saw the limit of the shape: a valid `ResearchAnswer` can still be wrong, so citations are verified against retrieval and an unsupported question is refused before a call is spent.
+Session 4 assumes you read a trace without help, treat model output as untrusted input, and reach for a typed refusal instead of `None`.
+It gives the model tools. Every argument it passes needs exactly the treatment you just gave its output.

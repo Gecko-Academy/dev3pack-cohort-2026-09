@@ -1,0 +1,114 @@
+# The provider seam [[provider-seam]]
+
+## One method, and everything else is yours
+
+```python
+class LLMClient(Protocol):
+    def complete(self, system: str, user: str) -> str:
+        """Return the model's text for one system+user exchange."""
+        ...
+```
+
+That is the whole seam, in `src/bootcamp_agent/llm.py`. Two strings in, one
+string out. `system` says how to behave, `user` carries the task, the return
+value is text you have not validated yet.
+
+Every agent framework wraps this one call. They give it different names and
+add retries, streaming, tool schemas and callbacks on top. None of them
+removes it, because it is the only step in your program that a vendor runs.
+Write your application against the seam and the framework becomes a choice you
+can defer. Write it against an SDK and the SDK is in every module by Friday.
+
+## Calling it
+
+```python
+from bootcamp_agent.llm import FakeLLM
+
+hello_llm = FakeLLM(
+    responses={
+        "hello": "Hello! I am a deterministic stand-in for a language model.",
+        "agent": "An agent is a loop around a model: perceive, decide, act, observe.",
+    },
+    default="I have no canned answer for that — a real model would improvise here.",
+)
+
+print(hello_llm.complete(system="You are concise.", user="Say hello to the bootcamp"))
+```
+
+```
+Hello! I am a deterministic stand-in for a language model.
+```
+
+`FakeLLM` matches the first key found in `user`, case-insensitively, in
+insertion order. No match returns `default`. It also appends every
+`(system, user)` pair to `self.calls`, so a test can assert what your code
+asked, not only what it did with the answer.
+
+| Question contains | Answer |
+|---|---|
+| `agent` | the `agent` canned line |
+| `hello` | the `hello` canned line |
+| neither | the `default` |
+
+Three paths, three calls: that is exercise 1.
+
+## A Protocol, not a base class
+
+`LLMClient` is a `typing.Protocol`. Nothing inherits from it. A class is an
+`LLMClient` because it has a `complete(system, user) -> str`, and for nothing
+else.
+
+| Client | Runs where | Needs a key | Deterministic |
+|---|---|---|---|
+| `FakeLLM` | in your process, no model | no | yes |
+| `OllamaClient` | your machine, over HTTP | no | no |
+| `AnthropicClient` | the vendor's API | yes | no |
+| `OpenAICompatibleClient` | OpenAI, or any compatible endpoint | yes | no |
+
+Four classes, one method each. Application code never learns which one it got.
+That is the property the rest of the course leans on: session 5's agent takes
+an `LLMClient` argument, and its tests pass a fake.
+
+## The SDK import is lazy, on purpose
+
+```python
+class AnthropicClient:
+    def __init__(self, api_key: str, model: str) -> None:
+        import anthropic          # inside __init__, not at module top
+
+        self._client = anthropic.Anthropic(api_key=api_key)
+```
+
+The import happens when you construct that client and never before. So
+`import bootcamp_agent.llm` works on a machine with no provider package
+installed, which is every machine in this room and the CI runner. A missing
+SDK becomes an `ImportError` at the moment you asked for that lane, with
+`uv sync --extra anthropic` as the fix.
+
+## Configuration is data
+
+```python
+@dataclass(frozen=True)
+class Settings:
+    provider: str
+    model: str | None
+    api_key: str | None
+    base_url: str | None
+```
+
+`load_settings()` reads the environment (and `.env`) into those four fields.
+`get_client(settings)` turns them into a client. Everything
+provider-specific in this course lives in those two functions: the name of the
+key variable, the default model per provider, the base URL for an
+OpenAI-compatible endpoint.
+
+Read `get_client` once. It is thirty lines and it is the whole adapter:
+
+- `fake` → `FakeLLM()`.
+- `ollama` → `OllamaClient(model, base_url)`, no key, stdlib HTTP.
+- anything not in `("fake", "ollama", "anthropic", "openai")` → `ConfigError`.
+- a keyed provider with no key → `ConfigError`, before any network call.
+- otherwise the SDK adapter, with the model defaulted per provider.
+
+Your code asks for a client and gets one. It never reads an environment
+variable, never holds a key, and never names a vendor.

@@ -1,0 +1,91 @@
+# The same prompt on two lanes [[two-lanes]]
+
+## Picking a lane
+
+One environment variable picks the lane. Nothing else in your code changes.
+
+| `BOOTCAMP_PROVIDER` | Runs where | Key | Deterministic | Cost |
+|---|---|---|---|---|
+| unset, or `fake` | in your process, no model | no | yes | 0 |
+| `ollama` | your machine, `qwen2.5:7b-instruct` | no | no | 0 |
+| `anthropic` | the vendor's API | yes | no | per token |
+| `openai` | OpenAI, or an OpenAI-compatible endpoint | yes | no | per token |
+
+Unset is the required lane. Every scored notebook and every test in this
+repository has to pass there, with `FakeLLM` and no network. The other lanes
+are for comparison, and one of them is free: Ollama runs a real model on your
+own machine with no account.
+
+## What the preflight already told you
+
+The first cell of every notebook calls `preflight(REPO_ROOT)` and returns the
+client for the configured lane as `LIVE`:
+
+```
+✅ Python 3.11 (need >= 3.11)
+✅ kernel is the repo .venv
+✅ corpus loads (6 documents)
+✅ lane = ollama (qwen2.5:7b-instruct at http://localhost:11434/v1)
+ready. LIVE is the ollama lane.
+```
+
+The lane check probes before it promises. On the `ollama` lane it asks the
+server which models it has, without sending a prompt. If the server is down or
+the model is not pulled, the line becomes a non-blocking `⚠️` with the fix
+command, and `LIVE` is a `FakeLLM`. The notebook still runs top to bottom.
+
+So `LIVE` is not "the real model". It is "whatever this machine can actually
+reach right now", and the printed line is the only honest statement of which.
+On Colab, note that `localhost` is the hosted VM, not your laptop; a local
+runtime is what makes the Ollama lane reachable there.
+
+## The experiment
+
+```python
+question = "Explain in one sentence what an agent is."
+
+runs = {
+    "fake": [hello_llm.complete(system="You are concise.", user=question) for _ in range(2)],
+    "live": [LIVE.complete(system="You are concise.", user=question) for _ in range(2)],
+}
+```
+
+```
+[fake] same answer twice? True
+   An agent is a loop around a model: perceive, decide, act, observe.
+   An agent is a loop around a model: perceive, decide, act, observe.
+[live] same answer twice? False
+   An agent is a program that uses a model to decide which actions to take toward a goal.
+   An agent is software that plans, calls tools, and checks results until a task is done.
+```
+
+Same question, same seam, two answers. Both are fine. Neither is testable by
+string equality, which is the point: on a real lane, `assert answer == "..."`
+is not a test, it is a coin toss you wrote down.
+
+| Lane | What a test may assert | Cost | Teaches |
+|---|---|---|---|
+| fake | exact strings, offline, in CI | 0 | the seam, the loop, the refusal path |
+| ollama | shape and behaviour: valid JSON, a doc id that exists, a refusal when asked something unsupported | 0 | what a real model does with your prompt |
+
+That gap is why week 2 spends a whole session on evaluation. You are not
+measuring words; you are measuring properties.
+
+## What a lane change is not allowed to touch
+
+| May differ | Must not differ |
+|---|---|
+| the wording | which tools are permitted |
+| the latency | the grading rules |
+| the cost | what a trace redacts |
+| whether two runs agree | the retry budget |
+| which failures you see | what a failure does |
+
+Read that right column as a contract. Swapping the provider must not widen a
+permission, relax a check, or change what happens when something breaks. If it
+does, the difference was in your code all along and the model change only
+revealed it.
+
+The seam is what makes the contract enforceable. `complete(system, user)` has
+nowhere to put a permission, a budget, or a grade, so a provider cannot smuggle
+one in.

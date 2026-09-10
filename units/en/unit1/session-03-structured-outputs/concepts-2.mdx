@@ -1,0 +1,113 @@
+# Parsing is your job [[parsing-is-your-job]]
+
+## The model does not enforce the schema
+
+You asked for JSON in the system prompt. That is a request, not a guarantee.
+Even a provider's own structured-output mode is a claim made by the thing you
+are trying to check. The only enforcement you own is the parser, so the parser
+is where the contract actually lives:
+
+```python
+from bootcamp_agent.schema import AnswerParseError, parse_research_answer
+
+for attempt in [
+    "The answer is chunking.",
+    '{"answer": "x", "citations": []}',
+    '{"answer": "x", "citations": [], "confidence": 7, "needs_human_review": false}',
+]:
+    try:
+        parse_research_answer(attempt)
+    except AnswerParseError as error:
+        print(f"rejected: {error}")
+```
+
+```
+rejected: Not valid JSON: Expecting value: line 1 column 1 (char 0)
+rejected: Wrong fields: missing=['confidence', 'needs_human_review'] unknown=[]
+rejected: 'confidence' out of range [0, 1]: 7
+```
+
+Three rejections, three different reasons, each naming the field. An error that
+says "invalid response" would have told you nothing at 2am.
+
+## What strict means, gate by gate
+
+`parse_research_answer` in `src/bootcamp_agent/schema.py` is a list of gates. In
+order:
+
+| Gate | Rejects |
+|---|---|
+| `json.loads` | prose, truncated objects, single quotes, a trailing comma |
+| `isinstance(payload, dict)` | a bare list or string that happens to be valid JSON |
+| `keys != REQUIRED_FIELDS` | a missing field **and** an unknown one, in one comparison |
+| type checks | `answer` empty, `citations` holding a number, `confidence` a string |
+| `0.0 <= confidence <= 1.0` | `7`, because the model read it as out of ten |
+
+The key gate is set **equality**, not a subset test. That is a deliberate
+choice, and it is the one people argue with.
+
+## Why an extra field is a rejection
+
+A model that adds `"source_url": "https://example.com/chunking"` is trying to
+help. Accept it and three things follow. Your `ResearchAnswer` no longer
+describes what the object holds, so the next reader guesses. The field appears
+on some replies and not others, so any code that uses it needs a fallback that
+nobody tests. And a field you never asked for is a field nobody validates,
+which is exactly the shape an injected instruction travels in.
+
+```
+rejected: Wrong fields: missing=[] unknown=['source_url']
+```
+
+A contract that accepts anything is not a contract. If you want the field, add
+it to the schema, give it a type, and write the check. Until then it does not
+exist.
+
+The one thing the parser does forgive is a single markdown code fence around
+the object, because chat-tuned models add one by reflex and stripping it changes
+no field. Forgiveness is a decision you make per case, in the parser, in the
+open — not a `try: except: pass` at the call site.
+
+## Untrusted input, and the word means it
+
+Model output crosses a trust boundary the same way an HTTP request body does.
+It arrived from a probabilistic process you do not control, possibly influenced
+by a document you did not write. So the rules are the ones you already use on a
+request body: parse at the boundary, reject on the first violation, never let a
+half-validated object into the rest of the program, and put the reason in the
+error.
+
+## When parsing fails: a budget, not a loop
+
+The parser rejecting is not the end of the story. `answer_question` in
+`agent.py` spends a fixed budget on repair:
+
+| Attempt | Action |
+|---|---|
+| 1st parse fails | retry **once**, appending "Your previous reply was not valid. Return ONLY the JSON object." |
+| 2nd parse fails | typed refusal: `needs_human_review: true`, empty citations, confidence `0.0` |
+| any | the trace records both calls and the decision |
+
+Two calls, then it stops. "Retry until it works" has no upper bound on cost or
+latency, and a model that misread the instruction misreads it the fourth time
+too. Bounded retries, visible failure, no infinite loops.
+
+The refusal is typed on purpose. Returning `None`, or raising into the caller,
+pushes the decision onto code that has less context than the agent does. A
+`ResearchAnswer` with `needs_human_review: true` travels through the same
+plumbing as a good answer and arrives somewhere a person can see it.
+
+## The failure this parser must catch
+
+Three, and the notebook injects each one so you watch it happen.
+
+| Injected | What the parser does | Where you see it |
+|---|---|---|
+| Malformed JSON — a reply cut off mid-object | `Not valid JSON: Expecting ',' delimiter` | the exception, at the boundary |
+| An extra field — four required plus one gift | `Wrong fields: missing=[] unknown=['source_url']` | the exception, at the boundary |
+| A repair budget that runs out | two `llm_call` events, then a flagged refusal | the trace, not the exception |
+
+The third is the one to sit with. Nothing raised. The program returned a valid
+`ResearchAnswer` and carried on. The only evidence that anything went wrong is
+`needs_human_review: true` and two `llm_call` lines in the trace — which is
+precisely why the flag is a field and the trace is not optional.

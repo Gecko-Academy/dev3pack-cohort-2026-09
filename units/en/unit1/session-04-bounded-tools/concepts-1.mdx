@@ -1,0 +1,94 @@
+# A tool is a contract [[tool-is-a-contract]]
+
+## From text to action
+
+Sessions 2 and 3 got a model to produce text you could parse. A tool is the
+next step: the model asks, **your code** decides and executes. That one word,
+*executes*, is why this session is about boundaries rather than capabilities.
+
+```python
+@dataclass(frozen=True)
+class Tool:
+    name: str
+    description: str
+    run: Callable[..., str]
+```
+
+Three fields, and each one is doing a job. `name` is what the model asks for.
+`description` is the model's entire manual — it never reads your source. `run`
+is the function you wrote and you control.
+
+## The registry
+
+```python
+tools = build_tools(documents, client)
+for tool in tools.values():
+    print(f"{tool.name:24} {tool.description}")
+```
+
+```
+search_documents         Search the corpus for passages relevant to a query (max_results capped at 5).
+get_document_metadata    Return title, source, tags, and length for a known doc_id.
+summarize_document       LLM-summarize one document by doc_id (read-only).
+```
+
+Read those three lines as a contract, because that is what they are. The cap is
+stated. The precondition ("a known doc_id") is stated. The read-only promise is
+stated. A model that picks the wrong tool usually read a description that
+described nothing.
+
+## The narrow schema
+
+A schema is narrow when there is exactly one way to call the tool correctly and
+the wrong ways are refusable on sight.
+
+| Wide | Narrow |
+|---|---|
+| `search(**kwargs)` | `search_documents(query: str, max_results: int = 3)` |
+| "search anything, return everything" | one corpus, at most five hits |
+| `read_file(path)` | `get_document_metadata(doc_id)` from a known set |
+| `fetch(url)` | one allow-listed host, https only |
+
+The last two rows are the same move twice: replace a free-text address with an
+identifier from a set you control. A `doc_id` cannot be `../../.env`. A
+`base` currency validated as three uppercase letters cannot be a query-string
+injection. **Argument shapes are your first security control**, and they cost
+nothing at runtime.
+
+## Read-only first
+
+Every tool today reads, searches, summarizes, or converts. Nothing writes,
+spends, or mutates. That is not timidity, it is blast radius: an injected
+instruction into a read-only system is an incident, into a write-capable one a
+breach. Session 13 builds the grown-up version of the same idea behind MCP.
+
+## The four-clause contract you write today
+
+`list_documents(tag=None)` is exercise 1, and its contract is four clauses,
+because a contract is not "what it returns when everything goes right":
+
+| Call | Behaviour |
+|---|---|
+| `list_documents()` | every `doc_id`, one per line |
+| `list_documents(tag="retrieval")` | only documents carrying the tag |
+| `list_documents(tag="nope")` | `ToolError` naming the valid tags |
+| `list_documents(tag="")` | `ToolError`; validate at the boundary |
+
+Two happy paths, two refusals. `ch04-e1` checks all four, and the two refusals
+are the half everyone forgets.
+
+## The same seam in a framework
+
+Three optional scripts sit in this folder. They are the framework contrast, not
+the path this session teaches — read them after the lab, and notice how little
+of the boundary the framework carries for you.
+
+| Script | What it shows |
+|---|---|
+| [`langchain_template.py`](langchain_template.py) | `init_chat_model` — LangChain's version of the provider seam you built in session 2 |
+| [`langchain_api_intent.py`](langchain_api_intent.py) | an API operation name turned into an intent description: the *description* field above, written by a model |
+| [`langchain_api_intent_gradio.py`](langchain_api_intent_gradio.py) | the same prompt behind a UI, one source of truth, two surfaces |
+
+Each one skips cleanly without a key and without LangChain installed. Neither
+the seam nor the generated description decides what a tool may do — the cap,
+the refusals and the allow-list in the next lesson still belong to you.
