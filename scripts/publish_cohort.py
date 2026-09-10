@@ -505,9 +505,11 @@ def trim_toctree(destination: Path, week: int) -> list[str]:
 #: into fifteen sessions a week-0 student does not have. Any document written
 #: against the full tree has this problem, so the rule is the whole set.
 #:
-#: `.mdx` pages are NOT in it. Those move with their unit, so their relative
-#: links stay correct, and the site generator already refuses a broken one.
-ANNOTATED_SUFFIX = ".md"
+#: `.mdx` is in it too, and the reasoning that once excluded it was wrong. Pages move
+#: WITH their unit, so a link inside a unit stays correct — but `unit0/week1.mdx` links
+#: ACROSS to `unit1/session-01-…`, which week 0 does not ship. Seventeen such links
+#: reached the cohort repository before this was widened.
+ANNOTATED_SUFFIXES = (".md", ".mdx")
 
 
 def _absent_note(target: str, destination: Path, document: Path) -> str | None:
@@ -573,7 +575,8 @@ def annotate_missing_links(destination: Path, week: int) -> int:
 
     documents = sorted(
         path
-        for path in destination.rglob(f"*{ANNOTATED_SUFFIX}")
+        for suffix in ANNOTATED_SUFFIXES
+        for path in destination.rglob(f"*{suffix}")
         if path.is_file()
         and ".git" not in path.parts
         and not _ignored(path.relative_to(destination))
