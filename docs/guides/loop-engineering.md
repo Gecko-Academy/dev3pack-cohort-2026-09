@@ -13,7 +13,7 @@ those parts on purpose.
 
 1. **Perceive** — assemble the context: the question, retrieved passages,
    previous tool results. (You choose what enters; see
-   harness-engineering — not released yet for the context budget.)
+   [harness-engineering](harness-engineering.md) for the context budget.)
 2. **Decide** — the model chooses: answer now, or call a tool with these
    arguments. This is the only probabilistic beat.
 3. **Act** — the application validates the arguments **at the boundary** and

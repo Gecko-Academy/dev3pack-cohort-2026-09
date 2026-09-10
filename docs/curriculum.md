@@ -39,9 +39,9 @@ homework; the lecture never extends into the lab.
 
 | Thread | Sessions | Guide |
 |---|---|---|
-| Loop engineering — budgets, stopping conditions, refusal-first design | 5, 8, 11 | loop-engineering — not released yet |
-| Graph engineering — retrieval metadata → state graphs → API surface graphs | 6–8, 12–13 | graph-engineering — not released yet |
-| Harness engineering — instructions, evals, traces, CI around the model | 1, 9, 14 | harness-engineering — not released yet |
+| Loop engineering — budgets, stopping conditions, refusal-first design | 5, 8, 11 | [loop-engineering](guides/loop-engineering.md) |
+| Graph engineering — retrieval metadata → state graphs → API surface graphs | 6–8, 12–13 | [graph-engineering](guides/graph-engineering.md) |
+| Harness engineering — instructions, evals, traces, CI around the model | 1, 9, 14 | [harness-engineering](guides/harness-engineering.md) |
 
 ## Shared capstone thread
 
@@ -233,7 +233,7 @@ Grade evidence of engineering practice, not chat-interface polish.
 | Skills/MCP integration | 15% | Reusable skill, safe-mode MCP connection, provenance inspection, safety checklist |
 | Capstone explanation | 15% | Clear demo, architecture, limitation, next-step reasoning |
 
-Per-area descriptors: instructor/assessment-rubric.md — not released yet.
+Per-area descriptors: instructor/assessment-rubric.md — not in your copy.
 
 ## Deliberately out of the core schedule
 

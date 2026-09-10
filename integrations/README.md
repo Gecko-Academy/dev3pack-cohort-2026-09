@@ -6,9 +6,9 @@ gracefully when a credential or a hosted service is missing.
 
 | Integration | What it does | Real calls |
 |---|---|---|
-| sendai-txs — not released yet | SendAI's Solana Agent Kit driving **devnet** reads and a real (tiny) transfer through the kit's own actions | `getTPS`, `get_balance`, `request_faucet_funds`, `transfer` — devnet enforced in code, `DEVNET_LIVE=1` to run |
-| hermes-telegram — not released yet | Hermes (Nous Research) as a Telegram bot — your agent in your pocket, with the course's safety lens on self-improving memory | guided setup + `check_hermes.py` verifier (needs your BotFather token) |
-| gecko-orquestra — not released yet | The cross-runtime **test matrix**: the instructor's Gecko-comprehended Orquestra surface probed by Claude Code, Hermes, and a SendAI agent — same questions, graded on receipts | `probe_matrix.py` scorecard; live when the hosted surface is up |
+| [sendai-txs](sendai-txs/) | SendAI's Solana Agent Kit driving **devnet** reads and a real (tiny) transfer through the kit's own actions | `getTPS`, `get_balance`, `request_faucet_funds`, `transfer` — devnet enforced in code, `DEVNET_LIVE=1` to run |
+| [hermes-telegram](hermes-telegram/) | Hermes (Nous Research) as a Telegram bot — your agent in your pocket, with the course's safety lens on self-improving memory | guided setup + `check_hermes.py` verifier (needs your BotFather token) |
+| [gecko-orquestra](gecko-orquestra/) | The cross-runtime **test matrix**: the instructor's Gecko-comprehended Orquestra surface probed by Claude Code, Hermes, and a SendAI agent — same questions, graded on receipts | `probe_matrix.py` scorecard; live when the hosted surface is up |
 
 Background reading: [docs/guides/solana-agent-stacks.md](../docs/guides/solana-agent-stacks.md)
 (SendAI vs Hermes, honestly compared) and the

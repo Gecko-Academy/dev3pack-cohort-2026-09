@@ -16,7 +16,7 @@ certificate when you pass.
 
 ## How it works
 
-1. **Build your agent** in `agent.py` — not released yet. As shipped it scores 30%:
+1. **Build your agent** in [`agent.py`](agent.py). As shipped it scores 30%:
    the refusal questions pass, the grounded ones do not. That is deliberate.
    The default answer is honest and insufficient, which is the whole course in
    one file. Improve it: configure a provider, tune retrieval, handle the

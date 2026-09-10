@@ -18,12 +18,12 @@ say. Those decisions stay yours, and this track is six of them.
 
 | # | Module | The decision you make |
 |---|---|---|
-| 1 | Building full-stack applications — not released yet | Where the boundary goes, and what a caller sees when it works, refuses, or breaks |
-| 2 | Managing data — not released yet | In memory or durable, what to keep, and what you refuse to keep at all |
-| 3 | Designing system architectures — not released yet | Synchronous or not, and the measurement that would reverse the call |
-| 4 | Making systems secure and reliable — not released yet | Fail closed or degrade, and the risk you decide to live with |
-| 5 | Scaling and operating in production — not released yet | Measured or aspirational, and what you would actually page on |
-| 6 | Retrieval over a graph — not released yet | When a graph earns its keep over plain search, and what maintaining it costs |
+| 1 | [Building full-stack applications](01-full-stack/) | Where the boundary goes, and what a caller sees when it works, refuses, or breaks |
+| 2 | [Managing data](02-managing-data/) | In memory or durable, what to keep, and what you refuse to keep at all |
+| 3 | [Designing system architectures](03-architecture/) | Synchronous or not, and the measurement that would reverse the call |
+| 4 | [Making systems secure and reliable](04-secure-and-reliable/) | Fail closed or degrade, and the risk you decide to live with |
+| 5 | [Scaling and operating in production](05-production/) | Measured or aspirational, and what you would actually page on |
+| 6 | [Retrieval over a graph](06-graph-rag/) | When a graph earns its keep over plain search, and what maintaining it costs |
 
 Each is one notebook of two to three exercises, roughly 45 minutes, built on the
 same assistant you build during the course. Everything runs offline against

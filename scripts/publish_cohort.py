@@ -510,17 +510,31 @@ def trim_toctree(destination: Path, week: int) -> list[str]:
 ANNOTATED_SUFFIX = ".md"
 
 
-def _absent_note(target: str, destination: Path) -> str | None:
+def _absent_note(target: str, destination: Path, document: Path) -> str | None:
     """Why this link's target is not in the student's copy, or None if it is.
 
     Three answers, and the difference matters to whoever reads it: it opens on a
     date, it is withheld from every week, or it is simply not there.
+
+    RESOLVED AGAINST THE DOCUMENT, not against the repository root. A markdown link
+    is relative to the file it sits in: `harness-engineering.md` inside
+    `docs/guides/loop-engineering.md` means `docs/guides/harness-engineering.md`.
+    Resolving it at the root looked for it beside `README.md`, found nothing, and
+    unwrapped a link that worked — silently damaging the shipped guides.
     """
-    relative = target.rstrip("/").lstrip("./")
-    while relative.startswith("../"):
-        relative = relative[3:]
-    if (destination / relative).exists():
+    head = target.rstrip("/")
+    resolved = (document.parent / head).resolve()
+    if resolved.exists():
         return None
+
+    # For the explanation only: the target as a path under the destination root,
+    # so the chapter/deny-list checks below read the same names they always did.
+    try:
+        relative = resolved.relative_to(destination.resolve()).as_posix()
+    except ValueError:
+        relative = head.lstrip("./")
+        while relative.startswith("../"):
+            relative = relative[3:]
     # EVERY segment, not just the last. A link to a page INSIDE an unreleased
     # session ends in `introduction.mdx`, and matching only the tail lost the
     # date and said the uselessly vague "not released yet" instead.
@@ -551,7 +565,7 @@ def annotate_missing_links(destination: Path, week: int) -> int:
     def unwrap(match: re.Match[str]) -> str:
         nonlocal changed
         title, target = match.group(1), match.group(2)
-        note = _absent_note(target, destination)
+        note = _absent_note(target, destination, document)
         if note is None:
             return match.group(0)
         changed += 1

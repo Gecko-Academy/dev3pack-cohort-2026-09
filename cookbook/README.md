@@ -26,27 +26,27 @@ uv run python scripts/check_notebooks.py cookbook   # they all pass or skip clea
 
 | # | Notebook | What it teaches | Runs |
 |---|---|---|---|
-| 01 | Welcome to Gecko — not released yet | What comprehension/provenance/recorded mode are; the doctor | offline (+opt-in live) |
-| 02 | Comprehend an OpenAPI — not released yet | Spec in → question-shaped tools out; auth surfaced, never valued | offline (+opt-in live) |
-| 03 | Recorded-mode calls — not released yet | One code path, two modes; deterministic examples from schemas | offline |
-| 04 | Connect an MCP client — not released yet | `gecko serve` → Claude Code / Cursor config; sanity checks | manual (edits config) |
-| 05 | Read the report — not released yet | Provenance tiers; why unknowns are a feature | offline |
+| 01 | [Welcome to Gecko](introduction/01_welcome_to_gecko.ipynb) | What comprehension/provenance/recorded mode are; the doctor | offline (+opt-in live) |
+| 02 | [Comprehend an OpenAPI](introduction/02_comprehend_an_openapi.ipynb) | Spec in → question-shaped tools out; auth surfaced, never valued | offline (+opt-in live) |
+| 03 | [Recorded-mode calls](introduction/03_recorded_mode_calls.ipynb) | One code path, two modes; deterministic examples from schemas | offline |
+| 04 | [Connect an MCP client](introduction/04_connect_mcp_client.ipynb) | `gecko serve` → Claude Code / Cursor config; sanity checks | manual (edits config) |
+| 05 | [Read the report](introduction/05_read_the_report.ipynb) | Provenance tiers; why unknowns are a feature | offline |
 
 ## Integrations
 
 | # | Notebook | What it teaches | Runs |
 |---|---|---|---|
-| 06 | The capstone meets Gecko — not released yet | A comprehended surface as one more bounded tool in the bootcamp agent | offline |
-| 07 | Two APIs, one assistant — not released yet | Surface-then-operation routing; the routing floor as a safety control | offline |
-| 11 | The Autonomous Petshop — not released yet | LangGraph pipeline: comprehend a multi-API system → correlate by value domain → emit an **Arazzo** workflow → simulate it → assemble a consumable agent graph with provenance. `uv run` resolves its own deps; `PETSTORE_LIVE=1` executes the GET steps against the real Swagger Petstore | offline (+opt-in live GETs) |
+| 06 | [The capstone meets Gecko](integrations/06_capstone_meets_gecko.ipynb) | A comprehended surface as one more bounded tool in the bootcamp agent | offline |
+| 07 | [Two APIs, one assistant](integrations/07_two_apis_one_assistant.ipynb) | Surface-then-operation routing; the routing floor as a safety control | offline |
+| 11 | [The Autonomous Petshop](integrations/11_autonomous_petshop.py) | LangGraph pipeline: comprehend a multi-API system → correlate by value domain → emit an **Arazzo** workflow → simulate it → assemble a consumable agent graph with provenance. `uv run` resolves its own deps; `PETSTORE_LIVE=1` executes the GET steps against the real Swagger Petstore | offline (+opt-in live GETs) |
 
 ## Advanced
 
 | # | Notebook | What it teaches | Runs |
 |---|---|---|---|
-| 08 | Anti-poisoning — not released yet | A poisoned spec fixture, a miniature detector, the fail-closed layers | offline |
-| 09 | Program graph & find_start — not released yet | Instruction↔account graph, derivation order, intent → starting instruction | offline |
-| 10 | Full loop on the hosted fork — not released yet | browse → comprehend → prepare → try → **receipt of what moved** | manual (hosted MCP) |
+| 08 | [Anti-poisoning](advanced/08_anti_poisoning.ipynb) | A poisoned spec fixture, a miniature detector, the fail-closed layers | offline |
+| 09 | [Program graph & find_start](advanced/09_program_graph_find_start.ipynb) | Instruction↔account graph, derivation order, intent → starting instruction | offline |
+| 10 | [Full loop on the hosted fork](advanced/10_full_loop_hosted_fork.ipynb) | browse → comprehend → prepare → try → **receipt of what moved** | manual (hosted MCP) |
 
 ## Fixtures
 
