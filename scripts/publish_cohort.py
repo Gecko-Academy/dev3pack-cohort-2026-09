@@ -736,6 +736,22 @@ def main(argv: list[str] | None = None) -> int:
     if withdrawn:
         print(f"\n  withdrew {len(withdrawn)} file(s) no longer in the release")
 
+    # RE-TRIM AFTER THE WITHDRAWAL, not before it.
+    #
+    # `build()` trims the contents and annotates links while LAST week's files
+    # are still on disk, so on a downgrade (week 1 back to week 0) it sees the
+    # higher week's pages, keeps their groups, and the withdrawal then deletes
+    # the pages underneath them. That shipped 30 dead contents entries pointing
+    # at `unit1/session-01-…` after a rollback.
+    #
+    # The pristine file is re-copied first because trimming an already-trimmed
+    # toctree would fold the previous run's trailing comment into the last group.
+    toctree = destination / UNITS / "_toctree.yml"
+    if (ROOT / UNITS / "_toctree.yml").is_file():
+        shutil.copy2(ROOT / UNITS / "_toctree.yml", toctree)
+        trim_toctree(destination, args.week)
+        annotate_missing_links(destination, args.week)
+
     write_manifest(destination, shipped_files(ROOT, args.week, released_solutions))
     if first_manifest:
         # Before the manifest existed, a file the course deleted could only be

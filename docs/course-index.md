@@ -55,11 +55,11 @@ Mon 14 Sep to Fri 18 Sep
 
 | Day | # | Session | Checks | Runs unattended |
 |---|---|---|---|---|
-| Mon 14 Sep | 1 | [Configure the assistant and the repository instructions](../units/en/unit1/session-01-assistant-configuration/) | 1 | no: assistant-driven: it edits your editor and assistant configuration |
-| Tue 15 Sep | 2 | [Call a model through the adapter](../units/en/unit1/session-02-model-adapter/) | 4 | yes |
-| Wed 16 Sep | 3 | [Structured outputs](../units/en/unit1/session-03-structured-outputs/) | 3 | yes |
-| Thu 17 Sep | 4 | [Bounded tools](../units/en/unit1/session-04-bounded-tools/) | 3 | yes |
-| Fri 18 Sep | 5 | [A deterministic mini-agent](../units/en/unit1/session-05-deterministic-mini-agent/) | 2 | yes |
+| Mon 14 Sep | 1 | Configure the assistant and the repository instructions — not yet | 1 | no: assistant-driven: it edits your editor and assistant configuration |
+| Tue 15 Sep | 2 | Call a model through the adapter — not yet | 4 | yes |
+| Wed 16 Sep | 3 | Structured outputs — not yet | 3 | yes |
+| Thu 17 Sep | 4 | Bounded tools — not yet | 3 | yes |
+| Fri 18 Sep | 5 | A deterministic mini-agent — not yet | 2 | yes |
 
 ## Week 2: Retrieval, graphs, evaluation, skills
 

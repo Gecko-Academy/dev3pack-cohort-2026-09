@@ -121,31 +121,31 @@ Every exercise in `notebook.ipynb` has the same shape: context, numbered instruc
 
 ### Session 1 — Configure the assistant and the repository instructions (Mon 14 Sep)
 
-`ch01` · handed in, not marked · [page](../units/en/unit1/session-01-assistant-configuration/introduction.mdx)
+`ch01` · handed in, not marked · page — opens Mon 14 Sep
 
 You leave with a coding assistant that reads this repository's policy before it edits, a scoped instruction set you wrote (`AGENTS.md` as the canonical file, `CLAUDE.md` and `.cursor/rules/*.mdc` pointing at it), the acceptance checks that decide when a change is done, and one record of the inspect → plan → edit → test → review loop with a change you refused. Day one also carries the orientation: the request → context → model → tool → verification mental model, and the capstone you build over three weeks.
 
 ### Session 2 — Call a model through the adapter (Tue 15 Sep)
 
-`ch02` · 4 checks · [page](../units/en/unit1/session-02-model-adapter/introduction.mdx)
+`ch02` · 4 checks · page — opens Tue 15 Sep
 
 You call a model through the course adapter instead of a vendor SDK. The same prompt runs on two lanes — the deterministic `FakeLLM` and whichever provider your `.env` names — and you can say what differed and what was never allowed to. You write down your reliability bar for the rest of the course. Then you handle the three ways a provider fails you: a credential that is missing, a model the lane does not serve, and a call that runs past its deadline. The timeout leaves as a flagged refusal your caller can read, not a traceback.
 
 ### Session 3 — Structured outputs (Wed 16 Sep)
 
-`ch03` · 3 checks · [page](../units/en/unit1/session-03-structured-outputs/introduction.mdx)
+`ch03` · 3 checks · page — opens Wed 16 Sep
 
 You leave with a typed answer contract and the code that enforces it: the `ResearchAnswer` schema (`answer`, `citations`, `confidence`, `needs_human_review`), a strict parser that rejects everything else, and the retry-once-then-refuse pattern that keeps a bad model reply out of the rest of the program. You also write the smallest evaluation there is — three golden questions, one answerable, one ambiguous, one unsupported — and watch the agent refuse the unsupported one *before* it spends a model call.
 
 ### Session 4 — Bounded tools (Thu 17 Sep)
 
-`ch04` · 3 checks · [page](../units/en/unit1/session-04-bounded-tools/introduction.mdx)
+`ch04` · 3 checks · page — opens Thu 17 Sep
 
 You leave with five read-only tools whose boundaries you can prove: a registry you read as a contract, a `list_documents` tool with a narrow schema and four clauses, a `convert_currency` tool that refuses bad arguments before it touches the network, an allow-list that decides which host a tool may reach at all, and a guard that flags an order hidden in what a tool returned. Three checks say so, and the notebook is the arbiter.
 
 ### Session 5 — A deterministic mini-agent (Fri 18 Sep)
 
-`ch05` · 2 checks · [page](../units/en/unit1/session-05-deterministic-mini-agent/introduction.mdx)
+`ch05` · 2 checks · page — opens Fri 18 Sep
 
 Complete a small tool-calling loop end to end, with `FakeLLM`, and prove three things about it: it stops at its budget, it notices a repeated call, and it ends safely when a tool refuses. The trace is the receipt. You leave with `run_loop(plan, tools, budget)` — four designed exits, one recorded step per tool call, and a refusal a caller can read on every exit that is not an answer.
 

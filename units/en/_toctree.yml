@@ -49,76 +49,6 @@
   sections:
   - local: unit0/w12-dsa-for-agents/introduction
     title: "Unit 12. Data structures for agents"
-- title: "Session 1. Configure the assistant and the repository instructions — Mon 14 Sep"
-  sections:
-  - local: unit1/session-01-assistant-configuration/introduction
-    title: "Introduction"
-  - local: unit1/session-01-assistant-configuration/concepts-1
-    title: "Day one: the mental model, then two prompts"
-  - local: unit1/session-01-assistant-configuration/concepts-2
-    title: "Instructions are code"
-  - local: unit1/session-01-assistant-configuration/concepts-3
-    title: "The task loop, enforced by you"
-  - local: unit1/session-01-assistant-configuration/quiz
-    title: "Quick quiz (ungraded)"
-  - local: unit1/session-01-assistant-configuration/conclusion
-    title: "Conclusion"
-- title: "Session 2. Call a model through the adapter — Tue 15 Sep"
-  sections:
-  - local: unit1/session-02-model-adapter/introduction
-    title: "Introduction"
-  - local: unit1/session-02-model-adapter/concepts-1
-    title: "The provider seam"
-  - local: unit1/session-02-model-adapter/concepts-2
-    title: "The same prompt on two lanes"
-  - local: unit1/session-02-model-adapter/concepts-3
-    title: "Failing closed"
-  - local: unit1/session-02-model-adapter/quiz
-    title: "Quick quiz (ungraded)"
-  - local: unit1/session-02-model-adapter/conclusion
-    title: "Conclusion"
-- title: "Session 3. Structured outputs — Wed 16 Sep"
-  sections:
-  - local: unit1/session-03-structured-outputs/introduction
-    title: "Introduction"
-  - local: unit1/session-03-structured-outputs/concepts-1
-    title: "Prose is for people, JSON is for software"
-  - local: unit1/session-03-structured-outputs/concepts-2
-    title: "Parsing is your job"
-  - local: unit1/session-03-structured-outputs/concepts-3
-    title: "Golden questions, and the agent on your lane"
-  - local: unit1/session-03-structured-outputs/quiz
-    title: "Quick quiz (ungraded)"
-  - local: unit1/session-03-structured-outputs/conclusion
-    title: "Conclusion"
-- title: "Session 4. Bounded tools — Thu 17 Sep"
-  sections:
-  - local: unit1/session-04-bounded-tools/introduction
-    title: "Introduction"
-  - local: unit1/session-04-bounded-tools/concepts-1
-    title: "A tool is a contract"
-  - local: unit1/session-04-bounded-tools/concepts-2
-    title: "Boundary tests: oversized input, forbidden targets"
-  - local: unit1/session-04-bounded-tools/concepts-3
-    title: "Tool output is untrusted"
-  - local: unit1/session-04-bounded-tools/quiz
-    title: "Quick quiz (ungraded)"
-  - local: unit1/session-04-bounded-tools/conclusion
-    title: "Conclusion"
-- title: "Session 5. A deterministic mini-agent — Fri 18 Sep"
-  sections:
-  - local: unit1/session-05-deterministic-mini-agent/introduction
-    title: "Introduction"
-  - local: unit1/session-05-deterministic-mini-agent/concepts-1
-    title: "The loop, and the plan that stands in for a model"
-  - local: unit1/session-05-deterministic-mini-agent/concepts-2
-    title: "Budgets, and the call that comes round again"
-  - local: unit1/session-05-deterministic-mini-agent/concepts-3
-    title: "Safe termination, and the trace as the receipt"
-  - local: unit1/session-05-deterministic-mini-agent/quiz
-    title: "Quick quiz (ungraded)"
-  - local: unit1/session-05-deterministic-mini-agent/conclusion
-    title: "Conclusion"
 - title: "Depth track (optional)"
   sections:
   - local: tracks/depth/introduction
@@ -158,6 +88,11 @@
 
 # Not in this repository yet. Each arrives on its Monday and
 # `git pull` brings it; the dates are in the README.
+#   Session 1. Configure the assistant and the repository instructions — Mon 14 Sep
+#   Session 2. Call a model through the adapter — Tue 15 Sep
+#   Session 3. Structured outputs — Wed 16 Sep
+#   Session 4. Bounded tools — Thu 17 Sep
+#   Session 5. A deterministic mini-agent — Fri 18 Sep
 #   Session 6. A retrieval baseline — Mon 21 Sep
 #   Session 7. Retrieval and grounding metrics — Tue 22 Sep
 #   Session 8. Loops and graphs — Wed 23 Sep
