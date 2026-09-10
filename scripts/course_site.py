@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -40,6 +41,7 @@ from bootcamp_agent.curriculum import (  # noqa: E402
     CAPSTONE,
     CHAPTERS,
     COURSE_RELEASE,
+    TRACKS_ROOT,
     UNITS_ROOT,
     WEEK0_COURSES,
     WEEK0_UNITS,
@@ -194,10 +196,20 @@ def pages(directory: Path) -> list[Path]:
     )
 
 
+def _local(page: Path) -> str:
+    """A toctree `local`: the page's path under `units/en`, without its suffix.
+
+    NOT `directory.name`. Units nest by week now, so a session's page is
+    `unit1/session-02-model-adapter/introduction`, and a name alone would
+    collide the moment two weeks held the same leaf.
+    """
+    return page.relative_to(UNITS_ROOT).with_suffix("").as_posix()
+
+
 def _sections(directory: Path, first_title: str | None = None) -> list[dict[str, str]]:
     sections = []
     for page in pages(directory):
-        local = f"{directory.name}/{page.stem}"
+        local = _local(page)
         title = first_title if (page.stem == "introduction" and first_title) else page_title(page)
         sections.append({"local": local, "title": title})
     return sections
@@ -216,7 +228,7 @@ def groups() -> list[dict[str, object]]:
             {
                 "title": "Unit 0. Welcome to the course",
                 "sections": [
-                    {"local": f"{UNIT0}/{page.stem}", "title": page_title(page)} for page in ordered
+                    {"local": _local(page), "title": page_title(page)} for page in ordered
                 ],
             }
         )
@@ -235,11 +247,19 @@ def groups() -> list[dict[str, object]]:
                 "sections": _sections(chapter.directory, "Introduction"),
             }
         )
-
-    out.append({"title": CAPSTONE.title, "sections": _sections(CAPSTONE.directory, "Introduction")})
+        # The capstone opens with a week, so it belongs after that week's last
+        # session rather than after all fifteen.
+        last_of_week = [c for c in CHAPTERS if c.module == chapter.module][-1]
+        if chapter is last_of_week and chapter.module == CAPSTONE.opens_in_week:
+            out.append(
+                {
+                    "title": CAPSTONE.title,
+                    "sections": _sections(CAPSTONE.directory, "Introduction"),
+                }
+            )
 
     for name, title in TRAILING:
-        directory = UNITS_ROOT / name
+        directory = UNITS_ROOT / TRACKS_ROOT / name
         if directory.is_dir() and pages(directory):
             out.append({"title": title, "sections": _sections(directory)})
 
@@ -486,17 +506,37 @@ def render_plan() -> str:
 def _ordered_units() -> list[tuple[Path, str]]:
     """Every unit directory that gets a Previous/Next, in course order."""
     ordered: list[tuple[Path, str]] = [(unit.directory, unit.title) for unit in WEEK0_UNITS]
-    ordered += [(chapter.directory, chapter.title) for chapter in CHAPTERS]
-    ordered.append((CAPSTONE.directory, CAPSTONE.title))
+    for chapter in CHAPTERS:
+        ordered.append((chapter.directory, chapter.title))
+        # The capstone sits in the week it opens with, so Previous and Next
+        # walk through it there rather than parking it after demo day.
+        last_of_week = [c for c in CHAPTERS if c.module == chapter.module][-1]
+        if chapter is last_of_week and chapter.module == CAPSTONE.opens_in_week:
+            ordered.append((CAPSTONE.directory, CAPSTONE.title))
     return ordered
 
 
-def _nav_block(previous: tuple[Path, str] | None, following: tuple[Path, str] | None) -> str:
+def _nav_block(
+    here: Path,
+    previous: tuple[Path, str] | None,
+    following: tuple[Path, str] | None,
+) -> str:
+    """Previous and Next, as paths relative to the page they sit on.
+
+    `../{name}/` only worked while every unit was a sibling. Units nest by week
+    now, so the last session of week 1 links up and across into week 2, and the
+    depth has to be computed rather than assumed.
+    """
+
+    def link(label: str, target: Path) -> str:
+        rel = os.path.relpath(target / "introduction.mdx", here)
+        return f"[{label}]({rel})"
+
     parts = []
     if previous:
-        parts.append(f"[Previous: {previous[1]}](../{previous[0].name}/introduction.mdx)")
+        parts.append(link(f"Previous: {previous[1]}", previous[0]))
     if following:
-        parts.append(f"[Next: {following[1]}](../{following[0].name}/introduction.mdx)")
+        parts.append(link(f"Next: {following[1]}", following[0]))
     return f"{NAV_START}\n{' · '.join(parts)}\n{NAV_END}\n"
 
 
@@ -519,7 +559,7 @@ def navigation_files() -> dict[Path, str]:
         previous = ordered[index - 1] if index > 0 else None
         following = ordered[index + 1] if index + 1 < len(ordered) else None
         out[page] = with_navigation(
-            page.read_text(encoding="utf-8"), _nav_block(previous, following)
+            page.read_text(encoding="utf-8"), _nav_block(directory, previous, following)
         )
     return out
 
@@ -530,9 +570,13 @@ def navigation_files() -> dict[Path, str]:
 def validate() -> list[str]:
     """Everything wrong with the tree, each naming the path."""
     problems: list[str] = []
-    known = {UNIT0, *BONUS_DIRS, *(name for name, _ in TRAILING)}
+    known = {
+        (UNITS_ROOT / UNIT0).resolve(),
+        *((UNITS_ROOT / name).resolve() for name in BONUS_DIRS),
+        *((UNITS_ROOT / TRACKS_ROOT / name).resolve() for name, _ in TRAILING),
+    }
     for directory, _title in _ordered_units():
-        known.add(directory.name)
+        known.add(directory.resolve())
         if not (directory / "introduction.mdx").is_file():
             problems.append(f"{directory.relative_to(ROOT)}: no introduction.mdx")
     for chapter in CHAPTERS:
@@ -547,8 +591,14 @@ def validate() -> list[str]:
     for path in (CAPSTONE.notebook, CAPSTONE.solutions):
         if not path.is_file():
             problems.append(f"{path.relative_to(ROOT)}: missing")
-    for entry in sorted(UNITS_ROOT.iterdir()):
-        if entry.is_dir() and entry.name not in known:
+    # A unit directory is one holding pages. Walk to find them, because the
+    # containers (`unit1/`, `bonus/`, `tracks/`) are not units themselves.
+    for entry in sorted(UNITS_ROOT.rglob("*")):
+        if not entry.is_dir() or entry.name == "solutions" or "solutions" in entry.parts:
+            continue
+        if not any(entry.glob("*.mdx")):
+            continue
+        if entry.resolve() not in known:
             problems.append(f"{entry.relative_to(ROOT)}: not a unit the curriculum knows")
     # A link that does not resolve is a 404 for a learner, and the whole reason
     # the tree moved was that every link in the old index was one. Code spans
@@ -581,11 +631,10 @@ def validate() -> list[str]:
         for group in groups()
         for section in group["sections"]  # type: ignore[union-attr]
     }
-    for page in sorted(UNITS_ROOT.glob("*/*.mdx")):
-        local = f"{page.parent.name}/{page.stem}"
-        if page.name.startswith(("_", "loader-")):
+    for page in sorted(UNITS_ROOT.rglob("*.mdx")):
+        if page.name.startswith(("_", "loader-")) or "solutions" in page.parts:
             continue
-        if local not in reachable:
+        if _local(page) not in reachable:
             problems.append(f"{page.relative_to(ROOT)}: not reachable from _toctree.yml")
     return problems
 

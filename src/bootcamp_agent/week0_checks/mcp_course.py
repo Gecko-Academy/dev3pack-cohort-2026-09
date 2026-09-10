@@ -28,10 +28,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from bootcamp_agent.checks import register
+from bootcamp_agent.curriculum import unit_by_prefix
 from bootcamp_agent.week0_checks.fast_lane import _unwritten
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-FIXTURES = REPO_ROOT / "units" / "en" / "w09-mcp-first-server" / "fixtures"
+FIXTURES = unit_by_prefix("w09").directory / "fixtures"
 TIMEZONES = FIXTURES / "timezones.json"
 
 #: How long a probe gets to start the learner's server, ask it one thing, and exit.

@@ -39,9 +39,9 @@ homework; the lecture never extends into the lab.
 
 | Thread | Sessions | Guide |
 |---|---|---|
-| Loop engineering — budgets, stopping conditions, refusal-first design | 5, 8, 11 | [loop-engineering](guides/loop-engineering.md) |
-| Graph engineering — retrieval metadata → state graphs → API surface graphs | 6–8, 12–13 | [graph-engineering](guides/graph-engineering.md) |
-| Harness engineering — instructions, evals, traces, CI around the model | 1, 9, 14 | [harness-engineering](guides/harness-engineering.md) |
+| Loop engineering — budgets, stopping conditions, refusal-first design | 5, 8, 11 | loop-engineering — not released yet |
+| Graph engineering — retrieval metadata → state graphs → API surface graphs | 6–8, 12–13 | graph-engineering — not released yet |
+| Harness engineering — instructions, evals, traces, CI around the model | 1, 9, 14 | harness-engineering — not released yet |
 
 ## Shared capstone thread
 
@@ -63,57 +63,57 @@ and never marked.
 
 ### The fast lane
 
-**Unit 1 — The environment** ([page](../units/en/w01-environment/introduction.mdx), 3 checks)
+**Unit 1 — The environment** ([page](../units/en/unit0/w01-environment/introduction.mdx), 3 checks)
 
 prove which Python and repository environment will execute the course before debugging agent code.
 
-**Unit 2 — Packages and documentation** ([page](../units/en/w02-packages-and-docs/introduction.mdx), 3 checks)
+**Unit 2 — Packages and documentation** ([page](../units/en/unit0/w02-packages-and-docs/introduction.mdx), 3 checks)
 
 inspect an installed package and its authoritative documentation instead of guessing APIs from memory.
 
-**Unit 3 — Classes and contracts** ([page](../units/en/w03-classes-and-contracts/introduction.mdx), 3 checks)
+**Unit 3 — Classes and contracts** ([page](../units/en/unit0/w03-classes-and-contracts/introduction.mdx), 3 checks)
 
 turn a prose requirement into a typed input/output boundary with explicit failure behavior.
 
-**Unit 4 — Calling a real API** ([page](../units/en/w04-real-apis/introduction.mdx), 4 checks)
+**Unit 4 — Calling a real API** ([page](../units/en/unit0/w04-real-apis/introduction.mdx), 4 checks)
 
 make one bounded HTTP call through an application-owned adapter and preserve an offline test path.
 
 ### Course A — Software engineering foundations
 
-**Unit 5 — Packages, PyPI and PEP 8** ([page](../units/en/w05-packages-and-pep8/introduction.mdx), 3 checks)
+**Unit 5 — Packages, PyPI and PEP 8** ([page](../units/en/unit0/w05-packages-and-pep8/introduction.mdx), 3 checks)
 
 Every exercise in `notebook.ipynb` has the same shape: context, numbered instructions, a starter that runs as shipped and gives a wrong or incomplete answer (marked `<------ EDIT THIS LINE`), the expected output, and a `check(...)` cell that prints ✅ or ❌ with the fix named. The last cell, `review("w05")`, is the scorecard.
 
-**Unit 6 — A portable package** ([page](../units/en/w06-portable-packages/introduction.mdx), 3 checks)
+**Unit 6 — A portable package** ([page](../units/en/unit0/w06-portable-packages/introduction.mdx), 3 checks)
 
 Every exercise in `notebook.ipynb` has the same shape: context, numbered instructions, a starter that runs as shipped and gives a wrong or incomplete answer (marked `<------ EDIT THIS LINE`), the expected output, and a `check(...)` cell that prints ✅ or ❌ with the fix named. The last cell, `review("w06")`, is the scorecard.
 
-**Unit 7 — Classes in a package** ([page](../units/en/w07-classes-in-packages/introduction.mdx), 4 checks)
+**Unit 7 — Classes in a package** ([page](../units/en/unit0/w07-classes-in-packages/introduction.mdx), 4 checks)
 
 Every exercise in `notebook.ipynb` has the same shape: context, numbered instructions, a starter that runs as shipped and gives a wrong or incomplete answer (marked `<------ EDIT THIS LINE`), the expected output, and a `check(...)` cell that prints ✅ or ❌ with the fix named. The last cell, `review("w07")`, is the scorecard.
 
-**Unit 8 — Documentation, tests and readability** ([page](../units/en/w08-docs-tests-readability/introduction.mdx), 3 checks)
+**Unit 8 — Documentation, tests and readability** ([page](../units/en/unit0/w08-docs-tests-readability/introduction.mdx), 3 checks)
 
 Every exercise in `notebook.ipynb` has the same shape: context, numbered instructions, a starter that runs as shipped and gives a wrong or incomplete answer (marked `<------ EDIT THIS LINE`), the expected output, and a `check(...)` cell that prints ✅ or ❌ with the fix named. The last cell, `review("w08")`, is the scorecard.
 
 ### Course B — MCP: AI apps as easy as 1, 2, 3
 
-**Unit 9 — Your first MCP server** ([page](../units/en/w09-mcp-first-server/introduction.mdx), 3 checks)
+**Unit 9 — Your first MCP server** ([page](../units/en/unit0/w09-mcp-first-server/introduction.mdx), 3 checks)
 
 Every exercise in `notebook.ipynb` has the same shape: context, numbered instructions, a starter that runs as shipped and gives a wrong or incomplete answer (marked `<------ EDIT THIS LINE`), the expected output, and a `check(...)` cell that prints ✅ or ❌ with the fix named. The last cell, `review("w09")`, is the scorecard.
 
-**Unit 10 — Resources, prompts, and the LLM** ([page](../units/en/w10-mcp-resources-prompts-llms/introduction.mdx), 4 checks)
+**Unit 10 — Resources, prompts, and the LLM** ([page](../units/en/unit0/w10-mcp-resources-prompts-llms/introduction.mdx), 4 checks)
 
 Every exercise in `notebook.ipynb` has the same shape: context, numbered instructions, a starter that runs as shipped and gives a wrong or incomplete answer (marked `<------ EDIT THIS LINE`), the expected output, and a `check(...)` cell that prints ✅ or ❌ with the fix named. The last cell, `review("w10")`, is the scorecard.
 
-**Unit 11 — Databases, APIs, and third-party servers** ([page](../units/en/w11-mcp-data-apis-third-party/introduction.mdx), 3 checks)
+**Unit 11 — Databases, APIs, and third-party servers** ([page](../units/en/unit0/w11-mcp-data-apis-third-party/introduction.mdx), 3 checks)
 
 Every exercise in `notebook.ipynb` has the same shape: context, numbered instructions, a starter that runs as shipped and gives a wrong or incomplete answer (marked `<------ EDIT THIS LINE`), the expected output, and a `check(...)` cell that prints ✅ or ❌ with the fix named. The last cell, `review("w11")`, is the scorecard.
 
 ### Course C — Data structures for agents
 
-**Unit 12 — Data structures for agents** ([page](../units/en/w12-dsa-for-agents/introduction.mdx), 4 checks)
+**Unit 12 — Data structures for agents** ([page](../units/en/unit0/w12-dsa-for-agents/introduction.mdx), 4 checks)
 
 Every exercise in `notebook.ipynb` has the same shape: context, numbered instructions, a starter that runs as shipped and gives a wrong or incomplete answer (marked `<------ EDIT THIS LINE`), the expected output, and a `check(...)` cell that prints ✅ or ❌ with the fix named. The last cell, `review("w12")`, is the scorecard.
 
@@ -121,31 +121,31 @@ Every exercise in `notebook.ipynb` has the same shape: context, numbered instruc
 
 ### Session 1 — Configure the assistant and the repository instructions (Mon 14 Sep)
 
-`ch01` · handed in, not marked · [page](../units/en/session-01-assistant-configuration/introduction.mdx)
+`ch01` · handed in, not marked · page — opens Mon 14 Sep
 
 You leave with a coding assistant that reads this repository's policy before it edits, a scoped instruction set you wrote (`AGENTS.md` as the canonical file, `CLAUDE.md` and `.cursor/rules/*.mdc` pointing at it), the acceptance checks that decide when a change is done, and one record of the inspect → plan → edit → test → review loop with a change you refused. Day one also carries the orientation: the request → context → model → tool → verification mental model, and the capstone you build over three weeks.
 
 ### Session 2 — Call a model through the adapter (Tue 15 Sep)
 
-`ch02` · 4 checks · [page](../units/en/session-02-model-adapter/introduction.mdx)
+`ch02` · 4 checks · page — opens Tue 15 Sep
 
 You call a model through the course adapter instead of a vendor SDK. The same prompt runs on two lanes — the deterministic `FakeLLM` and whichever provider your `.env` names — and you can say what differed and what was never allowed to. You write down your reliability bar for the rest of the course. Then you handle the three ways a provider fails you: a credential that is missing, a model the lane does not serve, and a call that runs past its deadline. The timeout leaves as a flagged refusal your caller can read, not a traceback.
 
 ### Session 3 — Structured outputs (Wed 16 Sep)
 
-`ch03` · 3 checks · [page](../units/en/session-03-structured-outputs/introduction.mdx)
+`ch03` · 3 checks · page — opens Wed 16 Sep
 
 You leave with a typed answer contract and the code that enforces it: the `ResearchAnswer` schema (`answer`, `citations`, `confidence`, `needs_human_review`), a strict parser that rejects everything else, and the retry-once-then-refuse pattern that keeps a bad model reply out of the rest of the program. You also write the smallest evaluation there is — three golden questions, one answerable, one ambiguous, one unsupported — and watch the agent refuse the unsupported one *before* it spends a model call.
 
 ### Session 4 — Bounded tools (Thu 17 Sep)
 
-`ch04` · 3 checks · [page](../units/en/session-04-bounded-tools/introduction.mdx)
+`ch04` · 3 checks · page — opens Thu 17 Sep
 
 You leave with five read-only tools whose boundaries you can prove: a registry you read as a contract, a `list_documents` tool with a narrow schema and four clauses, a `convert_currency` tool that refuses bad arguments before it touches the network, an allow-list that decides which host a tool may reach at all, and a guard that flags an order hidden in what a tool returned. Three checks say so, and the notebook is the arbiter.
 
 ### Session 5 — A deterministic mini-agent (Fri 18 Sep)
 
-`ch05` · 2 checks · [page](../units/en/session-05-deterministic-mini-agent/introduction.mdx)
+`ch05` · 2 checks · page — opens Fri 18 Sep
 
 Complete a small tool-calling loop end to end, with `FakeLLM`, and prove three things about it: it stops at its budget, it notices a repeated call, and it ends safely when a tool refuses. The trace is the receipt. You leave with `run_loop(plan, tools, budget)` — four designed exits, one recorded step per tool call, and a refusal a caller can read on every exit that is not an answer.
 
@@ -153,31 +153,31 @@ Complete a small tool-calling loop end to end, with `FakeLLM`, and prove three t
 
 ### Session 6 — A retrieval baseline (Mon 21 Sep)
 
-`ch06` · 3 checks · [page](../units/en/session-06-retrieval-baseline/introduction.mdx)
+`ch06` · 3 checks · page — opens Mon 21 Sep
 
 You leave with both halves of a retrieval baseline, and with the failures that come with it. The first half is the corpus: a typed loader that turns a directory of markdown into `Document` values or refuses out loud, and the smallest index there is, a tag mapped to the documents that carry it. The second half is retrieval over what that loader produced: chunk each document, score the chunks by token overlap weighted by inverse document frequency, return the top k with their scores. Then you classify what came back for three queries, and you watch the baseline fail in the three ways it fails: nothing comes back, the index is older than the corpus, and one confident hit points at the wrong document.
 
 ### Session 7 — Retrieval and grounding metrics (Tue 22 Sep)
 
-`ch07` · 3 checks · [page](../units/en/session-07-grounding-metrics/introduction.mdx)
+`ch07` · 3 checks · page — opens Tue 22 Sep
 
 You leave with three numbers you produced yourself and can defend: a retrieval baseline (hit rate at k on a labeled set), a grounding baseline (the golden set's pass rate), and the cost of the one change you made between them. You write the labeled set, find a query that breaks lexical retrieval, fix it with query expansion, and measure the fix twice — on the cases it was written for and on four it never saw. Then you turn on the evaluator itself: a fake that answers every question with the same sentence and cites the same document scores **50%** on the golden set, and you write down why.
 
 ### Session 8 — Loops and graphs (Wed 23 Sep)
 
-`ch08` · 3 checks · [page](../units/en/session-08-loops-and-graphs/introduction.mdx)
+`ch08` · 3 checks · page — opens Wed 23 Sep
 
 You build one task three ways — a chain, the tool loop you already have, and a capped reflection — and you fill the comparison table from counted calls rather than from taste. Then you write the workflow down as a graph: five states, six declared edges, and `step(state, event)` as the only thing that moves between them. An event that is not legal from where you are does not move you and does not raise. It comes back with the state unchanged and a sentence naming what was refused. You leave able to say, about any workflow you ship, which transitions exist — and to show that the others cannot happen.
 
 ### Session 9 — Trace and evaluate an agent (Thu 24 Sep)
 
-`ch09` · 2 checks · [page](../units/en/session-09-trace-and-evaluate/introduction.mdx)
+`ch09` · 2 checks · page — opens Thu 24 Sep
 
 You leave with two artifacts and one habit. The artifacts: a provider-neutral event log — `kind`, `detail`, and the fields a reader needs, with nothing in it you are not allowed to keep — and a regression dataset, the eight-case golden set run by one command anybody can rerun. The habit is error analysis: read the trace, put the failure in a named bucket, fix the bucket. You also write `redact(event)`, the function that decides what a trace is allowed to carry, and you see what a trace looks like when one event goes missing.
 
 ### Session 10 — Skills and an architecture decision record (Fri 25 Sep)
 
-`ch10` · handed in, not marked · [page](../units/en/session-10-skills-and-adr/introduction.mdx)
+`ch10` · handed in, not marked · page — opens Fri 25 Sep
 
 You leave with two artifacts and one habit. The artifacts: a `SKILL.md` your assistant loads on demand, with a before-and-after pair of runs that shows what it changed, and a decision record for one architecture choice you already made in the capstone. The habit is the reversal test — a decision that does not name the measurement which would overturn it is an opinion, and week 2 ends by writing one that is not.
 
@@ -185,37 +185,37 @@ You leave with two artifacts and one habit. The artifacts: a `SKILL.md` your ass
 
 ### Session 11 — State and memory (Mon 28 Sep)
 
-`ch11` · 3 checks · [page](../units/en/session-11-state-and-memory/introduction.mdx)
+`ch11` · 3 checks · page — opens Mon 28 Sep
 
 Decide what your assistant remembers, and prove the decision in code. You leave with three things: a `SessionState` whose one preference changes what the model sees and whose episode list has a ceiling, a written retention policy that names something you refuse to store, and a `MemoryStore` that keeps two users' memories apart when both of them use the same key. Every store you build today answers four questions before it holds anything: why this is useful, who owns it, how it is corrected, and when it stops being true.
 
 ### Session 12 — MCP architecture and primitives (Tue 29 Sep)
 
-`ch12` · 3 checks · [page](../units/en/session-12-mcp-architecture/introduction.mdx)
+`ch12` · 3 checks · page — opens Tue 29 Sep
 
 Draw the host, client and server responsibilities of the Model Context Protocol, discover what a server offers, and tell a tool that reads from one that mutates before anything is called. You leave with two functions and one habit. The functions: `describe_surface(listing)`, which turns a server's handshake and its listings into a map of what it offers and what it claimed and cannot serve, and `review_tool(tool)`, which reads one tool definition and returns a verdict a caller can branch on. The habit is reading a surface as claims rather than as facts — a name is a claim, an annotation is a claim, and a description is somebody else's text sitting in your model's context.
 
 ### Session 13 — Build and secure an MCP server (Wed 30 Sep)
 
-`ch13` · 3 checks · [page](../units/en/session-13-secure-mcp-server/introduction.mdx)
+`ch13` · 3 checks · page — opens Wed 30 Sep
 
 You build the part of a server that says no. A read-only MCP tool with one narrow argument, and `fetch_guard(url)` — the gate it consults **before** it fetches anything, which refuses private space, loopback, link-local, the cloud metadata address, a scheme that is not http, and any host that is not on a declared allowlist. Every refusal names the rule that fired. Then you read a real comprehended surface — Orquestra's Solana catalogue through Gecko, from dated recordings — and place each activity in the lowest lane that can do it.
 
 ### Session 14 — Deploy and operate the capstone (Thu 01 Oct)
 
-`ch14` · 1 checks · [page](../units/en/session-14-deploy-and-operate/introduction.mdx)
+`ch14` · 1 checks · page — opens Thu 01 Oct
 
 You put the capstone behind a request boundary and run it as a service you start yourself. Then you write the test that decides whether a deployment is worth keeping: `smoke(request)` sends three probes, measures the first call, sends a malformed body on purpose, and returns a report that is allowed to say the deployment is bad. You also write the rollback sentence today, while nothing is broken and you can still think.
 
 ### Session 15 — Defend the capstone (Fri 02 Oct)
 
-`ch15` · no notebook · [page](../units/en/session-15-defend-the-capstone/introduction.mdx)
+`ch15` · no notebook · page — opens Fri 02 Oct
 
 You present the capstone, and then you are handed one failure you did not prepare for. You diagnose it from your own traces, and either recover or fail safely in front of the room. A demo that only shows the happy path proves that the happy path exists, which nobody doubted.
 
 ## Capstone: the source-grounded research assistant
 
-`cap01` · 5 checks · opens with week 2 · [page](../units/en/capstone/introduction.mdx)
+`cap01` · 5 checks · opens with week 2 · page — opens with week 2
 
 You ship a research assistant that answers developer questions from a small versioned corpus, names the documents behind each claim, and refuses when the corpus supports nothing. It calls a bounded read-only tool, it exposes a skill file another assistant can load, and it arrives with a regression test and an evaluation report whose numbers you produced. Five checks judge the behaviour. Session 15 judges you: you demo it, and then diagnose a failure you did not prepare for, from your own traces.
 
@@ -233,7 +233,7 @@ Grade evidence of engineering practice, not chat-interface polish.
 | Skills/MCP integration | 15% | Reusable skill, safe-mode MCP connection, provenance inspection, safety checklist |
 | Capstone explanation | 15% | Clear demo, architecture, limitation, next-step reasoning |
 
-Per-area descriptors: [instructor/assessment-rubric.md](instructor/assessment-rubric.md).
+Per-area descriptors: instructor/assessment-rubric.md — not released yet.
 
 ## Deliberately out of the core schedule
 

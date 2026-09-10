@@ -18,7 +18,7 @@ lives.
 | Project instructions | Durable context: architecture, commands, rules, "do not"s | `AGENTS.md` (+ `CLAUDE.md`, `.cursor/rules/`) |
 | Output contract | Makes responses machine-checkable | `schema.py` — strict parse, reject unknown fields |
 | Tool contracts | Bounds what actions are possible | `tools.py` — validation, caps, read-only |
-| Loop bounds | Budgets and defined exits | `agent.py` — see [loop-engineering](loop-engineering.md) |
+| Loop bounds | Budgets and defined exits | `agent.py` — see loop-engineering — not released yet |
 | Traces | Records what actually happened | `TraceEvent`s on every result |
 | Evaluation | Repeatable measurement | `evals.py` + `data/evals/golden.jsonl` |
 | Regression suite | Keeps fixed things fixed | `tests/` — every bugfix starts with a failing test |

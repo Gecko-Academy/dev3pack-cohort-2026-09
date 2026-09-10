@@ -25,6 +25,7 @@ import re
 from pathlib import Path
 
 from bootcamp_agent.checks import register
+from bootcamp_agent.curriculum import unit_by_prefix
 from bootcamp_agent.week0_checks.fast_lane import _unwritten
 from bootcamp_agent.week0_checks.mcp_course import (
     NEW_YORK_TO_TOKYO,
@@ -36,7 +37,7 @@ from bootcamp_agent.week0_checks.mcp_course import (
     zone_list,
 )
 
-UNIT_11 = Path(__file__).resolve().parents[3] / "units" / "en" / "w11-mcp-data-apis-third-party"
+UNIT_11 = unit_by_prefix("w11").directory
 ORQUESTRA_TOOLS = UNIT_11 / "fixtures" / "orquestra-tools.json"
 
 #: The value that turns the starter's f-string query into two queries. It is a

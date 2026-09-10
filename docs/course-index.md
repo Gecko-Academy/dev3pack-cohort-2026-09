@@ -21,33 +21,33 @@ the courses beside it are the long form.
 
 | # | Unit | Checks |
 |---|---|---|
-| 1 | [The environment](../units/en/w01-environment/) | 3 |
-| 2 | [Packages and documentation](../units/en/w02-packages-and-docs/) | 3 |
-| 3 | [Classes and contracts](../units/en/w03-classes-and-contracts/) | 3 |
-| 4 | [Calling a real API](../units/en/w04-real-apis/) | 4 |
+| 1 | [The environment](../units/en/unit0/w01-environment/) | 3 |
+| 2 | [Packages and documentation](../units/en/unit0/w02-packages-and-docs/) | 3 |
+| 3 | [Classes and contracts](../units/en/unit0/w03-classes-and-contracts/) | 3 |
+| 4 | [Calling a real API](../units/en/unit0/w04-real-apis/) | 4 |
 
 ### Course A — Software engineering foundations
 
 | # | Unit | Checks |
 |---|---|---|
-| 5 | [Packages, PyPI and PEP 8](../units/en/w05-packages-and-pep8/) | 3 |
-| 6 | [A portable package](../units/en/w06-portable-packages/) | 3 |
-| 7 | [Classes in a package](../units/en/w07-classes-in-packages/) | 4 |
-| 8 | [Documentation, tests and readability](../units/en/w08-docs-tests-readability/) | 3 |
+| 5 | [Packages, PyPI and PEP 8](../units/en/unit0/w05-packages-and-pep8/) | 3 |
+| 6 | [A portable package](../units/en/unit0/w06-portable-packages/) | 3 |
+| 7 | [Classes in a package](../units/en/unit0/w07-classes-in-packages/) | 4 |
+| 8 | [Documentation, tests and readability](../units/en/unit0/w08-docs-tests-readability/) | 3 |
 
 ### Course B — MCP: AI apps as easy as 1, 2, 3
 
 | # | Unit | Checks |
 |---|---|---|
-| 9 | [Your first MCP server](../units/en/w09-mcp-first-server/) | 3 |
-| 10 | [Resources, prompts, and the LLM](../units/en/w10-mcp-resources-prompts-llms/) | 4 |
-| 11 | [Databases, APIs, and third-party servers](../units/en/w11-mcp-data-apis-third-party/) | 3 |
+| 9 | [Your first MCP server](../units/en/unit0/w09-mcp-first-server/) | 3 |
+| 10 | [Resources, prompts, and the LLM](../units/en/unit0/w10-mcp-resources-prompts-llms/) | 4 |
+| 11 | [Databases, APIs, and third-party servers](../units/en/unit0/w11-mcp-data-apis-third-party/) | 3 |
 
 ### Course C — Data structures for agents
 
 | # | Unit | Checks |
 |---|---|---|
-| 12 | [Data structures for agents](../units/en/w12-dsa-for-agents/) | 4 |
+| 12 | [Data structures for agents](../units/en/unit0/w12-dsa-for-agents/) | 4 |
 
 ## Week 1: Contracts, adapters, tools, and a first agent
 

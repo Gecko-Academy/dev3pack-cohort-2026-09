@@ -19,71 +19,71 @@
     title: "Week 3 — State, MCP, deployment, defense"
 - title: "Week 0. The fast lane"
   sections:
-  - local: w01-environment/introduction
+  - local: unit0/w01-environment/introduction
     title: "Unit 1. The environment"
-  - local: w02-packages-and-docs/introduction
+  - local: unit0/w02-packages-and-docs/introduction
     title: "Unit 2. Packages and documentation"
-  - local: w03-classes-and-contracts/introduction
+  - local: unit0/w03-classes-and-contracts/introduction
     title: "Unit 3. Classes and contracts"
-  - local: w04-real-apis/introduction
+  - local: unit0/w04-real-apis/introduction
     title: "Unit 4. Calling a real API"
 - title: "Week 0. Course A — Software engineering foundations"
   sections:
-  - local: w05-packages-and-pep8/introduction
+  - local: unit0/w05-packages-and-pep8/introduction
     title: "Unit 5. Packages, PyPI and PEP 8"
-  - local: w06-portable-packages/introduction
+  - local: unit0/w06-portable-packages/introduction
     title: "Unit 6. A portable package"
-  - local: w07-classes-in-packages/introduction
+  - local: unit0/w07-classes-in-packages/introduction
     title: "Unit 7. Classes in a package"
-  - local: w08-docs-tests-readability/introduction
+  - local: unit0/w08-docs-tests-readability/introduction
     title: "Unit 8. Documentation, tests and readability"
 - title: "Week 0. Course B — MCP: AI apps as easy as 1, 2, 3"
   sections:
-  - local: w09-mcp-first-server/introduction
+  - local: unit0/w09-mcp-first-server/introduction
     title: "Unit 9. Your first MCP server"
-  - local: w10-mcp-resources-prompts-llms/introduction
+  - local: unit0/w10-mcp-resources-prompts-llms/introduction
     title: "Unit 10. Resources, prompts, and the LLM"
-  - local: w11-mcp-data-apis-third-party/introduction
+  - local: unit0/w11-mcp-data-apis-third-party/introduction
     title: "Unit 11. Databases, APIs, and third-party servers"
 - title: "Week 0. Course C — Data structures for agents"
   sections:
-  - local: w12-dsa-for-agents/introduction
+  - local: unit0/w12-dsa-for-agents/introduction
     title: "Unit 12. Data structures for agents"
 - title: "Depth track (optional)"
   sections:
-  - local: depth/introduction
+  - local: tracks/depth/introduction
     title: "Depth track (optional)"
 - title: "Cookbook"
   sections:
-  - local: cookbook/introduction
+  - local: tracks/cookbook/introduction
     title: "Cookbook"
 - title: "Workspaces"
   sections:
-  - local: workspaces/introduction
+  - local: tracks/workspaces/introduction
     title: "Workspaces"
 - title: "Final assignment"
   sections:
-  - local: final-assignment/introduction
+  - local: tracks/final-assignment/introduction
     title: "Final assignment"
 - title: "(Optional) Bonus 1. Graph RAG and hybrid search"
   sections:
-  - local: bonus-b01-graph-rag/introduction
+  - local: bonus/b01-graph-rag/introduction
     title: "Graph RAG and hybrid search"
 - title: "(Optional) Bonus 2. Multimodal ingestion as an untrusted-data pipeline"
   sections:
-  - local: bonus-b02-multimodal-ingestion/introduction
+  - local: bonus/b02-multimodal-ingestion/introduction
     title: "Multimodal ingestion as an untrusted-data pipeline"
 - title: "(Optional) Bonus 3. Multi-agent orchestration with ADK"
   sections:
-  - local: bonus-b03-multi-agent-orchestration/introduction
+  - local: bonus/b03-multi-agent-orchestration/introduction
     title: "Multi-agent orchestration with ADK"
 - title: "(Optional) Bonus 4. Long-term memory, consent, and deletion"
   sections:
-  - local: bonus-b04-memory-consent-deletion/introduction
+  - local: bonus/b04-memory-consent-deletion/introduction
     title: "Long-term memory, consent, and deletion"
 - title: "(Optional) Bonus 5. Deployment, evaluation, and cloud teardown"
   sections:
-  - local: bonus-b05-deploy-evaluate-teardown/introduction
+  - local: bonus/b05-deploy-evaluate-teardown/introduction
     title: "Deployment, evaluation, and cloud teardown"
 
 # Not in this repository yet. Each arrives on its Monday and
@@ -98,9 +98,9 @@
 #   Session 8. Loops and graphs — Wed 23 Sep
 #   Session 9. Trace and evaluate an agent — Thu 24 Sep
 #   Session 10. Skills and an architecture decision record — Fri 25 Sep
+#   Capstone: the source-grounded research assistant
 #   Session 11. State and memory — Mon 28 Sep
 #   Session 12. MCP architecture and primitives — Tue 29 Sep
 #   Session 13. Build and secure an MCP server — Wed 30 Sep
 #   Session 14. Deploy and operate the capstone — Thu 01 Oct
 #   Session 15. Defend the capstone — Fri 02 Oct
-#   Capstone: the source-grounded research assistant

@@ -52,16 +52,15 @@ from bootcamp_agent.curriculum import (  # noqa: E402
     BONUS_DIRS,
     CAPSTONE,
     CHAPTERS,
-    WEEK0_UNITS,
+    TRACK_DIRS,
     get_chapter,
+    unit_dir,
 )
 
 #: The weeks a publish can name. Week 0 is the prerequisite; 1-3 are the live weeks.
 WEEKS = (0, 1, 2, 3)
 
-#: The optional tracks. Each is one page under `units/en` pointing at material
-#: that lives at the repository root, and each ships on day one.
-SIDE_TRACKS = ("depth", "cookbook", "workspaces", "final-assignment")
+
 UNITS = "units/en"
 
 
@@ -75,12 +74,14 @@ def week_of(relative: Path) -> int | None:
     parts = relative.parts
     if parts[:2] != ("units", "en") or len(parts) < 3:
         return None
-    name = parts[2]
-    for chapter in CHAPTERS:
-        if chapter.dirname == name:
-            return chapter.module
-    if name == CAPSTONE.dirname:
-        return CAPSTONE.opens_in_week
+    # The week is the directory the material sits in: `unit0` is the
+    # prerequisite, `unit1`-`unit3` are the teaching weeks. Reading it from the
+    # path is why the nesting was worth doing — before it, this had to match
+    # every session and the capstone by name.
+    container = parts[2]
+    if re.fullmatch(r"unit[0-9]+", container):
+        return int(container[4:])
+    # `bonus/` and `tracks/` are never gated; they ship on day one.
     return 0
 
 
@@ -176,10 +177,10 @@ def solution_dir_for(token: str) -> str:
     """
     stripped = token.strip()
     if stripped.lower() in {CAPSTONE.prefix, CAPSTONE.slug}:
-        return f"{UNITS}/{CAPSTONE.dirname}/{SOLUTIONS}"
+        return f"{UNITS}/{CAPSTONE.unit}/{CAPSTONE.dirname}/{SOLUTIONS}"
     if re.fullmatch(r"(ch)?0*\d+", stripped.lower()):
         chapter = get_chapter(stripped)
-        return f"{UNITS}/{chapter.dirname}/{SOLUTIONS}"
+        return f"{UNITS}/{chapter.unit}/{chapter.dirname}/{SOLUTIONS}"
     return f"{stripped.rstrip('/')}/{SOLUTIONS}"
 
 
@@ -213,17 +214,18 @@ def _solution_owner(relative: Path) -> str:
 def released_paths(week: int) -> list[str]:
     """Everything that should exist in the student repo at this week."""
     paths = list(ALWAYS)
-    paths += [f"{UNITS}/_toctree.yml", f"{UNITS}/unit0"]
+    paths += [f"{UNITS}/_toctree.yml"]
+    # `unit0` carries both the welcome pages and the twelve self-paced units.
+    paths += [f"{UNITS}/{unit_dir(0)}"]
     # The one-page entries for the side tracks. Their material ships from the
     # repository root (`depth/`, `cookbook/`, ...), but the page that introduces
-    # each one lives under `units/en` and was left behind, so the contents page
-    # named four groups a student did not have.
-    paths += [f"{UNITS}/{name}" for name in SIDE_TRACKS]
-    paths += [f"{UNITS}/{unit.dirname}" for unit in WEEK0_UNITS]
+    # each one lives under `units/en` and was left behind once, so the contents
+    # page named four groups a student did not have.
+    paths += [f"{UNITS}/{name}" for name in TRACK_DIRS]
     paths += [f"{UNITS}/{name}" for name in BONUS_DIRS]
-    paths += [f"{UNITS}/{chapter.dirname}" for chapter in CHAPTERS if chapter.module <= week]
-    if week >= CAPSTONE.opens_in_week:
-        paths.append(f"{UNITS}/{CAPSTONE.dirname}")
+    # A whole week's directory, once that week has opened. The capstone lives
+    # inside the week it opens with, so it needs no case of its own.
+    paths += [f"{UNITS}/{unit_dir(open_week)}" for open_week in WEEKS if 1 <= open_week <= week]
     return paths
 
 
@@ -496,10 +498,16 @@ def trim_toctree(destination: Path, week: int) -> list[str]:
     return withheld
 
 
-#: The published documents whose relative links are rewritten. Each is generated
-#: or authored against the FULL tree, so a link into a week that has not shipped
-#: resolves to nothing in a student's clone.
-ANNOTATED = ("README.md", "docs/course-index.md")
+#: EVERY published markdown document, found rather than listed.
+#:
+#: A hand-list is the wrong shape here and was wrong twice: `AGENTS.md` shipped
+#: linking to the deny-listed `tests/`, and `docs/curriculum.md` shipped linking
+#: into fifteen sessions a week-0 student does not have. Any document written
+#: against the full tree has this problem, so the rule is the whole set.
+#:
+#: `.mdx` pages are NOT in it. Those move with their unit, so their relative
+#: links stay correct, and the site generator already refuses a broken one.
+ANNOTATED_SUFFIX = ".md"
 
 
 def _absent_note(target: str, destination: Path) -> str | None:
@@ -513,12 +521,15 @@ def _absent_note(target: str, destination: Path) -> str | None:
         relative = relative[3:]
     if (destination / relative).exists():
         return None
-    name = relative.split("/")[-1]
+    # EVERY segment, not just the last. A link to a page INSIDE an unreleased
+    # session ends in `introduction.mdx`, and matching only the tail lost the
+    # date and said the uselessly vague "not released yet" instead.
+    segments = relative.split("/")
     for chapter in CHAPTERS:
-        if chapter.dirname == name:
+        if chapter.dirname in segments:
             return f" — opens {chapter.weekday}"
-    if name == CAPSTONE.dirname:
-        return " — opens with week 2"
+    if CAPSTONE.dirname in segments:
+        return f" — opens with week {CAPSTONE.opens_in_week}"
     for denied in NEVER:
         if relative == denied or relative.startswith(f"{denied}/"):
             return " — not in your copy"
@@ -546,10 +557,14 @@ def annotate_missing_links(destination: Path, week: int) -> int:
         changed += 1
         return f"{title}{note}"
 
-    for name in ANNOTATED:
-        document = destination / name
-        if not document.is_file():
-            continue
+    documents = sorted(
+        path
+        for path in destination.rglob(f"*{ANNOTATED_SUFFIX}")
+        if path.is_file()
+        and ".git" not in path.parts
+        and not _ignored(path.relative_to(destination))
+    )
+    for document in documents:
         text = document.read_text(encoding="utf-8")
         # Line by line, so a row that already carries the date is not told it
         # twice: both documents put sessions in a table with a date column.

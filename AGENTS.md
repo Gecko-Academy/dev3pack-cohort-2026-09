@@ -17,7 +17,7 @@ visible, not hidden.
 2. `00-START-HERE.ipynb` — progress ticker and notebook links.
 3. [units/en/_toctree.yml](units/en/_toctree.yml) — page order.
 4. [src/bootcamp_agent/](src/bootcamp_agent/) — capstone package (finished shape).
-5. [tests/](tests/) — behaviour contracts.
+5. tests/ — not in your copy — behaviour contracts.
 
 ## Before editing
 

@@ -36,6 +36,28 @@ COURSE_RELEASE = "2026.09.1"
 #: Where every learner-facing page lives. The language is a directory on purpose.
 UNITS_ROOT = REPO_ROOT / "units" / "en"
 
+#: NESTED BY WEEK, and this is the second layout decision after `en`.
+#:
+#: Flat, `units/en` held 39 entries: one welcome directory, twelve week-0 units,
+#: fifteen sessions, a capstone, five bonus pages and four side tracks, all in
+#: one alphabetical list. Two axes — what kind of thing it is, and when it opens
+#: — collapsed into one, so nothing about the shape of the course was visible
+#: from the shape of the tree.
+#:
+#: `unit0` is the prerequisite, `unit1`-`unit3` are the three teaching weeks, and
+#: a session sits inside the week it opens with. The week a directory belongs to
+#: is therefore readable from its path, which is what the publisher gates on.
+#:
+#: EXERCISE IDS ARE UNAFFECTED. `ch01-e1` is still `ch01-e1`; this moved paths,
+#: never ids, so no progress database or submission had to migrate.
+BONUS_ROOT = "bonus"
+TRACKS_ROOT = "tracks"
+
+
+def unit_dir(week: int) -> str:
+    """The directory a week's material lives in: week 0 is `unit0`, and so on."""
+    return f"unit{week}"
+
 
 @dataclass(frozen=True)
 class Chapter:
@@ -61,8 +83,13 @@ class Chapter:
         return f"session-{self.number:02d}-{self.slug}"
 
     @property
+    def unit(self) -> str:
+        """The week directory this session lives in."""
+        return unit_dir(self.module)
+
+    @property
     def directory(self) -> Path:
-        return UNITS_ROOT / self.dirname
+        return UNITS_ROOT / self.unit / self.dirname
 
     @property
     def notebook(self) -> Path | None:
@@ -149,8 +176,13 @@ class Unit:
         return f"{self.prefix}-{self.slug}"
 
     @property
+    def unit(self) -> str:
+        """Week 0 is `unit0`, beside the welcome pages a learner opens first."""
+        return unit_dir(0)
+
+    @property
     def directory(self) -> Path:
-        return UNITS_ROOT / self.dirname
+        return UNITS_ROOT / self.unit / self.dirname
 
     @property
     def notebook(self) -> Path:
@@ -236,8 +268,13 @@ class Project:
         return self.slug
 
     @property
+    def unit(self) -> str:
+        """It sits in the week it opens with, which is where a learner looks."""
+        return unit_dir(self.opens_in_week)
+
+    @property
     def directory(self) -> Path:
-        return UNITS_ROOT / self.dirname
+        return UNITS_ROOT / self.unit / self.dirname
 
     @property
     def notebook(self) -> Path:
@@ -253,13 +290,39 @@ CAPSTONE = Project()
 #: Optional bonus units: pages only, never counted, never submitted. The
 #: directory name is the id, and the title carries the optionality in words,
 #: the way the Hugging Face course marks its bonus units.
+#: Relative to `UNITS_ROOT`, so a caller never rebuilds the `bonus/` prefix.
 BONUS_DIRS: tuple[str, ...] = (
-    "bonus-b01-graph-rag",
-    "bonus-b02-multimodal-ingestion",
-    "bonus-b03-multi-agent-orchestration",
-    "bonus-b04-memory-consent-deletion",
-    "bonus-b05-deploy-evaluate-teardown",
+    f"{BONUS_ROOT}/b01-graph-rag",
+    f"{BONUS_ROOT}/b02-multimodal-ingestion",
+    f"{BONUS_ROOT}/b03-multi-agent-orchestration",
+    f"{BONUS_ROOT}/b04-memory-consent-deletion",
+    f"{BONUS_ROOT}/b05-deploy-evaluate-teardown",
 )
+
+#: The optional tracks. Each is one page pointing at material that lives at the
+#: repository root, and each ships on day one.
+TRACK_DIRS: tuple[str, ...] = (
+    f"{TRACKS_ROOT}/depth",
+    f"{TRACKS_ROOT}/cookbook",
+    f"{TRACKS_ROOT}/workspaces",
+    f"{TRACKS_ROOT}/final-assignment",
+)
+
+BY_PREFIX: dict[str, Unit] = {unit.prefix: unit for unit in WEEK0_UNITS}
+
+
+def unit_by_prefix(prefix: str) -> Unit:
+    """The week-0 unit an exercise prefix belongs to, e.g. `w04` -> unit 4.
+
+    A checker that needs its own fixtures asks for them through here rather than
+    spelling a path. Every time a directory has moved, the modules that spelled
+    one broke and the ones that derived it did not.
+    """
+    try:
+        return BY_PREFIX[prefix]
+    except KeyError:
+        raise UnknownChapter(f"no week-0 unit called {prefix!r}") from None
+
 
 BY_ID: dict[str, Chapter] = {chapter.chapter_id: chapter for chapter in CHAPTERS}
 

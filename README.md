@@ -86,7 +86,7 @@ Three threads recur: [loop](docs/guides/loop-engineering.md), [graph](docs/guide
 |---|---|---|
 | **Week 0 units** (`w01`–`w12`) | [units/en/](units/en/) | Self-paced, ungraded, available now. The fast lane is the floor Session 1 assumes. |
 | **Sessions** (`session-01`–`15`) | same tree | Live, weekday, two hours. Introduction, concepts, quiz, exercise notebook, solutions. Session 15 has no notebook. |
-| **Capstone** | units/en/capstone/ — opens with week 2 | Built between sessions from week 2. `src/bootcamp_agent/` is the finished shape. |
+| **Capstone** | units/en/unit2/capstone/ — opens with week 2 | Built between sessions from week 2. `src/bootcamp_agent/` is the finished shape. |
 | **Bonus / depth / cookbook / workspaces** | linked below | Optional. Never counted. |
 
 Two sessions are assistant-driven (1 and 10) and show as `in Jupyter` in `bootcamp progress`.
@@ -154,10 +154,10 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (49 paths). |
-| Week 1 | Mon 14 Sep | Session 1, Configure the assistant and the repository instructions; Session 2, Call a model through the adapter; Session 3, Structured outputs; Session 4, Bounded tools; Session 5, A deterministic mini-agent |
-| Week 2 | Mon 21 Sep | Capstone: the source-grounded research assistant; Session 6, A retrieval baseline; Session 7, Retrieval and grounding metrics; Session 8, Loops and graphs; Session 9, Trace and evaluate an agent; Session 10, Skills and an architecture decision record |
-| Week 3 | Mon 28 Sep | Session 11, State and memory; Session 12, MCP architecture and primitives; Session 13, Build and secure an MCP server; Session 14, Deploy and operate the capstone; Session 15, Defend the capstone |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (37 paths). |
+| Week 1 | Mon 14 Sep | unit1 |
+| Week 2 | Mon 21 Sep | unit2 |
+| Week 3 | Mon 28 Sep | unit3 |
 
 **Nothing is hidden behind a permission.** A week that has not opened is not in the repository yet, so `git pull` on the Monday is the whole ritual. Your table of contents lists what you actually have, and names what is still to come in a comment at the end — this table is the schedule, and you have it from day one.
 
@@ -176,33 +176,33 @@ Self-paced. Handed in as a record, never marked. Short on time? Do the four 45-m
 
 | # | Unit | You leave able to |
 |---|---|---|
-| 1 | [The environment](units/en/w01-environment/) | Prove which Python and repo environment will run the course |
-| 2 | [Packages and documentation](units/en/w02-packages-and-docs/) | Read an installed package instead of guessing its API |
-| 3 | [Classes and contracts](units/en/w03-classes-and-contracts/) | Turn a prose requirement into a typed boundary |
-| 4 | [Calling a real API](units/en/w04-real-apis/) | Make one bounded HTTP call through an adapter you own |
+| 1 | [The environment](units/en/unit0/w01-environment/) | Prove which Python and repo environment will run the course |
+| 2 | [Packages and documentation](units/en/unit0/w02-packages-and-docs/) | Read an installed package instead of guessing its API |
+| 3 | [Classes and contracts](units/en/unit0/w03-classes-and-contracts/) | Turn a prose requirement into a typed boundary |
+| 4 | [Calling a real API](units/en/unit0/w04-real-apis/) | Make one bounded HTTP call through an adapter you own |
 
 ### Course A — Software engineering foundations
 
 | # | Unit |
 |---|---|
-| 5 | [Packages, PyPI and PEP 8](units/en/w05-packages-and-pep8/) |
-| 6 | [A portable package](units/en/w06-portable-packages/) |
-| 7 | [Classes in a package](units/en/w07-classes-in-packages/) |
-| 8 | [Documentation, tests and readability](units/en/w08-docs-tests-readability/) |
+| 5 | [Packages, PyPI and PEP 8](units/en/unit0/w05-packages-and-pep8/) |
+| 6 | [A portable package](units/en/unit0/w06-portable-packages/) |
+| 7 | [Classes in a package](units/en/unit0/w07-classes-in-packages/) |
+| 8 | [Documentation, tests and readability](units/en/unit0/w08-docs-tests-readability/) |
 
 ### Course B — MCP
 
 | # | Unit |
 |---|---|
-| 9 | [Your first MCP server](units/en/w09-mcp-first-server/) |
-| 10 | [Resources, prompts, and the LLM](units/en/w10-mcp-resources-prompts-llms/) |
-| 11 | [Databases, APIs, and third-party servers](units/en/w11-mcp-data-apis-third-party/) |
+| 9 | [Your first MCP server](units/en/unit0/w09-mcp-first-server/) |
+| 10 | [Resources, prompts, and the LLM](units/en/unit0/w10-mcp-resources-prompts-llms/) |
+| 11 | [Databases, APIs, and third-party servers](units/en/unit0/w11-mcp-data-apis-third-party/) |
 
 ### Course C — Data structures for agents
 
 | # | Unit |
 |---|---|
-| 12 | [Data structures for agents](units/en/w12-dsa-for-agents/) |
+| 12 | [Data structures for agents](units/en/unit0/w12-dsa-for-agents/) |
 
 ## Weeks 1-3
 
@@ -230,7 +230,7 @@ Session 13 uses an instructor-hosted Gecko MCP surface; the URL is handed out in
 
 ## Capstone and certificate
 
-A **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. You rebuild `src/bootcamp_agent/` in the session notebooks, then compare against the shipped package. Brief: units/en/capstone/ — opens with week 2.
+A **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. You rebuild `src/bootcamp_agent/` in the session notebooks, then compare against the shipped package. Brief: units/en/unit2/capstone/ — opens with week 2.
 
 [`final_assignment/`](final_assignment/) is a template that scores 30% as shipped — it refuses correctly and answers nothing. Pass both gates (aggregate bar and every **critical** question) and the course issues an Ed25519-signed certificate anyone can verify. Details: [`final_assignment/README.md`](final_assignment/README.md).
 
@@ -240,11 +240,11 @@ Optional. Never counted. Never required for the certificate.
 
 | # | Bonus |
 |---|---|
-| 1 | [Graph RAG and hybrid search](units/en/bonus-b01-graph-rag/) |
-| 2 | [Multimodal ingestion as untrusted data](units/en/bonus-b02-multimodal-ingestion/) |
-| 3 | [Multi-agent orchestration with ADK](units/en/bonus-b03-multi-agent-orchestration/) |
-| 4 | [Long-term memory, consent, and deletion](units/en/bonus-b04-memory-consent-deletion/) |
-| 5 | [Deploy, evaluate, and tear down](units/en/bonus-b05-deploy-evaluate-teardown/) |
+| 1 | [Graph RAG and hybrid search](units/en/bonus/b01-graph-rag/) |
+| 2 | [Multimodal ingestion as untrusted data](units/en/bonus/b02-multimodal-ingestion/) |
+| 3 | [Multi-agent orchestration with ADK](units/en/bonus/b03-multi-agent-orchestration/) |
+| 4 | [Long-term memory, consent, and deletion](units/en/bonus/b04-memory-consent-deletion/) |
+| 5 | [Deploy, evaluate, and tear down](units/en/bonus/b05-deploy-evaluate-teardown/) |
 
 - **[depth/](depth/)** — six software-engineering modules (~45 minutes each): boundaries, data, architecture, reliability, production, graph RAG.
 - **[cookbook/](cookbook/)** — ten Gecko notebooks, from comprehending an OpenAPI spec to a verified loop on an instructor-hosted fork.
