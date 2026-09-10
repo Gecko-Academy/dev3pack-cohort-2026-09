@@ -1,0 +1,33 @@
+# Deployment, evaluation, and cloud teardown
+
+> **Optional, never counted, externally billed.** Not required for completion or a certificate, and excluded from every total. Use a dedicated sandbox project, synthetic people and media, budget alerts, least-privilege identities, and the teardown checklist. Never use real disaster-response, health, identity, or location data.
+
+## Outcome
+
+Deploy only after offline tests pass, measure accepted outcomes and cost, verify least privilege and redaction, and remove every billable resource at the end.
+
+## Evidence artifact
+
+A deployment receipt, evaluation report, rollback plan, cost note, and teardown checklist.
+
+## Failure clinic
+
+Unexpected billing, public unauthenticated access, secret leakage, non-idempotent retries, cold starts, and orphaned resources.
+
+## Required comparison
+
+Before using a managed service, implement or inspect a local fixture-backed baseline. Record what the cloud component improves, what it costs, what new permissions it receives, and what failure modes it introduces. The cloud path must not be the only way to understand or demonstrate the concept.
+
+## Safety and operations gate
+
+1. Confirm the active project and account before creating resources.
+2. Use synthetic data and document its provenance.
+3. Record enabled APIs, regions, identities, roles, public endpoints, and retention.
+4. Bound model calls, uploads, retries, and concurrent work.
+5. Redact logs and traces before sharing.
+6. Delete or disable every resource and verify that billing surfaces are empty.
+
+## Reference
+
+- [Google Codelab: Build a Multimodal AI Agent with Graph RAG, ADK & Memory Bank](https://codelabs.developers.google.com/codelabs/survivor-network/instructions#0)
+

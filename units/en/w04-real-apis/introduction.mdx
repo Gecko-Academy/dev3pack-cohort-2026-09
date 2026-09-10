@@ -1,0 +1,17 @@
+# Unit 4 — Calling a real API
+
+**Outcome:** make one bounded HTTP call through an application-owned adapter and preserve an offline test path.
+
+Learners separate URL, authentication, timeout, request data, response validation, and error mapping. The live call is optional; the required artifact runs against a fixture or local fake without a credential.
+
+## Learning contract
+
+Every call has a finite timeout, validates status and response shape, distinguishes retryable from permanent failure, and keeps credentials outside source, prompts, notebooks, and logs. The same application function must be testable without the network.
+
+## Artifact
+
+Submit the executed notebook, adapter contract, offline test, and a redacted capability report. Never submit an API key or full authorization header.
+
+<!-- navigation:start -->
+[Previous: Classes and contracts](../w03-classes-and-contracts/introduction.mdx) · [Next: Packages, PyPI and PEP 8](../w05-packages-and-pep8/introduction.mdx)
+<!-- navigation:end -->

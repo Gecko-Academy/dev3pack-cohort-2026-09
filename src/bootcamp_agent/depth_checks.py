@@ -471,3 +471,248 @@ def _d5_e3(runbook: object) -> str | None:
             "tell recovery from a pause"
         )
     return None
+
+
+# ======================================================= D6 · graph retrieval
+
+
+# The check drives the learner's traversal with graphs of its own, not with the
+# module fixture. Hardcoding the fixture's answers is then no shortcut, and the
+# two graphs below carry the cases the fixture cannot: a node with nothing
+# before it, a node that is not in the graph at all, and a cycle.
+_D6_DAG: dict[str, list[str]] = {
+    "tokens": [],
+    "chunking": ["tokens"],
+    "search": ["chunking"],
+    "grounding": ["search", "tokens"],
+    "budgets": [],
+}
+
+_D6_CYCLE: dict[str, list[str]] = {
+    "planning": ["review"],
+    "review": ["drafting"],
+    "drafting": ["planning"],
+    "handover": ["drafting"],
+}
+
+
+def _d6_answer(value: object) -> tuple[list[str] | None, str | None]:
+    """Normalise one traversal answer, or say what is wrong with its shape."""
+    if value is None:
+        return None, None
+    if isinstance(value, (set, frozenset)):
+        return None, "return a sorted list, not a set: a set has no order to print, diff or test"
+    if isinstance(value, tuple):
+        return None, "return a list, not a tuple"
+    if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+        return None, f"expected a list of concept ids or None, got {type(value).__name__}"
+    return value, None
+
+
+@register("d6-e1")
+def _d6_e1(prerequisites_of: object) -> str | None:
+    """Transitive reachability: multi-hop, cycle-safe, and 'unknown' is not 'empty'."""
+    if not callable(prerequisites_of):
+        return "expected the prerequisites_of(graph, concept) function itself, not its result"
+
+    answers: dict[str, object] = {}
+    for label, graph, concept in (
+        ("deep", _D6_DAG, "grounding"),
+        ("root", _D6_DAG, "tokens"),
+        ("unknown", _D6_DAG, "fine-tuning"),
+        ("after_cycle", _D6_CYCLE, "handover"),
+        ("inside_cycle", _D6_CYCLE, "planning"),
+    ):
+        try:
+            answers[label] = prerequisites_of(dict(graph), concept)
+        except RecursionError:
+            return (
+                "the walk ran out of stack, so it followed an edge it had already followed. "
+                "A prerequisite graph can contain a cycle; keep a 'seen' set and skip anything "
+                "already in it"
+            )
+        except KeyError:
+            return (
+                f"prerequisites_of raised KeyError for {concept!r}, which is not in the graph. "
+                "A concept you have never heard of is not a crash: return None, so the caller "
+                "can say 'not in the syllabus' instead of printing an empty list"
+            )
+        except Exception as error:  # noqa: BLE001 - a crashing traversal is the failure
+            return f"prerequisites_of({concept!r}) raised {type(error).__name__}: {error}"
+
+    for label, expected in (
+        ("deep", ["chunking", "search", "tokens"]),
+        ("root", []),
+        ("after_cycle", ["drafting", "planning", "review"]),
+        ("inside_cycle", ["drafting", "review"]),
+    ):
+        got, problem = _d6_answer(answers[label])
+        if problem:
+            return problem
+        if got is None:
+            return (
+                f"the {label} case returned None for a concept that IS in the graph. None means "
+                "'not in the graph'; a concept with nothing before it returns []"
+            )
+        if sorted(got) != expected:
+            if label == "deep" and sorted(got) == ["search", "tokens"]:
+                return (
+                    "only the direct prerequisites came back. 'grounding' needs 'search', which "
+                    "needs 'chunking', so the walk has to keep going until it runs out of edges"
+                )
+            if label == "inside_cycle" and sorted(got) == ["drafting", "planning", "review"]:
+                return (
+                    "the concept itself came back in its own prerequisites. It is reachable from "
+                    "itself only because the graph has a cycle; exclude the starting concept"
+                )
+            return f"the {label} case returned {sorted(got)}, expected {expected}"
+        if got != expected:
+            return (
+                f"the {label} case has the right ids in the wrong order: {got}. Sort them, so two "
+                "runs print the same answer and a diff means something"
+            )
+
+    unknown, problem = _d6_answer(answers["unknown"])
+    if problem:
+        return problem
+    if unknown is not None:
+        return (
+            f"a concept that is not in the graph returned {unknown!r}. An empty list reads as "
+            "'nothing comes before it', which is a claim you cannot make about a concept you do "
+            "not have. Return None and let the caller say so"
+        )
+    return None
+
+
+# Question, the side that should answer it, and why. Four of these also appear in
+# the notebook; five do not, and three of those five carry a word from the other
+# side, so a router keyed on one keyword routes them wrong.
+_D6_ROUTING: tuple[tuple[str, str, str], ...] = (
+    (
+        "what must I understand before session 8",
+        "graph",
+        "'before' asks for everything upstream, which is a walk over edges",
+    ),
+    (
+        "which concepts depend on retrieval",
+        "graph",
+        "'depend on' is an edge; no single passage lists them all",
+    ),
+    (
+        "if chunking changes, what else is affected",
+        "graph",
+        "blast radius is reachability in the other direction",
+    ),
+    (
+        "is there a path from tokens to deployment",
+        "graph",
+        "a path is the one question a graph answers and text cannot",
+    ),
+    (
+        "what does the chunking note say about paragraph boundaries",
+        "lexical",
+        "it asks what a document SAYS; the graph holds ids, not sentences",
+    ),
+    (
+        "which note explains a fixed vocabulary",
+        "lexical",
+        "the phrase lives in one passage, and finding passages is what search does",
+    ),
+    (
+        "what does the retrieval note say about ranking",
+        "lexical",
+        "'retrieval' is the subject of the note here, not a node to walk from",
+    ),
+    (
+        "what does the note on session 8 say about rollout",
+        "lexical",
+        "naming a session does not make it a traversal; the answer is wording",
+    ),
+    (
+        "what does the grounding note say about what it depends on",
+        "lexical",
+        "it names a relationship and still asks for wording, and wording wins",
+    ),
+)
+
+
+@register("d6-e2")
+def _d6_e2(route: object) -> str | None:
+    """The routing decision, per question, with a reason that fits only that side."""
+    if not callable(route):
+        return "expected the route(question) function itself, not its result"
+
+    chosen: list[str] = []
+    reasons: dict[str, set[str]] = {"graph": set(), "lexical": set()}
+    for question, _expected, _hint in _D6_ROUTING:
+        try:
+            verdict = route(question)
+        except Exception as error:  # noqa: BLE001 - a crashing router is the failure
+            return f"route({question!r}) raised {type(error).__name__}: {error}"
+        problem = _keys_are(verdict, ("tool", "why"))
+        if problem:
+            return f"route({question!r}) must return {{'tool': ..., 'why': ...}}; {problem}"
+        assert isinstance(verdict, dict)
+        tool = str(verdict["tool"]).strip().lower()
+        if tool not in ("graph", "lexical"):
+            return f"'tool' must be 'graph' or 'lexical', got {verdict['tool']!r}"
+        chosen.append(tool)
+        if _unwritten(verdict["why"], minimum=15):
+            return (
+                f"route({question!r}) gave no reason. A router you cannot argue with is a coin "
+                "flip you cannot debug"
+            )
+        reasons[tool].add(str(verdict["why"]).strip())
+
+    if len(set(chosen)) == 1:
+        return (
+            f"every question routed to {chosen[0]!r}. That is not a router, it is a default, and "
+            "half of these questions are answered better by the other side"
+        )
+    for (question, expected, hint), got in zip(_D6_ROUTING, chosen, strict=True):
+        if got != expected:
+            return f"{question!r} went to {got}; it belongs to {expected}, because {hint}"
+
+    shared = reasons["graph"] & reasons["lexical"]
+    if shared:
+        return (
+            f"the same reason was given for both routes: {sorted(shared)[0]!r}. A reason that "
+            "fits either answer explains neither; say what about THIS question picked the side"
+        )
+    return None
+
+
+# A denial in the first words of the losses field. Bounded to the opening so that
+# "it lost 3 of 3, and nothing else surprised me" is not mistaken for a denial.
+_D6_NO_LOSS = re.compile(r"\b(nothing|none|no loss|no losses|never lost|did ?n.?t lose|n/a)\b")
+
+
+@register("d6-e3")
+def _d6_e3(report: object) -> str | None:
+    """The comparison. A graph that only ever won was not compared to anything."""
+    problem = _keys_are(report, ("graph_won", "graph_lost", "maintenance_cost", "worth_keeping"))
+    if problem:
+        return problem
+    assert isinstance(report, dict)
+    for field in ("graph_won", "graph_lost", "maintenance_cost"):
+        if _unwritten(report[field], minimum=30):
+            return f"'{field}' needs a sentence about what you saw, not a label"
+        if not re.search(r"\d", str(report[field])):
+            return (
+                f"'{field}' carries no number, so nobody can tell whether you ran the comparison "
+                "or remembered it. Take one from your own run: probes answered per side, edges "
+                "in the graph, edges the extraction agent got wrong"
+            )
+    if not isinstance(report["worth_keeping"], bool):
+        return (
+            "'worth_keeping' is True or False. The module ends in a decision about this "
+            "assistant, not in a summary of both sides"
+        )
+    if str(report["graph_won"]).strip() == str(report["graph_lost"]).strip():
+        return "'graph_won' and 'graph_lost' are the same sentence; one of them is unwritten"
+    if _D6_NO_LOSS.search(str(report["graph_lost"]).strip().lower()[:30]):
+        return (
+            "'graph_lost' opens by saying the graph did not lose. Every content probe in the run "
+            "above went the other way, and a comparison with no losses was not a comparison"
+        )
+    return None

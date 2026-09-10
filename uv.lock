@@ -303,6 +303,9 @@ dependencies = [
 anthropic = [
     { name = "anthropic" },
 ]
+certificate = [
+    { name = "cryptography" },
+]
 openai = [
     { name = "openai" },
 ]
@@ -321,10 +324,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "anthropic", marker = "extra == 'anthropic'", specifier = ">=0.40" },
+    { name = "cryptography", marker = "extra == 'certificate'", specifier = ">=43" },
     { name = "openai", marker = "extra == 'openai'", specifier = ">=1.40" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
 ]
-provides-extras = ["anthropic", "openai"]
+provides-extras = ["anthropic", "openai", "certificate"]
 
 [package.metadata.requires-dev]
 dev = [

@@ -1,0 +1,113 @@
+{
+  "about": "A synthetic syllabus. Invented for this module: the sessions, the concepts and the notes are made up, and none of it describes a real course, a real person or a real event.",
+  "sessions": [
+    {"id": "session-01", "title": "How a model reads", "teaches": ["tokens"]},
+    {"id": "session-02", "title": "Asking well", "teaches": ["prompting", "structured-output"]},
+    {"id": "session-03", "title": "Cutting a document up", "teaches": ["chunking"]},
+    {"id": "session-04", "title": "Two ways to find a passage", "teaches": ["lexical-search", "embeddings"]},
+    {"id": "session-05", "title": "Choosing what the model sees", "teaches": ["retrieval"]},
+    {"id": "session-06", "title": "Answers you can trace", "teaches": ["grounding", "cost-tracking"]},
+    {"id": "session-07", "title": "Letting it act", "teaches": ["tool-calling", "agent-loop", "caching"]},
+    {"id": "session-08", "title": "Shipping it", "teaches": ["evaluation", "deployment"]}
+  ],
+  "concepts": [
+    {
+      "id": "tokens",
+      "name": "Tokens and the context window",
+      "taught_in": "session-01",
+      "depends_on": [],
+      "note": "A model reads tokens, not characters and not words. The context window is how many tokens one call can hold, and everything competes for it: the system prompt, the retrieved passages, the conversation so far. When the window fills, something is dropped, and nothing tells you what was dropped."
+    },
+    {
+      "id": "prompting",
+      "name": "Prompt shape",
+      "taught_in": "session-02",
+      "depends_on": ["tokens"],
+      "note": "A prompt is a contract written in prose. Put the task first, the constraints next, and the material last, so the model reads the instructions before the thing it has to act on. A vague prompt fails quietly: you get an answer, and the answer is plausible."
+    },
+    {
+      "id": "structured-output",
+      "name": "Structured output",
+      "taught_in": "session-02",
+      "depends_on": ["prompting"],
+      "note": "Ask for JSON, then validate it. A response that parses is not the same as a response that is correct, so the schema lists the fields you will actually read and rejects the ones you will not. An unknown field fails validation, because a contract that accepts anything is not a contract."
+    },
+    {
+      "id": "chunking",
+      "name": "Chunking",
+      "taught_in": "session-03",
+      "depends_on": ["tokens"],
+      "note": "Split a document into passages small enough to retrieve and large enough to mean something. Prefer paragraph boundaries over a fixed character count: a chunk that ends mid-sentence retrieves badly and reads worse. Overlap costs storage and buys you the sentence that straddles a boundary."
+    },
+    {
+      "id": "lexical-search",
+      "name": "Lexical search",
+      "taught_in": "session-04",
+      "depends_on": ["chunking"],
+      "note": "Score a passage by how many query words it shares, weighted so that common words count for less. It is cheap, it is inspectable, and it has one hard limit: it matches a fixed vocabulary, so a question worded differently from the document scores zero."
+    },
+    {
+      "id": "embeddings",
+      "name": "Embeddings",
+      "taught_in": "session-04",
+      "depends_on": ["tokens", "chunking"],
+      "note": "An embedding turns a passage into a vector, so that two ways of saying the same thing land near each other. The gain is paraphrase. The cost is that you cannot read a vector and say why two passages matched."
+    },
+    {
+      "id": "retrieval",
+      "name": "Retrieval",
+      "taught_in": "session-05",
+      "depends_on": ["lexical-search", "embeddings"],
+      "note": "Retrieval decides what the model sees. Order the candidates, cut the list, pass the top few: ranking badly and then passing everything is the same as not retrieving at all. Combine word scores and vector scores when neither alone covers the questions you actually get."
+    },
+    {
+      "id": "grounding",
+      "name": "Grounding and citations",
+      "taught_in": "session-06",
+      "depends_on": ["retrieval", "structured-output"],
+      "note": "An answer is grounded when every claim in it traces to a passage that was retrieved. Citations that point nowhere are worse than no citations: they look like evidence and they are decoration. When nothing was retrieved, refuse."
+    },
+    {
+      "id": "cost-tracking",
+      "name": "Cost tracking",
+      "taught_in": "session-06",
+      "depends_on": ["tokens"],
+      "note": "Count tokens per call and per answer, and record the count beside the answer. A cost surprise is almost never one expensive call. It is a cheap call inside a loop that nobody counted."
+    },
+    {
+      "id": "tool-calling",
+      "name": "Tool calling",
+      "taught_in": "session-07",
+      "depends_on": ["structured-output"],
+      "note": "A tool is a function the model may ask you to run. Validate the arguments before running anything, because the arguments are model output, and model output is untrusted input."
+    },
+    {
+      "id": "agent-loop",
+      "name": "The agent loop",
+      "taught_in": "session-07",
+      "depends_on": ["tool-calling", "grounding"],
+      "note": "The loop is: decide, call a tool, read the result, repeat until done or out of budget. The budget is not optional. A loop with no step limit is a bill."
+    },
+    {
+      "id": "caching",
+      "name": "Caching",
+      "taught_in": "session-07",
+      "depends_on": ["cost-tracking", "retrieval"],
+      "note": "Cache the retrieved passages rather than the finished answer, and key the cache on the exact query text. A cache that hands back a stale passage produces a confident answer from evidence that has since been corrected."
+    },
+    {
+      "id": "evaluation",
+      "name": "Evaluation",
+      "taught_in": "session-08",
+      "depends_on": ["grounding"],
+      "note": "Write the cases before the improvements. A score you cannot reproduce is an anecdote, and a case set you edit after seeing the result is a mirror."
+    },
+    {
+      "id": "deployment",
+      "name": "Deployment",
+      "taught_in": "session-08",
+      "depends_on": ["agent-loop", "evaluation"],
+      "note": "Rollout is the boring part, and it is the part that fails. Ship behind a flag, keep the previous version one command away, and decide before you start which observation tells you the rollback worked."
+    }
+  ]
+}

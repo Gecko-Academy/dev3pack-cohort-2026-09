@@ -12,9 +12,9 @@ The failure that line names is not *cannot deploy*. It is that a developer never
 knew a tradeoff existed, so they never steered the agent toward it. A coding
 agent will write the endpoint. It will not decide whether the trace belongs in
 the response, whether a refusal is a 200 or a 422, or what a 500 is allowed to
-say. Those decisions stay yours, and this track is five of them.
+say. Those decisions stay yours, and this track is six of them.
 
-## The five modules
+## The six modules
 
 | # | Module | The decision you make |
 |---|---|---|
@@ -23,6 +23,7 @@ say. Those decisions stay yours, and this track is five of them.
 | 3 | [Designing system architectures](03-architecture/) | Synchronous or not, and the measurement that would reverse the call |
 | 4 | [Making systems secure and reliable](04-secure-and-reliable/) | Fail closed or degrade, and the risk you decide to live with |
 | 5 | [Scaling and operating in production](05-production/) | Measured or aspirational, and what you would actually page on |
+| 6 | [Retrieval over a graph](06-graph-rag/) | When a graph earns its keep over plain search, and what maintaining it costs |
 
 Each is one notebook of two to three exercises, roughly 45 minutes, built on the
 same assistant you build during the course. Everything runs offline against

@@ -18,7 +18,7 @@ expensive to get wrong:
 
   - `tests/test_checks.py` runs every checker against its SOLVED value. It is a
     literal answer key for all fifteen sessions.
-  - an unreleased `modules/module-N/` is the staging itself.
+  - an unreleased `units/en/session-NN-*/` is the staging itself.
 
 So this refuses to publish rather than trusting anyone to remember. The refusal
 is the product; the copying is incidental.
@@ -45,18 +45,55 @@ ROOT = Path(__file__).resolve().parent.parent
 #: which is exactly what happened when this said "Scoras-Academy".
 STUDENT_REPO = "Gecko-Academy/dev3pack-cohort-2026-09"
 
-#: Weeks, and the chapter directories each one opens.
-WEEK_MODULES = {
-    0: "modules/module-0",
-    1: "modules/module-1",
-    2: "modules/module-2",
-    3: "modules/module-3",
-}
+sys.path.insert(0, str(ROOT / "src"))
+
+from bootcamp_agent.curriculum import (  # noqa: E402
+    BONUS_DIRS,
+    CAPSTONE,
+    CHAPTERS,
+    WEEK0_UNITS,
+    get_chapter,
+)
+
+#: The weeks a publish can name. Week 0 is the prerequisite; 1-3 are the live weeks.
+WEEKS = (0, 1, 2, 3)
+
+#: The optional tracks. Each is one page under `units/en` pointing at material
+#: that lives at the repository root, and each ships on day one.
+SIDE_TRACKS = ("depth", "cookbook", "workspaces", "final-assignment")
+UNITS = "units/en"
+
+
+def week_of(relative: Path) -> int | None:
+    """The week a path under `units/en` opens with, or None if it is never gated.
+
+    Read from the curriculum: a session opens with its week, the capstone with
+    the week its first exercise needs, and everything else (week-0 units, the
+    welcome pages, the bonus track, the table of contents) ships on day one.
+    """
+    parts = relative.parts
+    if parts[:2] != ("units", "en") or len(parts) < 3:
+        return None
+    name = parts[2]
+    for chapter in CHAPTERS:
+        if chapter.dirname == name:
+            return chapter.module
+    if name == CAPSTONE.dirname:
+        return CAPSTONE.opens_in_week
+    return 0
+
 
 #: Ships whole, on day one, whatever week it is. Every one of these is either
 #: shared by all three weeks or reached across weeks (chapter 05 of week 1 links
 #: into `cookbook/integrations/11`), so partitioning them breaks week 1.
 ALWAYS = (
+    # The map a learner opens first. It sorts to the top of a Jupyter file list
+    # on purpose, and it reads the curriculum live, so a newly published week
+    # appears in it without this file changing.
+    "00-START-HERE.ipynb",
+    # The pointer left where the old layout lived, so a student who pulled week 0
+    # under `modules/` is told where it went rather than left with an empty dir.
+    "modules/README.md",
     "src",
     "data",
     "cookbook",
@@ -72,6 +109,15 @@ ALWAYS = (
     "README.md",
     "SETUP.md",
     "LICENSE",
+    # The assistant policy, and the two files that point at it rather than
+    # forking it. The README a student receives has a whole section telling them
+    # to read AGENTS.md first, and session 1's outcome is a scoped instruction
+    # set shaped like this one — so withholding them made the shipped README
+    # promise a file that was not there.
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".cursor",
+    ".claude-plugin",
     "pyproject.toml",
     "uv.lock",
     ".env.example",
@@ -94,10 +140,10 @@ NEVER = {
 #: Solutions are withheld and released one session at a time, so a learner meets
 #: an exercise before its answer is a folder away — the whole point of the priced
 #: hint tier. The set of released chapters is recorded in the student repo, so a
-#: rebuild never silently un-releases one. Every tree under `modules/` is gated,
+#: rebuild never silently un-releases one. Every tree under `units/` is gated,
 #: week-0 units included: their worked answer is `hint(reveal=True)`, and a unit's
 #: solutions can still be released by path (`--release-solutions
-#: modules/module-0/unit-01-environment`). The depth track keeps its own.
+#: units/en/w01-environment`). The depth track keeps its own.
 SOLUTIONS = "solutions"
 RELEASED_SOLUTIONS_FILE = ".solutions-released"
 
@@ -110,16 +156,16 @@ def solution_dir_for(token: str) -> str:
     """The solutions directory a release token names, relative to the repo.
 
     A chapter id (`ch03`, `3`) resolves through the curriculum, the single source
-    of where a chapter lives. Anything else is taken as the path to a solutions
-    parent directory (`modules/module-0/unit-01-environment`), so week-0 units
-    stay releasable without inventing a second id scheme.
+    of where a chapter lives, and so does the capstone (`cap01`). Anything else is
+    taken as the path to a solutions parent directory (`units/en/w01-environment`),
+    so week-0 units stay releasable without inventing a second id scheme.
     """
     stripped = token.strip()
+    if stripped.lower() in {CAPSTONE.prefix, CAPSTONE.slug}:
+        return f"{UNITS}/{CAPSTONE.dirname}/{SOLUTIONS}"
     if re.fullmatch(r"(ch)?0*\d+", stripped.lower()):
-        from bootcamp_agent.curriculum import get_chapter
-
         chapter = get_chapter(stripped)
-        return f"modules/module-{chapter.module}/chapter-{chapter.number:02d}/{SOLUTIONS}"
+        return f"{UNITS}/{chapter.dirname}/{SOLUTIONS}"
     return f"{stripped.rstrip('/')}/{SOLUTIONS}"
 
 
@@ -138,9 +184,9 @@ def write_released_solutions(destination: Path, released: set[str]) -> None:
 
 
 def _is_module_solution(relative: Path) -> bool:
-    """A solutions directory (or a file inside one) under a module chapter."""
+    """A solutions directory (or a file inside one) under a gated unit."""
     parts = relative.parts
-    return len(parts) >= 2 and parts[0] == "modules" and SOLUTIONS in parts
+    return len(parts) >= 2 and parts[0] == "units" and SOLUTIONS in parts
 
 
 def _solution_owner(relative: Path) -> str:
@@ -153,9 +199,17 @@ def _solution_owner(relative: Path) -> str:
 def released_paths(week: int) -> list[str]:
     """Everything that should exist in the student repo at this week."""
     paths = list(ALWAYS)
-    for number, directory in sorted(WEEK_MODULES.items()):
-        if number <= week:
-            paths.append(directory)
+    paths += [f"{UNITS}/_toctree.yml", f"{UNITS}/unit0"]
+    # The one-page entries for the side tracks. Their material ships from the
+    # repository root (`depth/`, `cookbook/`, ...), but the page that introduces
+    # each one lives under `units/en` and was left behind, so the contents page
+    # named four groups a student did not have.
+    paths += [f"{UNITS}/{name}" for name in SIDE_TRACKS]
+    paths += [f"{UNITS}/{unit.dirname}" for unit in WEEK0_UNITS]
+    paths += [f"{UNITS}/{name}" for name in BONUS_DIRS]
+    paths += [f"{UNITS}/{chapter.dirname}" for chapter in CHAPTERS if chapter.module <= week]
+    if week >= CAPSTONE.opens_in_week:
+        paths.append(f"{UNITS}/{CAPSTONE.dirname}")
     return paths
 
 
@@ -168,9 +222,9 @@ def _forbidden(
         denied_parts = Path(denied).parts
         if parts[: len(denied_parts)] == denied_parts:
             return reason
-    for number, directory in WEEK_MODULES.items():
-        if number > week and parts[: len(Path(directory).parts)] == Path(directory).parts:
-            return f"week {number} has not been released yet"
+    opens = week_of(relative)
+    if opens is not None and opens > week:
+        return f"week {opens} has not been released yet"
     if _is_module_solution(relative) and _solution_owner(relative) not in released_solutions:
         return "solutions are released per session; this chapter's has not been"
     return None
@@ -236,7 +290,7 @@ def build(
         if origin.is_dir():
             # A module tree copies without any solutions; every other tree (depth,
             # workspaces) keeps its own.
-            ignore = _COPY_IGNORE + (SOLUTIONS,) if entry.startswith("modules/") else _COPY_IGNORE
+            ignore = _COPY_IGNORE + (SOLUTIONS,) if entry.startswith("units/") else _COPY_IGNORE
             shutil.copytree(
                 origin,
                 target,
@@ -261,12 +315,158 @@ def build(
         copied.append(owner)
 
     _prune_unreleased_solutions(destination, released_solutions)
+    trim_toctree(destination, week)
+    annotate_missing_links(destination, week)
     return copied, skipped
 
 
+def trim_toctree(destination: Path, week: int) -> list[str]:
+    """Drop table-of-contents groups whose pages this week does not ship.
+
+    THE SHIPPED CONTENTS MUST MATCH THE SHIPPED TREE. The generated toctree
+    names every page in the course, all 15 sessions included, and a student
+    holding week 0 has a fraction of them. Left whole, their contents page lists
+    entries that resolve to nothing, which reads as a broken repository rather
+    than as a course that has not opened yet.
+
+    So the groups go, and a comment says what is coming and when — the schedule
+    itself lives in the README's release table, which every student has on day
+    one. Returns the titles that were withheld.
+    """
+    toctree = destination / UNITS / "_toctree.yml"
+    if not toctree.is_file():
+        return []
+
+    lines = toctree.read_text(encoding="utf-8").splitlines()
+    groups: list[list[str]] = []
+    header: list[str] = []
+    for line in lines:
+        if line.startswith("- title:"):
+            groups.append([line])
+        elif groups:
+            groups[-1].append(line)
+        else:
+            header.append(line)
+
+    kept: list[list[str]] = []
+    withheld: list[str] = []
+    for group in groups:
+        locals_ = [
+            line.split("local:", 1)[1].strip()
+            for line in group
+            if line.strip().startswith("- local:")
+        ]
+        present = [local for local in locals_ if (destination / UNITS / f"{local}.mdx").is_file()]
+        if locals_ and not present:
+            withheld.append(group[0].split("title:", 1)[1].strip().strip('"'))
+            continue
+        if len(present) < len(locals_):
+            # A partly-shipped group keeps only the pages that are actually here.
+            trimmed = [group[0], "  sections:"]
+            keep = False
+            for line in group[1:]:
+                if line.strip().startswith("- local:"):
+                    keep = line.split("local:", 1)[1].strip() in present
+                elif not line.strip().startswith("title:"):
+                    keep = False
+                if keep:
+                    trimmed.append(line)
+            group = trimmed
+        kept.append(group)
+
+    out = list(header)
+    for group in kept:
+        out.extend(group)
+    if withheld:
+        out.append("")
+        out.append("# Not in this repository yet. Each arrives on its Monday and")
+        out.append("# `git pull` brings it; the dates are in the README.")
+        for title in withheld:
+            out.append(f"#   {title}")
+    toctree.write_text("\n".join(out) + "\n", encoding="utf-8")
+    return withheld
+
+
+#: The published documents whose relative links are rewritten. Each is generated
+#: or authored against the FULL tree, so a link into a week that has not shipped
+#: resolves to nothing in a student's clone.
+ANNOTATED = ("README.md", "docs/course-index.md")
+
+
+def _absent_note(target: str, destination: Path) -> str | None:
+    """Why this link's target is not in the student's copy, or None if it is.
+
+    Three answers, and the difference matters to whoever reads it: it opens on a
+    date, it is withheld from every week, or it is simply not there.
+    """
+    relative = target.rstrip("/").lstrip("./")
+    while relative.startswith("../"):
+        relative = relative[3:]
+    if (destination / relative).exists():
+        return None
+    name = relative.split("/")[-1]
+    for chapter in CHAPTERS:
+        if chapter.dirname == name:
+            return f" — opens {chapter.weekday}"
+    if name == CAPSTONE.dirname:
+        return " — opens with week 2"
+    for denied in NEVER:
+        if relative == denied or relative.startswith(f"{denied}/"):
+            return " — not in your copy"
+    return " — not released yet"
+
+
+def annotate_missing_links(destination: Path, week: int) -> int:
+    """Unwrap links whose target this week does not ship, saying why.
+
+    THE SAME FAILURE IN EVERY DOCUMENT A STUDENT OPENS. `README.md` links to all
+    fifteen sessions and `docs/course-index.md` names each one; in week 0 those
+    are eighteen links to nothing, which reads as a broken clone rather than as
+    a course that has not opened. The row is worth keeping — it is where a
+    learner sees the whole shape — so the link is unwrapped, not deleted, and
+    the reason replaces it. Returns how many were rewritten.
+    """
+    changed = 0
+
+    def unwrap(match: re.Match[str]) -> str:
+        nonlocal changed
+        title, target = match.group(1), match.group(2)
+        note = _absent_note(target, destination)
+        if note is None:
+            return match.group(0)
+        changed += 1
+        return f"{title}{note}"
+
+    for name in ANNOTATED:
+        document = destination / name
+        if not document.is_file():
+            continue
+        text = document.read_text(encoding="utf-8")
+        # Line by line, so a row that already carries the date is not told it
+        # twice: both documents put sessions in a table with a date column.
+        lines = []
+        for line in text.split("\n"):
+            # Skip code spans: `tools[name](**args)` is not a link, however much
+            # it looks like one to a regular expression.
+            rewritten_line = re.sub(
+                r"(?<!`)\[([^\]]+)]\((?!https?:|#|mailto:)([^)]+)\)",
+                unwrap,
+                line,
+            )
+            for chapter in CHAPTERS:
+                stamp = f" — opens {chapter.weekday}"
+                if stamp in rewritten_line and rewritten_line.count(chapter.weekday) > 1:
+                    rewritten_line = rewritten_line.replace(stamp, " — not yet")
+            lines.append(rewritten_line)
+        rewritten = "\n".join(lines)
+        if rewritten != text:
+            document.write_text(rewritten, encoding="utf-8")
+    return changed
+
+
 def _prune_unreleased_solutions(destination: Path, released_solutions: frozenset[str]) -> None:
-    """Remove any module solutions directory the release set does not name."""
-    modules = destination / "modules"
+    """Remove any unit solutions directory the release set does not name."""
+    modules = destination / "units"
     if not modules.is_dir():
         return
     for candidate in modules.rglob(SOLUTIONS):
@@ -305,7 +505,7 @@ def _stale(destination: Path, week: int) -> list[Path]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--week", type=int, required=True, choices=sorted(WEEK_MODULES))
+    parser.add_argument("--week", type=int, required=True, choices=WEEKS)
     parser.add_argument(
         "--into",
         type=Path,
@@ -329,8 +529,7 @@ def main(argv: list[str] | None = None) -> int:
     # solution cannot ship before the exercise it answers.
     newly = {solution_dir_for(token) for token in args.release_solutions}
     for owner in sorted(newly):
-        module = Path(owner).parts[1]  # module-N
-        number = int(module.split("-")[1])
+        number = week_of(Path(owner)) or 0
         if number > args.week:
             raise PublishError(
                 f"{owner}: its week ({number}) is not released yet, so its solutions cannot be"
@@ -339,10 +538,13 @@ def main(argv: list[str] | None = None) -> int:
     released_solutions = frozenset(already | newly)
 
     print(f"publishing week {args.week} -> {destination}")
-    print(
-        f"  released: {', '.join(WEEK_MODULES[n] for n in sorted(WEEK_MODULES) if n <= args.week)}"
-    )
-    withheld = [WEEK_MODULES[n] for n in sorted(WEEK_MODULES) if n > args.week]
+    opened = [chapter.dirname for chapter in CHAPTERS if chapter.module <= args.week]
+    withheld = [chapter.dirname for chapter in CHAPTERS if chapter.module > args.week]
+    if args.week >= CAPSTONE.opens_in_week:
+        opened.append(CAPSTONE.dirname)
+    else:
+        withheld.append(CAPSTONE.dirname)
+    print(f"  released: week 0, unit 0, bonus, {', '.join(opened) or 'no sessions'}")
     print(f"  withheld: {', '.join(withheld) or 'nothing'}")
     print(f"  excluded always: {', '.join(sorted(NEVER))}")
     print(

@@ -31,7 +31,7 @@ from bootcamp_agent.checks import register
 from bootcamp_agent.week0_checks.fast_lane import _unwritten
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-FIXTURES = REPO_ROOT / "modules" / "module-0" / "unit-09-mcp-first-server" / "fixtures"
+FIXTURES = REPO_ROOT / "units" / "en" / "w09-mcp-first-server" / "fixtures"
 TIMEZONES = FIXTURES / "timezones.json"
 
 #: How long a probe gets to start the learner's server, ask it one thing, and exit.
@@ -117,8 +117,39 @@ _PROBE = textwrap.dedent(
 )
 
 
-def _end(process: subprocess.Popen) -> None:
-    """Kill the probe and everything it started. The server is its child."""
+def _orphans(server_path: Path) -> list[int]:
+    """Any process still running this exact server file.
+
+    THE PROCESS GROUP IS NOT ENOUGH, and this is the whole reason this function
+    exists. The MCP stdio client starts the learner's server in a session of its
+    own, so it is not in the probe's process group and `killpg` never reaches
+    it. Killing the probe therefore leaves the server running, and on a machine
+    that runs the checks often — CI, or a learner retrying — they accumulate
+    one per timeout until something notices.
+
+    Matching is on the absolute path of a file this function was handed a moment
+    ago, under a temporary directory or the learner's own tree, so it cannot
+    match anything it did not start.
+    """
+    wanted = str(server_path.resolve())
+    found: list[int] = []
+    proc = Path("/proc")
+    if not proc.is_dir():  # pragma: no cover - not Linux
+        return found
+    for entry in proc.iterdir():
+        if not entry.name.isdigit():
+            continue
+        try:
+            argv = (entry / "cmdline").read_bytes().split(b"\0")
+        except OSError:
+            continue  # it exited while we looked, which is the outcome we wanted
+        if any(part.decode("utf-8", "replace") == wanted for part in argv):
+            found.append(int(entry.name))
+    return found
+
+
+def _end(process: subprocess.Popen, server_path: Path | None = None) -> None:
+    """Kill the probe, its group, and the server that escaped both."""
     try:
         if hasattr(os, "killpg"):
             os.killpg(process.pid, signal.SIGKILL)
@@ -127,6 +158,14 @@ def _end(process: subprocess.Popen) -> None:
     except ProcessLookupError:
         pass
     process.wait(timeout=5)
+
+    if server_path is None:
+        return
+    for pid in _orphans(server_path):
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            pass  # already gone, or not ours to kill
 
 
 def _last_line(stderr: str) -> str:
@@ -154,7 +193,7 @@ def probe(server_path: Path, request: dict) -> dict | str:
     try:
         stdout, stderr = process.communicate(timeout=PROBE_SECONDS)
     except subprocess.TimeoutExpired:
-        _end(process)
+        _end(process, server_path)
         return (
             f"the server did not answer within {PROBE_SECONDS:.0f}s. Does the file end with "
             "mcp.run(transport='stdio') under if __name__ == '__main__'?"

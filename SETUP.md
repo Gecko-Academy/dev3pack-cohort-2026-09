@@ -76,6 +76,16 @@ uv run python scripts/check_setup.py
 Everything green (⚠️ warnings are fine)? **Screenshot the doctor output and post
 it in the cohort channel.** That's your ticket for day 1.
 
+Then open the course and find your place:
+
+```bash
+uv run jupyter lab      # then open 00-START-HERE.ipynb, the first file listed
+```
+
+That notebook lists every part of the course in order, links each one, and ticks
+off what you have finished. Week 0 is open now, so you can begin the moment the
+doctor is green.
+
 ## 6. Install an editor and ONE coding assistant
 
 Any of these works for the course — Session 4 covers configuring them properly:

@@ -38,7 +38,7 @@ from urllib.parse import parse_qs, urlparse
 from bootcamp_agent.checks import register
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-UNIT_04 = REPO_ROOT / "modules" / "module-0" / "unit-04-real-apis" / "fixtures"
+UNIT_04 = REPO_ROOT / "units" / "en" / "w04-real-apis" / "fixtures"
 
 _PLACEHOLDERS = ("", "...", "todo", "tbd", "n/a", "na", "none", "-", "?", "yes", "no")
 
@@ -272,7 +272,7 @@ def _w01_e2(locate: object) -> str | None:
     if not callable(locate):
         return "expected the locate_repo_root(start) function itself"
     try:
-        found = locate(REPO_ROOT / "modules" / "module-0" / "unit-01-environment")
+        found = locate(REPO_ROOT / "units" / "en" / "w01-environment")
     except Exception as error:  # noqa: BLE001
         return f"raised {type(error).__name__}: {error}"
     if not isinstance(found, Path):

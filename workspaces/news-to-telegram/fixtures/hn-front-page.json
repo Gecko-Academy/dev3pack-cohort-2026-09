@@ -1,0 +1,102 @@
+{
+  "_provenance": {
+    "recorded": "2026-09-08",
+    "source": "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=10",
+    "lane": "recorded",
+    "auth_sent": "none",
+    "is_evidence_of": "the shape of an Algolia Hacker News response, and what was on the front page at that moment",
+    "is_not_evidence_of": "what is on Hacker News today. Re-run the live cell for that; this file never changes."
+  },
+  "hits": [
+    {
+      "objectID": "49592375",
+      "title": "216M Spy TVs \u2013 The LG Smart TV Problem [video]",
+      "url": "https://www.youtube.com/watch?v=6IFVTcM28KA",
+      "points": 666,
+      "num_comments": 858,
+      "created_at": "2026-09-07T00:22:04Z",
+      "author": "treve"
+    },
+    {
+      "objectID": "49552299",
+      "title": "WeatherNext 3",
+      "url": "https://deepmind.google/science/weathernext/",
+      "points": 294,
+      "num_comments": 66,
+      "created_at": "2026-09-03T16:06:08Z",
+      "author": "matthieu_bl"
+    },
+    {
+      "objectID": "49601655",
+      "title": "Watch Los Angeles get built, one building at a time (1880\u20132026)",
+      "url": "https://lax-skyline.parcelscope.net/",
+      "points": 264,
+      "num_comments": 134,
+      "created_at": "2026-09-07T18:52:06Z",
+      "author": "rustywasm"
+    },
+    {
+      "objectID": "49596055",
+      "title": "Caltech Mathathon \u2013 first hackathon ever devoted to research level mathematics",
+      "url": "https://mathathonchallenge.com/index.html",
+      "points": 253,
+      "num_comments": 88,
+      "created_at": "2026-09-07T09:26:53Z",
+      "author": "astroanax"
+    },
+    {
+      "objectID": "49604861",
+      "title": "Jellyfin 12.0",
+      "url": "https://jellyfin.org/posts/jellyfin-release-12.0/",
+      "points": 242,
+      "num_comments": 90,
+      "created_at": "2026-09-08T01:56:35Z",
+      "author": "0xC0ncord"
+    },
+    {
+      "objectID": "49604637",
+      "title": "I've factored the RSA keys of a Certificate Authority from the 90s",
+      "url": "https://mcpherrin.ca/2026/09/07/rsa.html",
+      "points": 229,
+      "num_comments": 45,
+      "created_at": "2026-09-08T01:16:59Z",
+      "author": "ahlCVA"
+    },
+    {
+      "objectID": "49571096",
+      "title": "This Month in Ladybird \u2013 August 2026",
+      "url": "https://ladybird.org/newsletter/2026-08-31/",
+      "points": 215,
+      "num_comments": 51,
+      "created_at": "2026-09-04T22:47:04Z",
+      "author": "exploraz"
+    },
+    {
+      "objectID": "49569838",
+      "title": "Scientists observe Einstein's gravity in the quantum world",
+      "url": "https://www.ox.ac.uk/news/2026-08-28-scientists-observe-einsteins-gravity-in-the-quantum-world",
+      "points": 195,
+      "num_comments": 46,
+      "created_at": "2026-09-04T20:28:52Z",
+      "author": "mudil"
+    },
+    {
+      "objectID": "49575515",
+      "title": "Trusting-Trust Attack against an Entire Linux Distribution",
+      "url": "https://arxiv.org/abs/2607.24888",
+      "points": 189,
+      "num_comments": 40,
+      "created_at": "2026-09-05T11:25:18Z",
+      "author": "signa11"
+    },
+    {
+      "objectID": "49604150",
+      "title": "TALA Is Open-Source",
+      "url": "https://d2lang.com/blog/tala-is-open-source/",
+      "points": 164,
+      "num_comments": 11,
+      "created_at": "2026-09-07T23:37:42Z",
+      "author": "alixanderwang"
+    }
+  ]
+}

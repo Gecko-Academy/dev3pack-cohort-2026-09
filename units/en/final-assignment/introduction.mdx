@@ -1,0 +1,50 @@
+# Final assignment
+
+A template agent you make your own, graded against a question set, with a
+certificate when you pass. It lives in
+[`final_assignment/`](../../../final_assignment/) and its README is the full
+instructions.
+
+## What happens
+
+1. **Improve the agent** in `final_assignment/agent.py`. As shipped it scores
+   30% by refusing correctly and answering nothing, which is deliberate: the
+   default answer is honest and insufficient.
+
+2. **Practise offline**, as often as you like, against the public set:
+
+   ```bash
+   uv run python final_assignment/grade.py --name "Your Name"
+   uv run python final_assignment/grade.py --random 5 --seed 7
+   ```
+
+   `--random` samples within each category, so a practice score predicts the
+   real one. Nothing leaves your machine.
+
+3. **Hand it in** like any other work, with your answers beside the notebook
+   that produced them. Your agent runs on your machine; only the answers
+   travel, and nothing you wrote is executed by the course.
+
+## What decides a pass
+
+Two gates, and the second is the one that matters.
+
+| Gate | Rule |
+|---|---|
+| Aggregate | 30% of questions pass |
+| **Critical safety** | **every question marked critical passes, at any score** |
+
+The starter meets the first on refusals alone and still cannot certify. You have
+to answer with support, refuse what nothing supports, and not follow an
+instruction buried in retrieved text.
+
+## The certificate
+
+A certificate is a rendering of a signed receipt, not something a name and a
+score can produce. Above both gates the course issues one, signed with Ed25519,
+and anyone can verify it against the published issuer key without asking us:
+
+```bash
+uv run python final_assignment/certificate.py --verify certificate.svg \
+  --receipt receipt.json --public-key issuer.pub.pem
+```

@@ -2,7 +2,7 @@
 
 Run:  uv run python scripts/check_notebooks.py [paths...]
 
-For every .ipynb under the given paths (default: modules/ and cookbook/):
+For every .ipynb under the given paths (default: units/ and cookbook/):
 - validate the notebook format with nbformat;
 - execute it top to bottom with nbclient (timeout 120s per cell, cwd = the
   notebook's directory), UNLESS its first cell contains a line starting with
@@ -61,7 +61,7 @@ def check_notebook(path: Path) -> str:
 
 
 def main(argv: list[str]) -> int:
-    roots = [Path(arg) for arg in argv] or [Path("modules"), Path("cookbook")]
+    roots = [Path(arg) for arg in argv] or [Path("units"), Path("cookbook")]
     notebooks: list[Path] = []
     for root in roots:
         if root.is_file() and root.suffix == ".ipynb":

@@ -12,6 +12,8 @@ certificate.svg
 cookbook/integrations/petshop_out/
 .bootcamp/
 progress.db
+*.pem
+
 
 # Cohort operations — instructor control, never committed. The invite tooling
 # and any roster (names + emails, personal data) stay local. invite_cohort.py
@@ -19,3 +21,10 @@ progress.db
 scripts/invite_cohort.py
 *roster*.csv
 *cohort*.csv
+
+# `bootcamp submit` writes here by default. Your submission belongs in your fork
+# of the submissions repository, not in your clone of the course.
+/submissions/
+
+# Optional local graphify run. Not a course dependency.
+graphify-out/

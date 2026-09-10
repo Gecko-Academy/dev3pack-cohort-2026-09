@@ -35,16 +35,40 @@ sys.path.insert(0, str(ROOT / "src"))
 
 OUTPUT = ROOT / "docs" / "notebook-index.md"
 
-#: Where notebooks live, and what each collection is for.
-COLLECTIONS = (
-    ("modules/module-0", "Week 0 — the prerequisite", "Self-paced, before session 1."),
-    ("modules/module-1", "Week 1 — foundations", "Sessions 1 to 5."),
-    ("modules/module-2", "Week 2 — retrieval, agents, reliability", "Sessions 6 to 10."),
-    ("modules/module-3", "Week 3 — production, Gecko, capstone", "Sessions 11 to 15."),
-    ("depth", "Depth track — optional", "Software engineering fundamentals. Ungraded."),
-    ("cookbook", "Cookbook", "Gecko reference notebooks, not part of any week."),
-    ("workspaces", "Workspaces", "Open-ended labs, one per week."),
-)
+
+def collections() -> tuple[tuple[tuple[str, ...], str, str], ...]:
+    """Where notebooks live, and what each collection is for.
+
+    Read from the curriculum rather than typed, because the layout is one
+    directory per unit and the grouping (week 0, week 1, ...) is a fact the
+    curriculum already holds.
+    """
+    from bootcamp_agent.curriculum import CAPSTONE, CHAPTERS, WEEK0_UNITS, WEEK_TITLES
+
+    groups: list[tuple[tuple[str, ...], str, str]] = [
+        (
+            tuple(f"units/en/{unit.dirname}" for unit in WEEK0_UNITS),
+            "Week 0 — the prerequisite",
+            "Self-paced, before session 1.",
+        )
+    ]
+    for week, title in sorted(WEEK_TITLES.items()):
+        chapters = [chapter for chapter in CHAPTERS if chapter.module == week]
+        groups.append(
+            (
+                tuple(f"units/en/{chapter.dirname}" for chapter in chapters),
+                f"Week {week} — {title}",
+                f"Sessions {chapters[0].number} to {chapters[-1].number}.",
+            )
+        )
+    groups += [
+        ((f"units/en/{CAPSTONE.dirname}",), "Capstone", "Built between sessions, from week 2."),
+        (("depth",), "Depth track — optional", "Software engineering fundamentals. Ungraded."),
+        (("cookbook",), "Cookbook", "Gecko reference notebooks, not part of any week."),
+        (("workspaces",), "Workspaces", "Open-ended labs, one per week."),
+    ]
+    return tuple(groups)
+
 
 GOAL = re.compile(r"\*\*Goal:\*\*\s*(.+?)(?:\n\n|\Z)", re.S)
 TITLE = re.compile(r"^#\s+(.+)$", re.M)
@@ -124,11 +148,13 @@ def render() -> str:
     ]
 
     total = 0
-    for relative, heading, blurb in COLLECTIONS:
-        directory = ROOT / relative
-        if not directory.is_dir():
-            continue
-        found = notebooks_under(directory)
+    for relatives, heading, blurb in collections():
+        found = [
+            notebook
+            for relative in relatives
+            if (ROOT / relative).is_dir()
+            for notebook in notebooks_under(ROOT / relative)
+        ]
         if not found:
             continue
         lines += [f"## {heading}", "", blurb, ""]

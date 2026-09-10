@@ -15,14 +15,19 @@ from __future__ import annotations
 import os
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from bootcamp_agent.checks import STRICT_ENV
 from bootcamp_agent.curriculum import Chapter, exercise_ids
 
 #: What `check()` prints. Anchored, because a notebook may legitimately print
 #: a tick inside prose and that is not a verdict.
-_PASS = re.compile(r"^✅ (ch\d\d-e\d+) passed\s*$")
-_FAIL = re.compile(r"^❌ (ch\d\d-e\d+): (.+)$")
+# `ch03-e1` for a session, `w05-e1` for a week-0 unit. Matching only `ch` made
+# every week-0 verdict invisible, so a submitted unit reported all its exercises
+# as never run when they had in fact reported.
+_EXERCISE = r"(?:ch|w|cap)\d\d-e\d+"
+_PASS = re.compile(rf"^✅ ({_EXERCISE}) passed\s*$")
+_FAIL = re.compile(rf"^❌ ({_EXERCISE}): (.+)$")
 
 
 class CourseworkError(Exception):
@@ -64,7 +69,9 @@ def outputs_of(notebook: object) -> list[str]:
     return lines
 
 
-def read_scorecard(chapter: Chapter, lines: list[str]) -> Scorecard:
+def read_scorecard(
+    item: Chapter | str, lines: list[str], expected: tuple[str, ...] | None = None
+) -> Scorecard:
     """Turn printed output into a scorecard. Nothing is judged here, only read."""
     passed: list[str] = []
     # Keyed by exercise id, because one exercise reports twice in a normal run:
@@ -72,6 +79,9 @@ def read_scorecard(chapter: Chapter, lines: list[str]) -> Scorecard:
     # failure again in the closing scorecard. Counting both turned chapter 1's
     # honest 0/3 into 0/6, which is a tally no participant could act on. First
     # reason wins, since that is the one `check()` gave at the point of failure.
+    identifier = item.chapter_id if isinstance(item, Chapter) else item
+    if expected is None:
+        expected = exercise_ids(identifier)
     failures: dict[str, str] = {}
     for line in lines:
         if match := _PASS.match(line.strip()):
@@ -80,11 +90,9 @@ def read_scorecard(chapter: Chapter, lines: list[str]) -> Scorecard:
             failures.setdefault(match.group(1), match.group(2))
     failed = tuple(failures.items())
     seen = {*passed, *failures}
-    not_reached = tuple(
-        exercise for exercise in exercise_ids(chapter.chapter_id) if exercise not in seen
-    )
+    not_reached = tuple(exercise for exercise in expected if exercise not in seen)
     return Scorecard(
-        chapter_id=chapter.chapter_id,
+        chapter_id=identifier,
         passed=tuple(dict.fromkeys(passed)),
         failed=failed,
         not_reached=not_reached,
@@ -93,14 +101,28 @@ def read_scorecard(chapter: Chapter, lines: list[str]) -> Scorecard:
 
 
 def run_chapter(chapter: Chapter, timeout: int = 180) -> Scorecard:
-    """Execute a chapter's notebook with checks non-strict, and read its verdicts.
-
-    :raises CourseworkError: when there is no notebook, when nbclient is absent,
-        or when the notebook raised before its checks could report.
-    """
-    notebook_path = chapter.notebook
-    if notebook_path is None:
+    """Execute a chapter's notebook and read its verdicts."""
+    if chapter.notebook is None:
         raise CourseworkError(f"{chapter.chapter_id} has no notebook (it is demo day)")
+    return run_notebook(
+        chapter.notebook, exercise_ids(chapter.chapter_id), chapter.chapter_id, timeout
+    )
+
+
+def run_notebook(
+    notebook_path: Path,
+    expected: tuple[str, ...],
+    identifier: str,
+    timeout: int = 180,
+) -> Scorecard:
+    """Execute any notebook with checks non-strict, and read its verdicts.
+
+    Takes a path rather than a `Chapter` so a week-0 unit, which deliberately is
+    not a chapter because it has no date, can be run by the same code.
+
+    :raises CourseworkError: when the notebook is missing, when nbclient is
+        absent, or when it raised before its checks could report.
+    """
     if not notebook_path.is_file():
         raise CourseworkError(f"not found: {notebook_path}")
     try:
@@ -128,7 +150,7 @@ def run_chapter(chapter: Chapter, timeout: int = 180) -> Scorecard:
             os.environ.pop(STRICT_ENV, None)
         else:
             os.environ[STRICT_ENV] = previous
-    return read_scorecard(chapter, outputs_of(notebook))
+    return read_scorecard(identifier, outputs_of(notebook), expected)
 
 
 def render(card: Scorecard) -> str:

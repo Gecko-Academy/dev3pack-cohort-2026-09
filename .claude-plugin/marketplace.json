@@ -1,0 +1,21 @@
+{
+  "$schema": "https://code.claude.com/schemas/marketplace.json",
+  "name": "dev3pack",
+  "owner": {
+    "name": "Dev3Pack",
+    "url": "https://github.com/ernanibmurtinho"
+  },
+  "metadata": {
+    "description": "Dev3Pack AI-Engineering Bootcamp builder kit — skills and commands for building bounded, citation-verified, receipt-checked agents.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "dev3pack-builder-kit",
+      "source": "./builder-kit/plugin",
+      "description": "Builder kit from the bootcamp: the store-builder skill (Waiter/Manager/Delivery agents with the receipt rule), the corpus-answers skill (grounded Q&A with verified citations), and the /bootcamp-doctor command.",
+      "category": "Education",
+      "strict": true
+    }
+  ]
+}

@@ -15,6 +15,9 @@ dependencies = [
 [project.optional-dependencies]
 anthropic = ["anthropic>=0.40"]
 openai = ["openai>=1.40"]
+# Only the issuer signs, and only a holder verifies. Neither is on a learner's
+# path through the course, so this stays out of the default install.
+certificate = ["cryptography>=43"]
 
 [dependency-groups]
 dev = [

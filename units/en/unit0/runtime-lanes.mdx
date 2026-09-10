@@ -1,0 +1,13 @@
+# Runtime lanes
+
+The course has one required execution contract and two optional comparison lanes.
+
+| Lane | Required | Credentials | Contract |
+|---|---:|---:|---|
+| Offline deterministic | Yes | No | Every scored notebook and test must pass with `FakeLLM` or a controlled test double. |
+| Hosted model | No | Usually | The model adapter reports tool, schema, timeout and provider behaviour. |
+| Local Ollama | No | No | Run locally or through a Colab local runtime. Hosted Colab's `localhost` is the temporary VM, not your laptop. |
+
+A model change must not change tool permissions, grading rules, trace redaction,
+retry budgets, or failure behaviour. Set `BOOTCAMP_PROVIDER=ollama` or
+`BOOTCAMP_PROVIDER=anthropic` to switch; leave it unset for the required lane.

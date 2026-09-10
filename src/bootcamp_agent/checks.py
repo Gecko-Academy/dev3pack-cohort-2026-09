@@ -1,6 +1,6 @@
 """Exercise checks: one function per exercise id, called from the notebooks.
 
-`check("ch01-e1", value)` prints one line (✅ or ❌ with the reason and a
+`check("ch02-e1", value)` prints one line (✅ or ❌ with the reason and a
 hint) and returns a bool. It never raises, so an unfinished exercise does
 not stop the notebook. In strict mode (`BOOTCAMP_CHECKS_STRICT=1`, set by
 the notebook checker for `solutions/` notebooks) a failed check raises, so
@@ -52,8 +52,19 @@ def register(exercise_id: str) -> Callable[[Checker], Checker]:
     return wrap
 
 
+def _ensure_registered() -> None:
+    """Import the per-session check modules, once, so a notebook needs no extra import.
+
+    The registry is filled by side effect of importing. Week 0 asks for its own
+    package explicitly; the sessions authored after the re-sequence live in
+    `session_checks`, and a learner should not have to know that.
+    """
+    import bootcamp_agent.session_checks  # noqa: F401 - importing is what registers them
+
+
 def check(exercise_id: str, value: Any) -> bool:
     """Run the checker for `exercise_id` on `value`, print the verdict, return pass/fail."""
+    _ensure_registered()
     if exercise_id not in CHECKS:
         raise UnknownCheck(f"no check registered for {exercise_id!r}; known: {sorted(CHECKS)}")
     try:
@@ -99,6 +110,7 @@ def _marks(ids: list[str]) -> str:
 
 def review(chapter: str) -> bool:
     """Print the chapter scorecard from the checks run so far. Returns True when all passed."""
+    _ensure_registered()
     ids = sorted(exercise_id for exercise_id in CHECKS if exercise_id.startswith(f"{chapter}-"))
     passed = [exercise_id for exercise_id in ids if RESULTS.get(exercise_id, "") is None]
     print(f"{chapter}: {len(passed)}/{len(ids)} passed{_marks(ids)}")
@@ -117,8 +129,8 @@ def _corpus():  # noqa: ANN202 - small local helper
 # ---------------------------------------------------------------- chapter 01
 
 
-@register("ch01-e1")
-def _ch01_e1(replies: Any) -> str | None:
+@register("ch02-e1")
+def _ch02_e1(replies: Any) -> str | None:
     """Three FakeLLM replies: one per canned keyword, one default."""
     if not isinstance(replies, (list, tuple)) or len(replies) != 3:
         return "expected a list of exactly three replies; hint: one call per question"
@@ -136,8 +148,8 @@ def _ch01_e1(replies: Any) -> str | None:
     return None
 
 
-@register("ch01-e2")
-def _ch01_e2(runs: Any) -> str | None:
+@register("ch02-e2")
+def _ch02_e2(runs: Any) -> str | None:
     """Two lanes, two calls each: the fake pair is identical; the live pair is two answers."""
     if not isinstance(runs, dict) or set(runs) != {"fake", "live"}:
         return "expected a dict with keys 'fake' and 'live'"
@@ -152,8 +164,8 @@ def _ch01_e2(runs: Any) -> str | None:
     return None
 
 
-@register("ch01-e3")
-def _ch01_e3(bar: Any) -> str | None:
+@register("ch02-e3")
+def _ch02_e3(bar: Any) -> str | None:
     """The reliability bar: three sentences, each written by the participant."""
     keys = ("reliable_when", "review_when", "never_unreviewed")
     if not isinstance(bar, dict) or set(bar) != set(keys):
@@ -168,8 +180,8 @@ def _ch01_e3(bar: Any) -> str | None:
 # ---------------------------------------------------------------- chapter 02
 
 
-@register("ch02-e1")
-def _ch02_e1(load_mini: Any) -> str | None:
+@register("ch06-e2")
+def _ch06_e2(load_mini: Any) -> str | None:
     """A loader with both failure modes, judged on a temp directory."""
     import tempfile
 
@@ -198,8 +210,8 @@ def _ch02_e1(load_mini: Any) -> str | None:
     return None
 
 
-@register("ch02-e2")
-def _ch02_e2(index: Any) -> str | None:
+@register("ch06-e3")
+def _ch06_e3(index: Any) -> str | None:
     """A tag index over the real corpus: tag -> sorted doc_ids."""
     expected: dict[str, list[str]] = {}
     for doc in _corpus():
@@ -280,8 +292,8 @@ def _ch03_e3(answer: Any) -> str | None:
 # ---------------------------------------------------------------- chapter 05
 
 
-@register("ch05-e1")
-def _ch05_e1(list_documents: Any) -> str | None:
+@register("ch04-e1")
+def _ch04_e1(list_documents: Any) -> str | None:
     """The four-clause contract of list_documents(tag=None)."""
     if not callable(list_documents):
         return "pass the list_documents function itself"
@@ -304,8 +316,8 @@ def _ch05_e1(list_documents: Any) -> str | None:
     return None
 
 
-@register("ch05-e2")
-def _ch05_e2(convert_currency: Any) -> str | None:
+@register("ch04-e2")
+def _ch04_e2(convert_currency: Any) -> str | None:
     """A currency tool judged with an injected, offline rate table."""
     if not callable(convert_currency):
         return "pass the convert_currency function itself"
@@ -332,8 +344,8 @@ def _ch05_e2(convert_currency: Any) -> str | None:
     return None
 
 
-@register("ch05-e3")
-def _ch05_e3(traces: Any) -> str | None:
+@register("ch05-e1")
+def _ch05_e1(traces: Any) -> str | None:
     """Trace kinds at two budgets: both visible, budget never exceeded."""
     if not isinstance(traces, dict) or set(traces) != {1, 3}:
         return "expected a dict {1: [...kinds...], 3: [...kinds...]}"
@@ -506,8 +518,8 @@ def _ch09_e1(buckets: object) -> str | None:
     return None
 
 
-@register("ch09-e2")
-def _ch09_e2(finding: object) -> str | None:
+@register("ch07-e3")
+def _ch07_e3(finding: object) -> str | None:
     """The cite-everything fake: the rate it really scores, and what that proves."""
     keys = ("pass_rate", "weakness")
     if not isinstance(finding, dict) or set(finding) != set(keys):
@@ -617,8 +629,8 @@ def _ch11_e2(policy: object) -> str | None:
 # ---------------------------------------------------------------- chapter 12
 
 
-@register("ch12-e1")
-def _ch12_e1(result: object) -> str | None:
+@register("cap01-e1")
+def _cap01_e1(result: object) -> str | None:
     """Checkpoint 1: a supported question answered with the citation verified."""
     answer = getattr(result, "answer", None)
     if not isinstance(answer, ResearchAnswer):
@@ -630,8 +642,8 @@ def _ch12_e1(result: object) -> str | None:
     return None
 
 
-@register("ch12-e2")
-def _ch12_e2(refusal: object) -> str | None:
+@register("cap01-e2")
+def _cap01_e2(refusal: object) -> str | None:
     """Checkpoint 2: an unsupported question refused BEFORE any model call."""
     if not isinstance(refusal, dict) or set(refusal) != {"result", "probe_calls"}:
         return "expected {'result': AgentResult, 'probe_calls': len(probe.calls)}"
@@ -650,8 +662,8 @@ def _ch12_e2(refusal: object) -> str | None:
     return None
 
 
-@register("ch12-e3")
-def _ch12_e3(kinds: object) -> str | None:
+@register("cap01-e3")
+def _cap01_e3(kinds: object) -> str | None:
     """Checkpoint 3: a trace a reviewer can follow."""
     if not isinstance(kinds, (list, tuple, set)):
         return "expected the trace kinds: [e.kind for e in result.trace]"
@@ -661,8 +673,8 @@ def _ch12_e3(kinds: object) -> str | None:
     return None
 
 
-@register("ch12-e4")
-def _ch12_e4(report: object) -> str | None:
+@register("cap01-e4")
+def _cap01_e4(report: object) -> str | None:
     """Checkpoint 4: the eval gate. v1 is done when every case passes."""
     rate = getattr(report, "pass_rate", None)
     if rate is None:
@@ -672,8 +684,8 @@ def _ch12_e4(report: object) -> str | None:
     return None
 
 
-@register("ch12-e5")
-def _ch12_e5(issues: object) -> str | None:
+@register("cap01-e5")
+def _cap01_e5(issues: object) -> str | None:
     """The ranked issue list: Thursday's backlog, and demo day's honest limitation."""
     if not isinstance(issues, (list, tuple)) or len(issues) < 3:
         return "expected at least three ranked issues"
@@ -756,8 +768,8 @@ def _ch13_e2(lanes: object) -> str | None:
     return None
 
 
-@register("ch13-e3")
-def _ch13_e3(classified: object) -> str | None:
+@register("ch12-e1")
+def _ch12_e1(classified: object) -> str | None:
     """Of sixteen tools, two can change state. Knowing which two is the session."""
     changes_state = {"try_purchase", "submit_transaction"}
     builds_unsigned = {"prepare_purchase", "prepare_instruction", "plan_payment", "plan_swap"}
@@ -797,8 +809,8 @@ def _keys_are_ch13(value: object) -> str | None:
 # ---------------------------------------------------------------- chapter 14
 
 
-@register("ch14-e1")
-def _ch14_e1(answer_with_timeout: object) -> str | None:
+@register("ch02-e4")
+def _ch02_e4(answer_with_timeout: object) -> str | None:
     """A hanging provider must become a defined refusal, judged by calling it."""
     if not callable(answer_with_timeout):
         return "pass the answer_with_timeout function itself"
@@ -816,8 +828,8 @@ def _ch14_e1(answer_with_timeout: object) -> str | None:
     return None
 
 
-@register("ch14-e2")
-def _ch14_e2(comparison: object) -> str | None:
+@register("ch08-e2")
+def _ch08_e2(comparison: object) -> str | None:
     """The graph appendix: it ran and was compared, or it was skipped for a stated reason."""
     keys = ("ran", "skipped_because", "framework_free_calls", "graph_calls", "difference")
     if not isinstance(comparison, dict) or set(comparison) != set(keys):
@@ -840,8 +852,8 @@ def _ch14_e2(comparison: object) -> str | None:
 # ---------------------------------------------------------------- chapter 04
 
 
-@register("ch04-e1")
-def _ch04_e1(loop: object) -> str | None:
+@register("ch01-e1")
+def _ch01_e1(loop: object) -> str | None:
     """The task loop, evidenced. The rejection is the one that cannot be skipped."""
     keys = ("plan_approved", "diff_inspected", "rejected_change", "why_rejected", "risks")
     if not isinstance(loop, dict) or set(loop) != set(keys):

@@ -1,0 +1,33 @@
+# Long-term memory, consent, and deletion
+
+> **Optional, never counted, externally billed.** Not required for completion or a certificate, and excluded from every total. Use a dedicated sandbox project, synthetic people and media, budget alerts, least-privilege identities, and the teardown checklist. Never use real disaster-response, health, identity, or location data.
+
+## Outcome
+
+Evaluate session memory and Vertex AI Memory Bank through a privacy-first policy for what may be stored, corrected, expired, exported, and deleted.
+
+## Evidence artifact
+
+A memory policy, two synthetic memory topics, consent flow, reset/delete test, and cross-user isolation test.
+
+## Failure clinic
+
+Sensitive-data retention, stale preferences, cross-user leakage, invisible background writes, and missing deletion evidence.
+
+## Required comparison
+
+Before using a managed service, implement or inspect a local fixture-backed baseline. Record what the cloud component improves, what it costs, what new permissions it receives, and what failure modes it introduces. The cloud path must not be the only way to understand or demonstrate the concept.
+
+## Safety and operations gate
+
+1. Confirm the active project and account before creating resources.
+2. Use synthetic data and document its provenance.
+3. Record enabled APIs, regions, identities, roles, public endpoints, and retention.
+4. Bound model calls, uploads, retries, and concurrent work.
+5. Redact logs and traces before sharing.
+6. Delete or disable every resource and verify that billing surfaces are empty.
+
+## Reference
+
+- [Google Codelab: Build a Multimodal AI Agent with Graph RAG, ADK & Memory Bank](https://codelabs.developers.google.com/codelabs/survivor-network/instructions#0)
+

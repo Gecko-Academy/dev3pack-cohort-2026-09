@@ -1,0 +1,33 @@
+# Multimodal ingestion as an untrusted-data pipeline
+
+> **Optional, never counted, externally billed.** Not required for completion or a certificate, and excluded from every total. Use a dedicated sandbox project, synthetic people and media, budget alerts, least-privilege identities, and the teardown checklist. Never use real disaster-response, health, identity, or location data.
+
+## Outcome
+
+Extract candidate entities from text, images, or video while keeping media, model output, validation, and persistence as separate boundaries.
+
+## Evidence artifact
+
+A fixture-backed upload, extraction, validation, and persistence pipeline with a rejected malformed example.
+
+## Failure clinic
+
+Prompt injection in media, unsupported entity claims, oversized files, sensitive metadata, and duplicate writes.
+
+## Required comparison
+
+Before using a managed service, implement or inspect a local fixture-backed baseline. Record what the cloud component improves, what it costs, what new permissions it receives, and what failure modes it introduces. The cloud path must not be the only way to understand or demonstrate the concept.
+
+## Safety and operations gate
+
+1. Confirm the active project and account before creating resources.
+2. Use synthetic data and document its provenance.
+3. Record enabled APIs, regions, identities, roles, public endpoints, and retention.
+4. Bound model calls, uploads, retries, and concurrent work.
+5. Redact logs and traces before sharing.
+6. Delete or disable every resource and verify that billing surfaces are empty.
+
+## Reference
+
+- [Google Codelab: Build a Multimodal AI Agent with Graph RAG, ADK & Memory Bank](https://codelabs.developers.google.com/codelabs/survivor-network/instructions#0)
+

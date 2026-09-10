@@ -1,4 +1,8 @@
-<p align="center"><img src=".github/assets/banner.svg" alt="Dev3Pack AI-Engineering Bootcamp — from an LLM call to a verified agent" width="100%" /></p>
+<p align="center">
+  <img src=".github/assets/github-cover.png"
+       alt="Dev3Pack AI Engineering Bootcamp — from an LLM call to a verified agent. 14 September to 2 October 2026, demo day 2 October. MCP, loop engineering, graph engineering, RAG."
+       width="100%" />
+</p>
 
 # Dev3Pack AI-Engineering Bootcamp
 
@@ -8,239 +12,260 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-ready-orange)
 
-A three-week, practice-first bootcamp on building small, reliable agentic
-applications — **September 14 – October 2, 2026**, Monday–Friday, 2-hour sessions,
-with an optional showcase on **Saturday, October 3**. For developers who can write
-Python and want to go from "I called an LLM once" to "I shipped an agent I can
-test, trace, and trust."
+Three weeks. **15 sessions**. One source-grounded research assistant you can test, cite, and defend.
 
-Every session builds toward one capstone: a source-grounded research assistant
-that cites what it read and refuses what it can't support. You leave knowing how
-to configure a coding assistant for a repo, put an LLM behind a provider seam,
-validate structured outputs, ground answers with retrieval, bound an agent's
-tools, evaluate its behavior, package a skill, and connect it to an external API
-surface through **MCP and Gecko** — safely.
+**14 September – 2 October 2026**, Monday to Friday, two hours a day. Optional showcase on Saturday 3 October.
 
-## What This Is
+## Contents
 
-- **Week 0, self-paced and optional** — four 45-minute units (the fast lane)
-  and three short courses in the DataCamp shape: software-engineering
-  foundations, MCP, and data structures for agents. Offline, ungraded,
-  available now
-- **15 sessions** of 2 hours each, every one with a guide and Marp slides;
-  sessions 1–14 add an exercise notebook plus an executable solutions notebook
-  (session 15 is demo day)
-- **One capstone** — a source-grounded developer research assistant;
-  `src/bootcamp_agent/` is its final shape, which you rebuild piece by piece
-  in the session notebooks
-- **3 concept guides** that thread the whole course: loop, graph, and harness
-  engineering
-- **10-notebook Gecko cookbook** — from comprehending an OpenAPI spec to a full
-  verified loop against an instructor-hosted fork
-- **3 project workspaces** (one per week, DataCamp-style: brief, chapters,
-  open coding) — capped by the Autonomous Store: Waiter, Store Manager, and
-  Delivery agents on LetMeBuy-shaped rails
-- **A graded final assignment with a signed certificate** — HF-agents-course
-  style: a template agent you improve, a question set you're scored on, a pass
-  bar of 70%, and an instructor-issued certificate with a verification code
-- **3 real-stack integrations** — SendAI's Agent Kit on devnet (real txs),
-  Hermes on Telegram, and the Gecko × Orquestra cross-runtime test matrix
-- **A builder kit** — this repo is a Claude Code plugin marketplace: the
-  store-builder and corpus-answers skills plus `/bootcamp-doctor`
-- **A setup doctor and a notebook checker**, both wired into CI
-- **88 deterministic tests** — FakeLLM by default, no API key, no network
-- **A local-model lane** — `BOOTCAMP_PROVIDER=ollama` runs a real model on
-  your machine with no key and no SDK (the doctor checks server and model)
+- [Start here](#start-here)
+- [For coding assistants](#for-coding-assistants)
+- [What you will learn](#what-you-will-learn)
+- [Units, sessions, extras](#units-sessions-extras)
+- [Repository map](#repository-map)
+- [Course map](#course-map)
+- [What arrives, and when](#what-arrives-and-when)
+- [Week 0](#week-0)
+- [Weeks 1-3](#weeks-1-3)
+- [Capstone and certificate](#capstone-and-certificate)
+- [Bonus and extras](#bonus-and-extras)
+- [Commands](#commands)
+- [Safety](#safety)
 
-## Start Here: Week 0
-
-[`modules/module-0/`](modules/module-0/) is open now. It is the floor session 1
-assumes: which Python is running, how to read a package instead of guessing at
-it, what a typed contract is, and how to make one real API call correctly.
-
-Short on time? Do **units 1–4**, about three hours in total. The three courses
-beside them go deeper — packages and documentation, MCP servers and clients,
-and the data structures an agent loop is made of — and nothing in the fifteen
-sessions waits for you to finish them. Come back to them whenever you like;
-they stay in the repository for the whole course.
-
-## Quick Start
-
-Do this **before September 14** — full instructions in [`SETUP.md`](SETUP.md):
+## Start here
 
 ```bash
-# The repository is private. Send us the email on your GitHub account, accept
-# the invitation, then:
 git clone git@github.com:Gecko-Academy/dev3pack-cohort-2026-09.git
 cd dev3pack-cohort-2026-09
 uv sync --group dev
-cp .env.example .env
-uv run pytest -q
-uv run python scripts/check_setup.py     # the doctor — screenshot the green output
-uv run bootcamp-agent "What are structured outputs?"
+uv run jupyter lab
 ```
 
-No API key is needed until you make live model calls: tests, the doctor, and
-every notebook default to a deterministic offline `FakeLLM`.
+Open **`00-START-HERE.ipynb`**. It lists every notebook in order and ticks what you have finished.
 
-**Access and weekly releases.** The repository is private and you are invited by
-email, so send us the address on your GitHub account. You get **read** access,
-which means nothing you do can break the course for anyone else. The repository
-**grows each week**: week 0 is there now, week 1 arrives on Monday 14 September,
-week 2 on the 21st, and week 3 on the 28th. Run `git pull` at the start of each
-week. Full detail, including how to back up your own work, is in
-[`SETUP.md`](SETUP.md).
+New to the repo? [`SETUP.md`](SETUP.md) is the half-hour path to a green doctor. No API key is required: every scored notebook runs offline against `FakeLLM`. The repository is private and read-only; week 0 is here now, later weeks land on 14 / 21 / 28 September — `git pull` at the start of each week.
 
-## Checking Your Own Work
+## For coding assistants
 
-Every exercise notebook ends each exercise with a `check("chNN-eN", value)` cell
-and closes with `review("chNN")`. The checks judge **behaviour, not wording**:
-they re-run retrieval, count model calls, rerun the evaluator, or call the
-function you wrote. There is no answer key to read, and no way to pass one by
-matching a string.
+Read [`AGENTS.md`](AGENTS.md) first. `CLAUDE.md` and `.cursor/rules/bootcamp.mdc` point at it — do not fork the policy.
 
-You do not need Jupyter open to see where you stand:
+Then read in this order:
+
+| File | Why |
+|---|---|
+| [README.md](README.md) | Course map: units, sessions, bonus |
+| `00-START-HERE.ipynb` | Progress ticker and notebook links |
+| [units/en/_toctree.yml](units/en/_toctree.yml) | Page order a learner opens |
+| [src/bootcamp_agent/](src/bootcamp_agent/) | Capstone package (finished shape) |
+| tests/ — not in your copy | Behaviour contracts |
+
+Inspect → plan → implement → test → review. No new dependency unless a lesson asks for it.
+
+Optional, local only — never required, never committed:
 
 ```bash
-uv run bootcamp doctor          # this machine: Python, kernel, corpus, model lane
-uv run bootcamp check ch03      # run one chapter and print its scorecard
-uv run bootcamp progress        # every chapter, one tally
+uv tool install graphifyy
+graphify install
 ```
 
-`bootcamp check` prints exactly what the notebook prints, so the terminal and
-Jupyter never disagree:
+Then `/graphify .` in your assistant. Leave `graphify-out/` untracked.
 
-```
-running ch01 (Orientation: from LLM calls to agentic systems)…
-ch01: 0/3 passed
-❌ ch01-e1: expected a list of exactly three replies; hint: one call per question
-❌ ch01-e2: runs['live'] must hold exactly two replies
-❌ ch01-e3: 'review_when' needs one full sentence (20+ characters); hint: be concrete
-```
+## What you will learn
 
-That is the correct output before you start. Zero is the honest score for an
-untouched notebook, and each ❌ names the next thing to do.
+- **Harness** — assistant instructions, traces, evals, and CI around the model
+- **Contracts** — one adapter, typed outputs, bounded read-only tools
+- **Loops** — budgets, stopping conditions, refusal as a first-class exit
+- **Grounding** — retrieve from a versioned corpus, cite sources, refuse the unsupported
+- **Surfaces** — MCP, deployment, and defending a failure from your own traces
 
-Two things that are not failures. A few cells are **checkpoints** rather than
-exercises: they verify machinery the repo already ships, so they are green the
-first time you run them, and their expected-output block shows them green.
-And three sessions are marked `in Jupyter` by `bootcamp progress`, because they
-need you or an instructor-hosted surface rather than an unattended run.
+Three threads recur: [loop](docs/guides/loop-engineering.md), [graph](docs/guides/graph-engineering.md), and [harness](docs/guides/harness-engineering.md) engineering. The full day-by-day plan is in [`docs/curriculum.md`](docs/curriculum.md).
 
-The full day-by-day table, with each session's check count, is generated from
-the code in [`docs/course-index.md`](docs/course-index.md).
+## Units, sessions, extras
 
-## Going Deeper (optional)
+| Kind | Where | Role |
+|---|---|---|
+| **Week 0 units** (`w01`–`w12`) | [units/en/](units/en/) | Self-paced, ungraded, available now. The fast lane is the floor Session 1 assumes. |
+| **Sessions** (`session-01`–`15`) | same tree | Live, weekday, two hours. Introduction, concepts, quiz, exercise notebook, solutions. Session 15 has no notebook. |
+| **Capstone** | units/en/capstone/ — opens with week 2 | Built between sessions from week 2. `src/bootcamp_agent/` is the finished shape. |
+| **Bonus / depth / cookbook / workspaces** | linked below | Optional. Never counted. |
 
-The fifteen sessions teach AI engineering. The software engineering underneath
-it — APIs and boundaries, data lifecycles, architecture decisions, reliability,
-and operating in production — lives in [`depth/`](depth/) as five optional
-self-paced modules.
+Two sessions are assistant-driven (1 and 10) and show as `in Jupyter` in `bootcamp progress`.
 
-Nothing in the course depends on them and nothing there is graded. They exist
-because a coding agent will write the endpoint for you but will not decide
-whether the trace belongs in the response. Same `check()` harness, same offline
-`FakeLLM`, roughly 45 minutes each.
+## Repository map
 
-## Schedule
+Where everything lives, and what a student receives.
 
-| Week | Dates | Focus | Sessions |
+<!-- repo-map:start -->
+
+| Path | What lives there | Students get it |
+|---|---|---|
+| `00-START-HERE.ipynb` | The map a learner opens first. Lists every notebook in order and ticks what is finished. | day one |
+| `units/` | The course. `en/` holds week-0 units, the fifteen sessions, the capstone, and the bonus track, each a directory of pages plus a notebook. | weekly |
+| `src/bootcamp_agent/` | The finished shape of the capstone package, and the check registry every exercise is graded by. | day one |
+| `tests/` | Behaviour contracts for the package — and the solved value of every exercise, which is why students never receive it. | **never** |
+| `data/` | The versioned corpus the retrieval sessions and the capstone answer from. | day one |
+| `scripts/` | The course's own tooling: the site generator, the publisher, the submission collector. | day one |
+| `docs/` | Curriculum, guides, the generated index, and the instructor material. | in part |
+| `depth/` | Six optional software-engineering modules, about 45 minutes each. Never counted. | day one |
+| `cookbook/` | Ten Gecko notebooks, from comprehending an OpenAPI spec to a verified loop on a fork. Optional. | day one |
+| `workspaces/` | Four open projects to build in. Optional, unmarked, no checks. | day one |
+| `integrations/` | Worked integrations the sessions link into rather than re-explain. | day one |
+| `builder-kit/` | Templates a learner copies from when starting their own surface. | day one |
+| `final_assignment/` | The final's harness and the offline practice grader. The private question set is not here and never will be. | day one |
+| `modules/` | A pointer only. The tree lived here until 9 Sep 2026; the file says where it went. | in part |
+| `AGENTS.md` | The policy a coding assistant reads before it edits. `CLAUDE.md` and the Cursor rules point at it rather than forking it. | day one |
+| `README.md` | This file. | day one |
+| `SETUP.md` | The half-hour path from a clone to a green doctor. | day one |
+| `CLAUDE.md` | Points Claude Code at `AGENTS.md`. | day one |
+| `LICENSE` | MIT. | day one |
+| `pyproject.toml` | The package, its dependency groups, and the tool configuration. | day one |
+| `uv.lock` | The resolved dependency set. CI installs from it frozen. | day one |
+| `.github/` | CI. It runs every notebook, the full test suite, and the generator's `--check`. | **never** |
+| `.claude-plugin/` | The plugin manifest that ships the course's own slash commands. | day one |
+| `.cursor/` | Cursor rules, pointing at `AGENTS.md`. | day one |
+| `.env.example` | Every variable the course reads, with empty values. | day one |
+| `.gitignore` | What never enters git, including keys and a learner's own submissions. | day one |
+| `.python-version` | The interpreter `uv` picks. | day one |
+
+6 paths are withheld by name, whatever the week: `.github`, `docs/instructor`, `docs/plans`, `docs/specs`, `evals`, `tests`. Each is on that list for a stated reason — `tests/` alone holds the solved value of every exercise. The publisher audits the tree it built rather than trusting the copy, and refuses if one of them appears.
+
+Sent in part: `docs/`, `modules/`. Guides, the curriculum and the generated index ship; the instructor material, the specs and the plans do not.
+
+<!-- repo-map:end -->
+## Course map
+
+| Track | When | What |
+|---|---|---|
+| [Week 0 — Fast lane](#week-0) | now, ~3h | Environment, packages, contracts, one API call |
+| [Week 0 — Courses A–C](#week-0) | now, optional | Packaging, MCP, data structures |
+| [Week 1 — Sessions 1–5](#weeks-1-3) | Sep 14–18 | Assistants, adapters, structured outputs, tools, first loop |
+| [Week 2 — Sessions 6–10](#weeks-1-3) | Sep 21–25 | Retrieval, grounding, graphs, evals, skills |
+| [Week 3 — Sessions 11–15](#weeks-1-3) | Sep 28–Oct 2 | State, MCP, deploy, defend |
+| [Capstone + certificate](#capstone-and-certificate) | weeks 2–3 | Source-grounded research assistant |
+| [Bonus 1–5](#bonus-and-extras) | optional | Graph RAG, multimodal, multi-agent, memory, teardown |
+| [Depth / cookbook / workspaces](#bonus-and-extras) | optional | SE fundamentals, Gecko labs, **4 project workspaces** |
+
+## What arrives, and when
+
+This repository grows during the course. Week 0 is here now; each Monday one
+more week lands and you `git pull`.
+
+<!-- release-plan:start -->
+
+| Arrives | Date | What is added |
+|---|---|---|
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (45 paths). |
+| Week 1 | Mon 14 Sep | Session 1, Configure the assistant and the repository instructions; Session 2, Call a model through the adapter; Session 3, Structured outputs; Session 4, Bounded tools; Session 5, A deterministic mini-agent |
+| Week 2 | Mon 21 Sep | Capstone: the source-grounded research assistant; Session 6, A retrieval baseline; Session 7, Retrieval and grounding metrics; Session 8, Loops and graphs; Session 9, Trace and evaluate an agent; Session 10, Skills and an architecture decision record |
+| Week 3 | Mon 28 Sep | Session 11, State and memory; Session 12, MCP architecture and primitives; Session 13, Build and secure an MCP server; Session 14, Deploy and operate the capstone; Session 15, Defend the capstone |
+
+**Nothing is hidden behind a permission.** A week that has not opened is not in the repository yet, so `git pull` on the Monday is the whole ritual. Your table of contents lists what you actually have, and names what is still to come in a comment at the end — this table is the schedule, and you have it from day one.
+
+A correction is withdrawn as well as added: the publisher removes a file the current week no longer contains, so a fix actually reaches somebody who already pulled.
+
+<!-- release-plan:end -->
+Solutions are separate again: a session's `solutions/` notebook is released
+after that session, so you meet an exercise before its answer is one folder
+away. Until then, `hint(reveal=True)` is the worked answer, and it costs marks.
+
+## Week 0
+
+Self-paced. Handed in as a record, never marked. Short on time? Do the four 45-minute units. Courses A–C stay here for the whole course and nothing in the fifteen sessions waits for them.
+
+### Fast lane
+
+| # | Unit | You leave able to |
+|---|---|---|
+| 1 | [The environment](units/en/w01-environment/) | Prove which Python and repo environment will run the course |
+| 2 | [Packages and documentation](units/en/w02-packages-and-docs/) | Read an installed package instead of guessing its API |
+| 3 | [Classes and contracts](units/en/w03-classes-and-contracts/) | Turn a prose requirement into a typed boundary |
+| 4 | [Calling a real API](units/en/w04-real-apis/) | Make one bounded HTTP call through an adapter you own |
+
+### Course A — Software engineering foundations
+
+| # | Unit |
+|---|---|
+| 5 | [Packages, PyPI and PEP 8](units/en/w05-packages-and-pep8/) |
+| 6 | [A portable package](units/en/w06-portable-packages/) |
+| 7 | [Classes in a package](units/en/w07-classes-in-packages/) |
+| 8 | [Documentation, tests and readability](units/en/w08-docs-tests-readability/) |
+
+### Course B — MCP
+
+| # | Unit |
+|---|---|
+| 9 | [Your first MCP server](units/en/w09-mcp-first-server/) |
+| 10 | [Resources, prompts, and the LLM](units/en/w10-mcp-resources-prompts-llms/) |
+| 11 | [Databases, APIs, and third-party servers](units/en/w11-mcp-data-apis-third-party/) |
+
+### Course C — Data structures for agents
+
+| # | Unit |
+|---|---|
+| 12 | [Data structures for agents](units/en/w12-dsa-for-agents/) |
+
+## Weeks 1-3
+
+Each live session is one directory under `units/en/session-NN-*/`.
+
+| # | Day | Session | You leave with |
 |---|---|---|---|
-| 1 | Sep 14–18 | Foundations and assistant setup | [1–5](modules/module-1/) |
-| 2 | Sep 21–25 | Retrieval, agents, reliability, skills | [6–10](modules/module-2/) |
-| 3 | Sep 28–Oct 2 | Production thinking, Gecko, capstone | [11–15](modules/module-3/) |
-| — | Oct 3 (optional) | Showcase and office hours | — |
+| 1 | Mon 14 Sep | Configure the assistant — not yet | Repo instructions the assistant must read before it edits |
+| 2 | Tue 15 Sep | Call a model through the adapter — not yet | One adapter, two lanes, failures that refuse instead of traceback |
+| 3 | Wed 16 Sep | Structured outputs — not yet | A typed answer; retry once, then refuse |
+| 4 | Thu 17 Sep | Bounded tools — not yet | Read-only tools whose boundaries you can prove |
+| 5 | Fri 18 Sep | A deterministic mini-agent — not yet | A loop that stops, notices repeats, and exits safely |
+| 6 | Mon 21 Sep | A retrieval baseline — not yet | A corpus loader and lexical retrieval — plus the ways it fails |
+| 7 | Tue 22 Sep | Retrieval and grounding metrics — not yet | Hit rate, grounding rate, and the cost of one fix |
+| 8 | Wed 23 Sep | Loops and graphs — not yet | Chain vs loop vs graph; illegal edges do not move |
+| 9 | Thu 24 Sep | Trace and evaluate — not yet | A redacted event log and named error buckets |
+| 10 | Fri 25 Sep | Skills and an ADR — not yet | A `SKILL.md` and a decision that names its reversal |
+| 11 | Mon 28 Sep | State and memory — not yet | Session state, a retention policy, cross-user isolation |
+| 12 | Tue 29 Sep | MCP architecture — not yet | Host / client / server; a surface read as claims |
+| 13 | Wed 30 Sep | Build and secure an MCP server — not yet | A fetch guard that refuses *before* it fetches |
+| 14 | Thu 1 Oct | Deploy and operate — opens Thu 01 Oct | A smoke test and the rollback sentence |
+| 15 | Fri 2 Oct | Defend the capstone — opens Fri 02 Oct | A demo, then a failure diagnosed from your own traces |
 
-The full class-by-class plan is in [`docs/curriculum.md`](docs/curriculum.md).
-Session 13 uses an instructor-hosted Gecko MCP surface; its URL is handed out
-in class.
+Session 13 uses an instructor-hosted Gecko MCP surface; the URL is handed out in class.
 
-## The Capstone
+## Capstone and certificate
 
-One project runs through everything: a **source-grounded developer research
-assistant**. It answers questions about a small versioned corpus
-(`data/corpus/`), cites the documents it used, and refuses to invent
-unsupported facts. The final assistant must:
+A **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. You rebuild `src/bootcamp_agent/` in the session notebooks, then compare against the shipped package. Brief: units/en/capstone/ — opens with week 2.
 
-1. answer at least one supported technical question using the local corpus;
-2. include source identifiers (doc ids) in its answer;
-3. qualify or refuse an unsupported question;
-4. use at least one bounded, read-only tool;
-5. expose a reusable assistant skill or instruction file;
-6. include a regression test and a small evaluation report; and
-7. connect to external surfaces only in recorded/offline or an explicitly
-   approved instructor-hosted mode.
+[`final_assignment/`](final_assignment/) is a template that scores 30% as shipped — it refuses correctly and answers nothing. Pass both gates (aggregate bar and every **critical** question) and the course issues an Ed25519-signed certificate anyone can verify. Details: [`final_assignment/README.md`](final_assignment/README.md).
 
-During the course you rebuild the pieces of `src/bootcamp_agent/` in the
-session notebooks, then compare against the shipped package.
+## Bonus and extras
 
-## Final Assignment & Certificate
+Optional. Never counted. Never required for the certificate.
 
-The course ends the Hugging Face way: [`final_assignment/`](final_assignment/)
-is a template you make your own. As shipped, its agent honestly scores 30% on
-the practice set; your job is to push it past the **70% pass bar**. Final
-grading runs on a private question set at demo day, and a passing score plus a
-completed demo earns an instructor-signed SVG certificate with an HMAC
-verification code. The folder doubles as a Hugging Face Space, so you can
-publish your agent as a public milestone. Details in
-[`final_assignment/README.md`](final_assignment/README.md).
+| # | Bonus |
+|---|---|
+| 1 | [Graph RAG and hybrid search](units/en/bonus-b01-graph-rag/) |
+| 2 | [Multimodal ingestion as untrusted data](units/en/bonus-b02-multimodal-ingestion/) |
+| 3 | [Multi-agent orchestration with ADK](units/en/bonus-b03-multi-agent-orchestration/) |
+| 4 | [Long-term memory, consent, and deletion](units/en/bonus-b04-memory-consent-deletion/) |
+| 5 | [Deploy, evaluate, and tear down](units/en/bonus-b05-deploy-evaluate-teardown/) |
 
-## Concept Threads
+- **[depth/](depth/)** — six software-engineering modules (~45 minutes each): boundaries, data, architecture, reliability, production, graph RAG.
+- **[cookbook/](cookbook/)** — ten Gecko notebooks, from comprehending an OpenAPI spec to a verified loop on an instructor-hosted fork.
+- **[workspaces/](workspaces/)** — four open projects (corpus Q&A, retrieval lab, Autonomous Store, news-to-Telegram).
 
-Three ideas recur across sessions, each with its own guide:
+## Commands
 
-- **[Loop engineering](docs/guides/loop-engineering.md)** — budgets, stopping
-  conditions, refusal as a first-class outcome (Sessions 5, 8)
-- **[Graph engineering](docs/guides/graph-engineering.md)** — from retrieval
-  metadata to explicit state graphs to API surface graphs (Sessions 6–8, 13)
-- **[Harness engineering](docs/guides/harness-engineering.md)** — instructions,
-  evals, traces, CI: everything around the model (Sessions 4, 9, 14)
-
-## Gecko Cookbook
-
-[`cookbook/`](cookbook/) holds 10 runnable notebooks on
-[Gecko](https://github.com/GeckoVision/gecko-surf) — the API comprehension
-layer for agents — from "comprehend an OpenAPI spec" to "full verified loop
-against an instructor-hosted fork". Start at
-[`cookbook/README.md`](cookbook/README.md).
-
-## Repository Structure
-
-```text
-├── SETUP.md                 # pre-course environment checklist
-├── src/bootcamp_agent/      # the capstone package (final shape)
-├── tests/                   # deterministic tests — FakeLLM, no keys, no network
-├── data/corpus/             # the six-document teaching corpus
-├── data/evals/golden.jsonl  # the golden evaluation set
-├── scripts/check_setup.py   # the setup doctor
-├── scripts/check_notebooks.py  # notebook validity + execution checker (CI)
-├── modules/module-{1,2,3}/  # chapters 01-15: guides, slides, notebooks, solutions
-├── workspaces/              # open-ended project workspaces, one per week
-├── integrations/            # SendAI devnet txs · Hermes Telegram · Gecko×Orquestra matrix
-├── builder-kit/             # Claude Code plugin: skills + /bootcamp-doctor
-├── final_assignment/        # graded final + certificate (HF-Space-compatible)
-├── cookbook/                # runnable Gecko examples
-└── docs/                    # curriculum, concept guides, instructor docs, specs
+```bash
+uv run bootcamp doctor                       # this machine
+uv run bootcamp check ch03                   # one session scorecard
+uv run bootcamp progress                     # every session, one tally
+uv run bootcamp submit ch03 --github <you>   # write submissions/<you>/ch03/
 ```
 
-## Safe Assistant Workflow
+Checks judge behaviour, not wording. How to hand work in: [units/en/unit0/how-to-submit.mdx](units/en/unit0/how-to-submit.mdx). The generated index: [`docs/course-index.md`](docs/course-index.md).
 
-Before asking a coding assistant to change code:
+## Safety
 
-1. Ask it to inspect the relevant files and propose a plan.
-2. Review the plan; restrict the allowed files and commands.
-3. Ask for the smallest implementation.
-4. Inspect the diff yourself.
-5. Run the tests and inspect failures.
-6. Ask for a concise explanation of the change and its remaining risks.
+Never place secrets in `CLAUDE.md`, `AGENTS.md`, Cursor rules, MCP JSON, issues, prompts, or commits. External-tool exercises use recorded/offline mode or the instructor-hosted fork. **No wallets, no payment credentials, no production API keys, no mainnet path — ever — in class exercises.**
 
-## Safety Boundary
-
-Never place secrets in `CLAUDE.md`, `AGENTS.md`, Cursor rules, MCP JSON,
-issues, prompts, or commits. All external-tool exercises use recorded/offline
-mode or the instructor-hosted fork surface. **No wallets, no payment
-credentials, no production API keys, no mainnet path — ever — in class
-exercises.**
+Ask a coding assistant to inspect, propose a plan, and make the smallest change. Review the diff yourself. The loop lives in [`AGENTS.md`](AGENTS.md).
 
 ## License
 

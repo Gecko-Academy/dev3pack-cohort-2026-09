@@ -36,12 +36,7 @@ from bootcamp_agent.week0_checks.mcp_course import (
     zone_list,
 )
 
-UNIT_11 = (
-    Path(__file__).resolve().parents[3]
-    / "modules"
-    / "module-0"
-    / "unit-11-mcp-data-apis-third-party"
-)
+UNIT_11 = Path(__file__).resolve().parents[3] / "units" / "en" / "w11-mcp-data-apis-third-party"
 ORQUESTRA_TOOLS = UNIT_11 / "fixtures" / "orquestra-tools.json"
 
 #: The value that turns the starter's f-string query into two queries. It is a

@@ -1,0 +1,20 @@
+# Handing work in
+
+Every unit with a notebook can be handed in. Week 0 is a record of the work and
+is never marked. Sessions are scored from what their checks print. Two sessions
+are assistant-driven and are handed in rather than marked, and their pages say so.
+
+```bash
+uv run bootcamp check ch03                       # what passes, what does not
+uv run bootcamp submit ch03 --github <you>       # writes submissions/<you>/ch03/
+```
+
+The bundle holds two files: `submission.json`, the claim, and `notebook.ipynb`,
+the evidence. Copy the folder into your fork of the submissions repository and
+open a pull request. CI checks the shape, that the folder is yours, that the
+notebook is the file the claim was written against, and that the score follows
+from the passes and help the claim lists. A human merges, and the merged file
+is your recorded score.
+
+Submitting again replaces the earlier attempt. Nothing is locked, and nothing is
+lost: the history is the pull requests.
