@@ -154,7 +154,7 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (45 paths). |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (49 paths). |
 | Week 1 | Mon 14 Sep | Session 1, Configure the assistant and the repository instructions; Session 2, Call a model through the adapter; Session 3, Structured outputs; Session 4, Bounded tools; Session 5, A deterministic mini-agent |
 | Week 2 | Mon 21 Sep | Capstone: the source-grounded research assistant; Session 6, A retrieval baseline; Session 7, Retrieval and grounding metrics; Session 8, Loops and graphs; Session 9, Trace and evaluate an agent; Session 10, Skills and an architecture decision record |
 | Week 3 | Mon 28 Sep | Session 11, State and memory; Session 12, MCP architecture and primitives; Session 13, Build and secure an MCP server; Session 14, Deploy and operate the capstone; Session 15, Defend the capstone |
