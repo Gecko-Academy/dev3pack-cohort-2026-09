@@ -35,6 +35,7 @@ import re
 import shutil
 import subprocess
 import sys
+from fnmatch import fnmatch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -134,6 +135,10 @@ NEVER = {
     "docs/plans": "internal planning notes, superseded as often as they are written",
     "docs/instructor": "teaching notes, rubric, and the hosted-MCP checklist",
     "evals": "instructor evaluation harness",
+    # `scripts/` ships, because a learner runs the doctor and the submit CLI
+    # from it. This one file is the exception: its whole job is to write the
+    # teaching plans and decks under `docs/instructor/`, which never travel.
+    "scripts/instructor_pack.py": "it generates the teaching material",
 }
 
 
@@ -146,6 +151,15 @@ NEVER = {
 #: units/en/w01-environment`). The depth track keeps its own.
 SOLUTIONS = "solutions"
 RELEASED_SOLUTIONS_FILE = ".solutions-released"
+#: Every file the last publish wrote, one path per line.
+#:
+#: WITHOUT IT, WITHDRAWAL IS ONLY AS FINE-GRAINED AS A DIRECTORY. `scripts/`
+#: ships whole, so a script deleted from the course stayed in every student's
+#: clone forever — `scripts/course_index.py` outlived its own replacement, and
+#: `scripts/instructor_pack.py` travelled once before it was denied. Comparing
+#: this list against what the current release writes says exactly which files to
+#: remove, and touches nothing a student added themselves.
+PUBLISHED_FILE = ".published"
 
 
 class PublishError(Exception):
@@ -262,7 +276,51 @@ _COPY_IGNORE = (
     # gitignored, tens of thousands of files; copying it is what made a publish crawl
     "node_modules",
     ".git",
+    # Deny-listed in NEVER, and `scripts/` copies as a tree, so the audit would
+    # catch it only after it had been written. Skipped at the copy instead.
+    "instructor_pack.py",
 )
+
+
+def tracked_files(source: Path) -> set[str] | None:
+    """Every path git tracks in the course, or None when it is not a checkout.
+
+    THE PUBLISH COPIES A WORKING TREE, and a working tree holds more than the
+    course: build artifacts, a scratch `score_report.json`, and — the reason
+    this exists — `integrations/sendai-txs/.keypair.json`, which is gitignored
+    here and was copied into a student checkout anyway. Anything git does not
+    track is not course material, and a secret is exactly the kind of thing that
+    is gitignored.
+    """
+    result = subprocess.run(
+        ["git", "ls-files", "-z"],
+        cwd=source,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    return {entry for entry in result.stdout.split("\0") if entry}
+
+
+def _untracked_filter(source: Path, tracked: set[str] | None, extra: tuple[str, ...]):
+    """A `copytree` ignore callable that drops untracked files and the usual noise."""
+
+    def ignore(directory: str, names: list[str]) -> set[str]:
+        here = Path(directory)
+        dropped = {name for name in names if any(fnmatch(name, pattern) for pattern in extra)}
+        if tracked is None:
+            return dropped
+        for name in names:
+            candidate = here / name
+            if candidate.is_dir():
+                continue
+            if (candidate.relative_to(source)).as_posix() not in tracked:
+                dropped.add(name)
+        return dropped
+
+    return ignore
 
 
 def build(
@@ -280,6 +338,7 @@ def build(
     """
     copied: list[str] = []
     skipped: list[str] = []
+    tracked = tracked_files(source)
     for entry in released_paths(week):
         origin = source / entry
         if not origin.exists():
@@ -290,14 +349,17 @@ def build(
         if origin.is_dir():
             # A module tree copies without any solutions; every other tree (depth,
             # workspaces) keeps its own.
-            ignore = _COPY_IGNORE + (SOLUTIONS,) if entry.startswith("units/") else _COPY_IGNORE
+            extra = _COPY_IGNORE + (SOLUTIONS,) if entry.startswith("units/") else _COPY_IGNORE
             shutil.copytree(
                 origin,
                 target,
                 dirs_exist_ok=True,
-                ignore=shutil.ignore_patterns(*ignore),
+                ignore=_untracked_filter(source, tracked, extra),
             )
         else:
+            if tracked is not None and entry not in tracked:
+                skipped.append(entry)
+                continue
             shutil.copy2(origin, target)
         copied.append(entry)
 
@@ -310,7 +372,7 @@ def build(
             origin,
             destination / owner,
             dirs_exist_ok=True,
-            ignore=shutil.ignore_patterns(*_COPY_IGNORE),
+            ignore=_untracked_filter(source, tracked, _COPY_IGNORE),
         )
         copied.append(owner)
 
@@ -318,6 +380,53 @@ def build(
     trim_toctree(destination, week)
     annotate_missing_links(destination, week)
     return copied, skipped
+
+
+def read_manifest(destination: Path) -> set[str] | None:
+    """What the last publish wrote, or None if this repo predates the manifest."""
+    marker = destination / PUBLISHED_FILE
+    if not marker.is_file():
+        return None
+    return {line.strip() for line in marker.read_text().splitlines() if line.strip()}
+
+
+def _ignored(relative: Path) -> bool:
+    """Whether any part of this path is something a publish never copies."""
+    return any(fnmatch(part, pattern) for part in relative.parts for pattern in _COPY_IGNORE)
+
+
+def shipped_files(
+    source: Path, week: int, released_solutions: frozenset[str] = frozenset()
+) -> set[str]:
+    """Exactly the files this release writes into a student repo.
+
+    Computed from what git TRACKS, not from what sits on either disk. This is
+    what makes withdrawal exact: a file the last release wrote and this one does
+    not is a file the course removed, and a file a student created was never in
+    it. It is also why an untracked artifact — a build output, a scratch report,
+    a gitignored keypair — cannot appear in a manifest and cannot be shipped.
+    """
+    tracked = tracked_files(source)
+    if tracked is None:
+        return set()
+    entries = released_paths(week)
+    shipped = set()
+    for name in tracked:
+        relative = Path(name)
+        if _ignored(relative):
+            continue
+        if not any(name == entry or name.startswith(f"{entry}/") for entry in entries):
+            continue
+        if _is_module_solution(relative) and _solution_owner(relative) not in released_solutions:
+            continue
+        if _forbidden(relative, week, released_solutions) is not None:
+            continue
+        shipped.add(name)
+    return shipped
+
+
+def write_manifest(destination: Path, files: set[str]) -> None:
+    (destination / PUBLISHED_FILE).write_text("".join(f"{entry}\n" for entry in sorted(files)))
 
 
 def trim_toctree(destination: Path, week: int) -> list[str]:
@@ -484,21 +593,38 @@ def _prune_empty_dirs(destination: Path) -> None:
             path.rmdir()
 
 
-def _stale(destination: Path, week: int) -> list[Path]:
+def _stale(
+    destination: Path,
+    week: int,
+    source: Path = ROOT,
+    released_solutions: frozenset[str] = frozenset(),
+) -> list[Path]:
     """Files in the student repo that this week's release no longer includes.
 
     A publish that only adds would leave a withdrawn file behind forever, so a
     correction to the course would never reach a student who already pulled.
     """
     allowed = {Path(entry) for entry in released_paths(week)}
+    previous = read_manifest(destination) or set()
+    now = shipped_files(source, week, released_solutions)
     stale: list[Path] = []
     for path in destination.rglob("*"):
         if not path.is_file() or ".git" in path.parts:
             continue
         relative = path.relative_to(destination)
-        if relative == Path(RELEASED_SOLUTIONS_FILE):
-            continue  # the release ledger, generated here, not course content
-        if not any(relative == entry or entry in relative.parents for entry in allowed):
+        if relative.as_posix() in {RELEASED_SOLUTIONS_FILE, PUBLISHED_FILE}:
+            continue  # our own ledgers, generated here, not course content
+        outside = not any(relative == entry or entry in relative.parents for entry in allowed)
+        # Shipped by a previous publish and not written by this one. That is a
+        # file the course deleted, and it is the only case where a file INSIDE a
+        # released directory may be removed — a student's own work never appears
+        # in the manifest, so it is never touched.
+        withdrawn = relative.as_posix() in previous and relative.as_posix() not in now
+        # A deny-listed file already in the destination. Refusing to publish is
+        # not enough on its own: the audit would then refuse every publish
+        # forever, and the file would sit there while it did.
+        denied = _forbidden(relative, week) is not None
+        if outside or withdrawn or denied:
             stale.append(relative)
     return stale
 
@@ -570,12 +696,33 @@ def main(argv: list[str] | None = None) -> int:
     # Withdraw first, audit second. A previous publish may have left a now-
     # withheld week on disk (going from week 1 back to week 0), and the audit
     # must judge what this release leaves behind, not what the last one did.
-    withdrawn = _stale(destination, args.week)
+    first_manifest = read_manifest(destination) is None
+    withdrawn = _stale(destination, args.week, ROOT, released_solutions)
     for relative in withdrawn:
         (destination / relative).unlink()
     _prune_empty_dirs(destination)
     if withdrawn:
         print(f"\n  withdrew {len(withdrawn)} file(s) no longer in the release")
+
+    write_manifest(destination, shipped_files(ROOT, args.week, released_solutions))
+    if first_manifest:
+        # Before the manifest existed, a file the course deleted could only be
+        # withdrawn if its whole directory was withheld. Anything that slipped
+        # through is named here once, for a human to decide on.
+        expected = shipped_files(ROOT, args.week, released_solutions)
+        ledgers = {PUBLISHED_FILE, RELEASED_SOLUTIONS_FILE}
+        orphans = sorted(
+            path.relative_to(destination).as_posix()
+            for path in destination.rglob("*")
+            if path.is_file()
+            and ".git" not in path.parts
+            and not _ignored(path.relative_to(destination))
+            and path.relative_to(destination).as_posix() not in expected | ledgers
+        )
+        if orphans:
+            print("\n  in the student repo and not in the course — check each:")
+            for entry in orphans:
+                print(f"    {entry}")
 
     problems = audit(destination, args.week)
     if problems:

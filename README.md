@@ -127,7 +127,7 @@ Where everything lives, and what a student receives.
 | `.gitignore` | What never enters git, including keys and a learner's own submissions. | day one |
 | `.python-version` | The interpreter `uv` picks. | day one |
 
-6 paths are withheld by name, whatever the week: `.github`, `docs/instructor`, `docs/plans`, `docs/specs`, `evals`, `tests`. Each is on that list for a stated reason — `tests/` alone holds the solved value of every exercise. The publisher audits the tree it built rather than trusting the copy, and refuses if one of them appears.
+7 paths are withheld by name, whatever the week: `.github`, `docs/instructor`, `docs/plans`, `docs/specs`, `evals`, `scripts/instructor_pack.py`, `tests`. Each is on that list for a stated reason — `tests/` alone holds the solved value of every exercise. The publisher audits the tree it built rather than trusting the copy, and refuses if one of them appears.
 
 Sent in part: `docs/`, `modules/`. Guides, the curriculum and the generated index ship; the instructor material, the specs and the plans do not.
 
