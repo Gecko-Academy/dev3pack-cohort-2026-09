@@ -78,7 +78,9 @@ pyproject.toml
 scripts/check_notebooks.py
 scripts/check_setup.py
 scripts/collect_submissions.py
+scripts/course_html.py
 scripts/course_site.py
+scripts/dev3pack_entry.py
 scripts/notebook_index.py
 scripts/publish_cohort.py
 scripts/submit_all.py
@@ -98,6 +100,7 @@ src/bootcamp_agent/hints.py
 src/bootcamp_agent/llm.py
 src/bootcamp_agent/ollama.py
 src/bootcamp_agent/preflight.py
+src/bootcamp_agent/read.py
 src/bootcamp_agent/retrieval.py
 src/bootcamp_agent/schema.py
 src/bootcamp_agent/session_checks/__init__.py

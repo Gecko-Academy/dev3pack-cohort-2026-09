@@ -28,3 +28,21 @@ scripts/invite_cohort.py
 
 # Optional local graphify run. Not a course dependency.
 graphify-out/
+
+# The curriculum-entry workbook is generated and NOT committed. `--check` cannot
+# verify a binary reliably — openpyxl may write byte-differently between versions —
+# so a committed workbook could sit stale while CI stays green, which is the exact
+# failure this repo spent two days removing elsewhere. The CSV it is built from IS
+# committed and IS checked, so content drift is caught; regenerating the workbook is
+# one command:  uv run --extra spreadsheet python scripts/dev3pack_entry.py --xlsx
+docs/dev3pack/curriculum-entry.xlsx
+
+# The rendered course site: generated from units/en/ and the toctree, and never
+# committed. There is no honest --check for a tree of HTML, and a stale site that
+# looks current is worse than no site. Rebuild it:
+#   uv run --extra site python scripts/course_html.py
+site/
+
+# LibreOffice writes a lock file beside any spreadsheet it has open, and it
+# carries the machine name and user of whoever opened it.
+.~lock.*#

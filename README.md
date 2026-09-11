@@ -6,7 +6,6 @@
 
 # Dev3Pack AI-Engineering Bootcamp
 
-[![CI](https://github.com/ernanibmurtinho/Dev3Pack-bootcamp-AI-Engineering/actions/workflows/test.yml/badge.svg)](https://github.com/ernanibmurtinho/Dev3Pack-bootcamp-AI-Engineering/actions/workflows/test.yml)
 ![Python](https://img.shields.io/badge/python-3.11+-blue)
 ![uv](https://img.shields.io/badge/uv-managed-6e56cf)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -35,11 +34,14 @@ Three weeks. **15 sessions**. One source-grounded research assistant you can tes
 ## Start here
 
 ```bash
-git clone git@github.com:Gecko-Academy/dev3pack-cohort-2026-09.git
+git clone https://github.com/Gecko-Academy/dev3pack-cohort-2026-09.git
 cd dev3pack-cohort-2026-09
 uv sync --group dev
 uv run jupyter lab
 ```
+
+If you have SSH keys set up, `git clone git@github.com:Gecko-Academy/dev3pack-cohort-2026-09.git`
+works too. HTTPS is above because it needs nothing configured first.
 
 Open **`00-START-HERE.ipynb`**. It lists every notebook in order and ticks what you have finished.
 

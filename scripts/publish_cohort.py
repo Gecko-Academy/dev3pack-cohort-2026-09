@@ -129,6 +129,22 @@ ALWAYS = (
 
 #: Never published, at any week. Each entry states why, because a bare deny-list
 #: is the kind of thing somebody edits without knowing what it was protecting.
+#: Not ours, at either end. The publisher neither copies these INTO the student
+#: repository nor removes them FROM it.
+#:
+#: This is a different thing from `NEVER`, and conflating the two deleted the
+#: cohort repository's own Pages workflow in a commit titled "week 0". Entries
+#: in `NEVER` carry the answers, so finding one in the student repo is a leak
+#: and it has to go. A workflow the cohort repository owns is simply none of
+#: our business: we do not ship it, and we do not get to delete it either.
+UNMANAGED = (".github",)
+
+
+def _unmanaged(relative: Path) -> bool:
+    """Is this path the student repository's own business, not ours?"""
+    return relative.parts[:1] and relative.parts[0] in UNMANAGED
+
+
 NEVER = {
     "tests": "test_checks.py holds the solved value of every exercise",
     ".github": "CI belongs to the source repo, and a partial tree fails it",
@@ -255,12 +271,11 @@ def audit(tree: Path, week: int) -> list[str]:
     """
     problems: list[str] = []
     released = frozenset(read_released_solutions(tree))
-    for path in sorted(tree.rglob("*")):
-        if not path.is_file():
-            continue
+    # `walk` prunes `.git` rather than filtering it afterwards; see its note.
+    for path in sorted(walk(tree)):
         relative = path.relative_to(tree)
-        if ".git" in relative.parts:
-            continue  # the student repo's own checkout, not published content
+        if _unmanaged(relative):
+            continue  # the student repo's own CI: we did not put it there
         reason = _forbidden(relative, week, released)
         if reason:
             problems.append(f"{relative}: {reason}")
@@ -575,11 +590,8 @@ def annotate_missing_links(destination: Path, week: int) -> int:
 
     documents = sorted(
         path
-        for suffix in ANNOTATED_SUFFIXES
-        for path in destination.rglob(f"*{suffix}")
-        if path.is_file()
-        and ".git" not in path.parts
-        and not _ignored(path.relative_to(destination))
+        for path in walk(destination)
+        if path.suffix in ANNOTATED_SUFFIXES and not _ignored(path.relative_to(destination))
     )
     for document in documents:
         text = document.read_text(encoding="utf-8")
@@ -618,11 +630,59 @@ def _prune_unreleased_solutions(destination: Path, released_solutions: frozenset
             shutil.rmtree(candidate)
 
 
+def walk(root: Path) -> list[Path]:
+    """Every file under `root`, never descending into `.git`.
+
+    WHY NOT `rglob` PLUS A FILTER. `rglob` walks `.git` and then the filter
+    throws the results away, so the walk still has to stat thousands of loose
+    objects -- and git is free to repack them WHILE we look. When it does, the
+    directory we are iterating stops existing and the walk raises
+    `FileNotFoundError: .git/objects/13`, which is how this first appeared: a
+    publish that failed for a reason having nothing to do with the course.
+
+    Pruning before descending removes the race rather than narrowing it, and
+    skips the biggest directory in the tree on the way past.
+    """
+    found: list[Path] = []
+    stack = [root]
+    while stack:
+        current = stack.pop()
+        try:
+            entries = list(current.iterdir())
+        except (FileNotFoundError, NotADirectoryError, PermissionError):
+            continue  # vanished or unreadable between listing and looking
+        for entry in entries:
+            if entry.name == ".git":
+                continue
+            if entry.is_dir():
+                stack.append(entry)
+            elif entry.is_file():
+                found.append(entry)
+    return found
+
+
 def _prune_empty_dirs(destination: Path) -> None:
     """Drop directories a withdrawal emptied, so a withheld week leaves no husk."""
-    for path in sorted(destination.rglob("*"), key=lambda p: len(p.parts), reverse=True):
-        if path.is_dir() and ".git" not in path.parts and not any(path.iterdir()):
-            path.rmdir()
+    directories: list[Path] = []
+    stack = [destination]
+    while stack:
+        current = stack.pop()
+        try:
+            children = [entry for entry in current.iterdir() if entry.is_dir()]
+        except (FileNotFoundError, NotADirectoryError, PermissionError):
+            continue
+        for child in children:
+            if child.name == ".git":
+                continue  # same race as `walk`: never descend into a live repo
+            directories.append(child)
+            stack.append(child)
+    # Deepest first, so emptying a child can empty its parent in the same pass.
+    for path in sorted(directories, key=lambda p: len(p.parts), reverse=True):
+        try:
+            if not any(path.iterdir()):
+                path.rmdir()
+        except (FileNotFoundError, OSError):
+            continue
 
 
 def _stale(
@@ -640,10 +700,10 @@ def _stale(
     previous = read_manifest(destination) or set()
     now = shipped_files(source, week, released_solutions)
     stale: list[Path] = []
-    for path in destination.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
-            continue
+    for path in walk(destination):
         relative = path.relative_to(destination)
+        if _unmanaged(relative):
+            continue  # the cohort repository's own CI; we neither ship nor reap it
         if relative.as_posix() in {RELEASED_SOLUTIONS_FILE, PUBLISHED_FILE}:
             continue  # our own ledgers, generated here, not course content
         outside = not any(relative == entry or entry in relative.parents for entry in allowed)
@@ -761,10 +821,9 @@ def main(argv: list[str] | None = None) -> int:
         ledgers = {PUBLISHED_FILE, RELEASED_SOLUTIONS_FILE}
         orphans = sorted(
             path.relative_to(destination).as_posix()
-            for path in destination.rglob("*")
-            if path.is_file()
-            and ".git" not in path.parts
-            and not _ignored(path.relative_to(destination))
+            for path in walk(destination)
+            if not _ignored(path.relative_to(destination))
+            and not _unmanaged(path.relative_to(destination))
             and path.relative_to(destination).as_posix() not in expected | ledgers
         )
         if orphans:

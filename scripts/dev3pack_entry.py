@@ -1,0 +1,470 @@
+"""Generate the Dev3Pack curriculum-entry sheet — the fields, in fill-in order.
+
+    uv run python scripts/dev3pack_entry.py            # markdown + csv
+    uv run python scripts/dev3pack_entry.py --xlsx     # also the workbook
+    uv run python scripts/dev3pack_entry.py --check    # CI: fail if stale
+
+THREE FORMATS, ONE SOURCE. The markdown is for reading beside the form; the CSV is
+one row per form action in fill order, for anyone who would rather work down a
+spreadsheet; the workbook is the same rows with the columns sized to be read.
+
+THE CSV COSTS NOTHING. `csv` is stdlib, so it is written on every run and CI checks
+it like the markdown. The workbook needs `openpyxl` and is therefore opt-in, behind
+the `spreadsheet` extra — the same discipline as `certificate`. Pandas would be
+fifty megabytes to do what thirty lines of stdlib already do, in a repository every
+learner runs `uv sync` on.
+
+WHY THIS EXISTS. Dev3Pack's curriculum builder is a form: per module, a lesson
+title, lesson content in markdown, a resource title and URL, one or more exercise
+titles, and a module resource. Fifteen sessions times those fields is the kind of
+transcription a person does once, wrongly, at 1am. This renders every field from
+the curriculum, in the order the form asks for them, so the job is copy and paste
+rather than recall.
+
+IT LINKS TO THE COHORT REPOSITORY, NOT THIS ONE. A student following a link from
+Dev3Pack must land on something they can actually open, and the source repo is
+private to us. A session that has not been published yet still gets its link —
+the URL is correct the moment its week opens, which is also when anyone will
+click it.
+
+GENERATED, SO IT CANNOT DRIFT. A retitled session or a renamed exercise changes
+here on the next run, and `--check` fails the build if someone edits the output
+by hand instead.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import io
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "src"))
+
+from bootcamp_agent.curriculum import (  # noqa: E402
+    CAPSTONE,
+    CHAPTERS,
+    WEEK_TITLES,
+)
+from bootcamp_agent.hints import FULL_MARKS  # noqa: E402
+
+OUT_DIR = ROOT / "docs" / "dev3pack"
+SHEET = OUT_DIR / "curriculum-entry.md"
+CSV = OUT_DIR / "curriculum-entry.csv"
+XLSX = OUT_DIR / "curriculum-entry.xlsx"
+
+#: One row per action the form asks for, in the order it asks. `section` says which
+#: block of the builder the row belongs to, so a filler never has to guess whether a
+#: row is a lesson, an exercise, or a module resource.
+COLUMNS = (
+    "order",
+    "week",
+    "module",
+    "module_title",
+    "item_id",
+    "section",
+    "title",
+    "content",
+    "resource_title",
+    "resource_url",
+    "link_submission",
+)
+
+#: The student-facing repository. Links must resolve for someone who is not us.
+COHORT = "https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main"
+#: Where a finished exercise is handed in. Every `Link submission` id resolves to a
+#: folder here once its pull request merges, so the id and the destination are two
+#: halves of one fact and the sheet should carry both.
+SUBMISSIONS = "https://github.com/Gecko-Academy/dev3pack-submissions"
+HEADING = re.compile(r"^#\s+(.+?)\s*(?:\[\[[^\]]*\]\])?\s*$", re.M)
+
+
+def _section(text: str, name: str) -> str:
+    """One `## name` section's body, stopping at the next heading."""
+    match = re.search(rf"^##\s+{re.escape(name)}\s*$", text, re.M)
+    if not match:
+        return ""
+    rest = text[match.end() :]
+    following = re.search(r"^#{1,3}\s+", rest, re.M)
+    return (rest[: following.start()] if following else rest).strip()
+
+
+def _read(path: Path) -> str:
+    return path.read_text(encoding="utf-8") if path.is_file() else ""
+
+
+def _link(unit: str, dirname: str, page: str) -> str:
+    return f"{COHORT}/units/en/{unit}/{dirname}/{page}"
+
+
+def _exercises(prefix: str) -> list[tuple[str, str]]:
+    """Each exercise id with the one-line description its checker carries.
+
+    Reads the registry by prefix rather than through `exercise_ids`, which only
+    knows chapters — the capstone's `cap01` is neither a chapter nor a week-0
+    unit, and asking for it by chapter raises.
+    """
+    import bootcamp_agent.session_checks  # noqa: F401 - importing registers them
+    from bootcamp_agent.checks import CHECKS
+
+    out = []
+    for key in sorted(k for k in CHECKS if k.startswith(f"{prefix}-")):
+        doc = (CHECKS[key].__doc__ or "").strip().splitlines()
+        out.append((key, doc[0] if doc else "—"))
+    return out
+
+
+def _concept_pages(directory: Path) -> list[tuple[str, str]]:
+    """Each concept page's filename and its own first heading."""
+    pages = []
+    for path in sorted(directory.glob("concepts-*.mdx")):
+        title = HEADING.search(_read(path))
+        pages.append((path.name, title.group(1) if title else path.stem))
+    return pages
+
+
+def render() -> str:
+    lines = [
+        "<!-- generated by scripts/dev3pack_entry.py — run it, do not edit this file -->",
+        "",
+        "# Dev3Pack curriculum entry sheet",
+        "",
+        "Every field the Dev3Pack builder asks for, per module, in the order the form",
+        "asks for it. Copy down the page; the order matches the screen.",
+        "",
+        "One **module = one session**. Fifteen sessions, three weeks, plus the capstone,",
+        "which is a module with no date because it is worked between sessions.",
+        "",
+        "Links point at the **cohort repository**, which is what a student can open. A",
+        "session whose week has not opened yet still has a correct link — it resolves the",
+        "moment that week is published, which is also when anyone will click it.",
+        "",
+    ]
+
+    for week in (1, 2, 3):
+        chapters = [c for c in CHAPTERS if c.module == week]
+        lines += [
+            "---",
+            "",
+            f"# Week {week} — {WEEK_TITLES[week]}",
+            "",
+        ]
+        for chapter in chapters:
+            lines += _module_block(chapter, week)
+        if week == CAPSTONE.opens_in_week:
+            lines += _capstone_block()
+
+    lines += [
+        "---",
+        "",
+        "## Session 15 has no exercise",
+        "",
+        "Demo day is a defence, not a notebook. Give it a lesson and a module resource;",
+        "leave **ADD EXERCISE** empty. That is a property of the session, not a gap.",
+        "",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def _module_block(chapter, week: int) -> list[str]:
+    directory = chapter.directory
+    introduction = _read(directory / "introduction.mdx")
+    outcome = _section(introduction, "Outcome")
+    exercises = _exercises(chapter.chapter_id) if chapter.has_notebook else []
+    marks = len(exercises) * FULL_MARKS if chapter.runs_in_ci else None
+
+    lines = [
+        f"## Week {week} · Module {chapter.number}: {chapter.title}",
+        "",
+        f"`{chapter.chapter_id}` · {chapter.on.strftime('%A %d %B %Y')} · "
+        + (f"{marks} marks" if marks else "handed in, not marked"),
+        "",
+        "**Lesson title**",
+        "",
+        f"> {chapter.title}",
+        "",
+        "**Lesson content (markdown)**",
+        "",
+    ]
+    lines += [
+        f"> {line}" if line else ">" for line in (outcome or "_no outcome page_").splitlines()
+    ]
+    lines += [
+        "",
+        "**Resource title** · **URL**",
+        "",
+        f"> Session {chapter.number} — introduction",
+        f"> `{_link(chapter.unit, chapter.dirname, 'introduction.mdx')}`",
+        "",
+    ]
+
+    concepts = _concept_pages(directory)
+    if concepts:
+        lines += ["Further resources, if the form takes more than one:", ""]
+        for name, title in concepts:
+            lines.append(f"> {title}")
+            lines.append(f"> `{_link(chapter.unit, chapter.dirname, name)}`")
+        lines.append("")
+
+    if exercises:
+        notebook = _link(chapter.unit, chapter.dirname, "notebook.ipynb")
+        lines += [
+            "**Exercises** — one row per `Add exercise`",
+            "",
+            "| Exercise title | Link submission | Where it is done |",
+            "|---|---|---|",
+        ]
+        for key, what in exercises:
+            lines.append(
+                f"| {key} — {what} | `{key}` | [{chapter.chapter_id} notebook]({notebook}) |"
+            )
+        lines += [
+            "",
+            f"Handed in with `uv run bootcamp submit {chapter.chapter_id} --github <login>`,",
+            f"which writes `submissions/<login>/{chapter.chapter_id}/` and becomes one pull",
+            f"request to [dev3pack-submissions]({SUBMISSIONS}). The merged bundle IS the",
+            "saved score — there is no second store.",
+            "",
+        ]
+    else:
+        lines += ["**Exercises** — none. Leave ADD EXERCISE empty.", ""]
+
+    lines += [
+        "**Module resource** · Title · URL",
+        "",
+        f"> Session {chapter.number} — all pages and the notebook",
+        f"> `{COHORT}/units/en/{chapter.unit}/{chapter.dirname}/`",
+        "",
+    ]
+    return lines
+
+
+def _capstone_block() -> list[str]:
+    exercises = _exercises(CAPSTONE.prefix)
+    return [
+        f"## Module: {CAPSTONE.title}",
+        "",
+        f"`{CAPSTONE.prefix}` · no date — worked between sessions from week "
+        f"{CAPSTONE.opens_in_week} · {len(exercises) * FULL_MARKS} marks",
+        "",
+        "**Lesson title**",
+        "",
+        "> Capstone: the source-grounded research assistant",
+        "",
+        "**Lesson content (markdown)**",
+        "",
+        "> A research assistant that answers from `data/corpus/`, cites document ids,",
+        "> and refuses when nothing supports the claim. Built in the hours between",
+        "> sessions; defended on demo day.",
+        "",
+        "**Resource title** · **URL**",
+        "",
+        "> Capstone — the brief",
+        f"> `{_link(CAPSTONE.unit, CAPSTONE.dirname, 'introduction.mdx')}`",
+        "",
+        "**Exercises** — one row per `Add exercise`",
+        "",
+        "| Exercise title | Link submission | Where it is done |",
+        "|---|---|---|",
+        *[
+            f"| {key} — {what} | `{key}` | [{CAPSTONE.prefix} notebook]"
+            f"({_link(CAPSTONE.unit, CAPSTONE.dirname, 'notebook.ipynb')}) |"
+            for key, what in exercises
+        ],
+        "",
+        f"Handed in with `uv run bootcamp submit {CAPSTONE.prefix} --github <login>`.",
+        "",
+        "**Module resource** · Title · URL",
+        "",
+        "> Capstone — all pages and the notebook",
+        f"> `{COHORT}/units/en/{CAPSTONE.unit}/{CAPSTONE.dirname}/`",
+        "",
+    ]
+
+
+def rows() -> list[dict[str, str]]:
+    """Every form action, in the order the builder asks for it.
+
+    Long format on purpose: the form nests (a module holds lessons, exercises and
+    resources) and a spreadsheet does not. One row per thing you press a button to
+    add, with `section` naming which button, beats a wide table with empty cells.
+    """
+    out: list[dict[str, str]] = []
+
+    def add(**fields: str) -> None:
+        row = {c: "" for c in COLUMNS}
+        row.update(fields)
+        row["order"] = str(len(out) + 1)
+        out.append(row)
+
+    for week in (1, 2, 3):
+        for chapter in [c for c in CHAPTERS if c.module == week]:
+            directory = chapter.directory
+            outcome = _section(_read(directory / "introduction.mdx"), "Outcome")
+            common = {
+                "week": str(week),
+                "module": str(chapter.number),
+                "module_title": chapter.title,
+                "item_id": chapter.chapter_id,
+            }
+            add(
+                **common,
+                section="LESSON",
+                title=chapter.title,
+                content=outcome,
+                resource_title=f"Session {chapter.number} — introduction",
+                resource_url=_link(chapter.unit, chapter.dirname, "introduction.mdx"),
+            )
+            if chapter.has_notebook:
+                for key, what in _exercises(chapter.chapter_id):
+                    add(
+                        **common,
+                        section="EXERCISE",
+                        title=f"{key} — {what}",
+                        link_submission=key,
+                        resource_url=_link(chapter.unit, chapter.dirname, "notebook.ipynb"),
+                    )
+            add(
+                **common,
+                section="MODULE_RESOURCE",
+                resource_title=f"Session {chapter.number} — all pages and the notebook",
+                resource_url=f"{COHORT}/units/en/{chapter.unit}/{chapter.dirname}/",
+            )
+            for name, title in _concept_pages(directory):
+                add(
+                    **common,
+                    section="MODULE_RESOURCE",
+                    resource_title=title,
+                    resource_url=_link(chapter.unit, chapter.dirname, name),
+                )
+
+        if week == CAPSTONE.opens_in_week:
+            common = {
+                "week": "",
+                "module": "",
+                "module_title": CAPSTONE.title,
+                "item_id": CAPSTONE.prefix,
+            }
+            add(
+                **common,
+                section="LESSON",
+                title=CAPSTONE.title,
+                content=(
+                    "A research assistant that answers from `data/corpus/`, cites document "
+                    "ids, and refuses when nothing supports the claim. Built in the hours "
+                    "between sessions; defended on demo day."
+                ),
+                resource_title="Capstone — the brief",
+                resource_url=_link(CAPSTONE.unit, CAPSTONE.dirname, "introduction.mdx"),
+            )
+            for key, what in _exercises(CAPSTONE.prefix):
+                add(
+                    **common,
+                    section="EXERCISE",
+                    title=f"{key} — {what}",
+                    link_submission=key,
+                    resource_url=_link(CAPSTONE.unit, CAPSTONE.dirname, "notebook.ipynb"),
+                )
+            add(
+                **common,
+                section="MODULE_RESOURCE",
+                resource_title="Capstone — all pages and the notebook",
+                resource_url=f"{COHORT}/units/en/{CAPSTONE.unit}/{CAPSTONE.dirname}/",
+            )
+    return out
+
+
+def render_csv() -> str:
+    """The rows as CSV text. Built in memory so `--check` can compare it."""
+    buffer = io.StringIO()
+    # newline="" is the csv module's requirement; StringIO honours it the same way.
+    writer = csv.DictWriter(buffer, fieldnames=list(COLUMNS), lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(rows())
+    return buffer.getvalue()
+
+
+def write_xlsx() -> int:
+    """The same rows as a workbook. Opt-in, because it needs a dependency."""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Alignment, Font
+    except ImportError:
+        print("--xlsx needs openpyxl:  uv sync --extra spreadsheet", file=sys.stderr)
+        return 1
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "curriculum"
+    sheet.append(list(COLUMNS))
+    for cell in sheet[1]:
+        cell.font = Font(bold=True)
+    for row in rows():
+        sheet.append([row[c] for c in COLUMNS])
+
+    # Widths chosen so the columns a person reads are readable without resizing;
+    # `content` wraps because an outcome paragraph is several sentences long.
+    widths = {
+        "title": 60,
+        "content": 80,
+        "resource_title": 38,
+        "resource_url": 70,
+        "module_title": 44,
+        "section": 16,
+        "item_id": 10,
+        "link_submission": 16,
+    }
+    for index, name in enumerate(COLUMNS, start=1):
+        letter = sheet.cell(row=1, column=index).column_letter
+        sheet.column_dimensions[letter].width = widths.get(name, 8)
+    for row in sheet.iter_rows(min_row=2):
+        for cell in row:
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
+    sheet.freeze_panes = "A2"
+    book.save(XLSX)
+    print(f"wrote {XLSX.relative_to(ROOT)}")
+    return 0
+
+
+def generate(check: bool = False, xlsx: bool = False) -> int:
+    #: The workbook is NOT checked: it is a binary that openpyxl may write
+    #: byte-differently between versions, and a CI failure nobody can read is
+    #: worse than no check. The CSV it is built from IS checked, so its content
+    #: cannot drift unnoticed.
+    expected = {SHEET: render(), CSV: render_csv()}
+    if check:
+        stale = [
+            path
+            for path, text in expected.items()
+            if not path.is_file() or path.read_text(encoding="utf-8") != text
+        ]
+        for path in stale:
+            print(f"stale: {path.relative_to(ROOT)}")
+        if stale:
+            print("re-run: uv run python scripts/dev3pack_entry.py", file=sys.stderr)
+            return 1
+        print(f"dev3pack entry sheet current ({len(rows())} rows)")
+        return 0
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    for path, text in expected.items():
+        path.write_text(text, encoding="utf-8")
+        print(f"wrote {path.relative_to(ROOT)}")
+    return write_xlsx() if xlsx else 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="fail when stale")
+    parser.add_argument(
+        "--xlsx", action="store_true", help="also write the workbook (needs openpyxl)"
+    )
+    args = parser.parse_args(argv)
+    return generate(check=args.check, xlsx=args.xlsx)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

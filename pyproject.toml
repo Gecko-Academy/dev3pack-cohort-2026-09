@@ -18,10 +18,23 @@ openai = ["openai>=1.40"]
 # Only the issuer signs, and only a holder verifies. Neither is on a learner's
 # path through the course, so this stays out of the default install.
 certificate = ["cryptography>=43"]
+# The curriculum-entry workbook, for handing the syllabus to Dev3Pack's builder.
+# Instructor-only, and openpyxl rather than pandas: fifty megabytes to write one
+# sheet is not a cost a learner should pay on `uv sync`.
+spreadsheet = ["openpyxl>=3.1"]
+# The readable course site. MDX with `<Question>` blocks renders as raw JSX
+# anywhere that just reads the file, so the pages are built rather than read.
+site = ["markdown-it-py>=3.0", "pyyaml>=6.0"]
 
 [dependency-groups]
 dev = [
   "pytest>=8.0",
+  # The page renderer's own dependency. It is an optional EXTRA for a learner
+  # (`site`), because reading the course is not the default path -- but the
+  # tests that prove 80 quizzes render must actually run in CI, and a test that
+  # silently skips is a test that stops guarding anything.
+  "markdown-it-py>=3.0",
+  "pyyaml>=6.0",
   "ruff>=0.6",
   "nbformat>=5.10",
   "nbclient>=0.10",

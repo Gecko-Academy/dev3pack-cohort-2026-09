@@ -176,6 +176,10 @@ def _progress() -> int:
         if not item.verifiable:
             print(f"{label} in Jupyter")
             continue
+        pending = _arrival(item.notebook, when)
+        if pending is not None:
+            print(f"{label} {pending}")
+            continue
         try:
             card = run_notebook(item.notebook, item.exercises, item.id)
         except CourseworkError as error:
@@ -187,6 +191,26 @@ def _progress() -> int:
         if card.failed or card.not_reached:
             worst = 1
     return worst
+
+
+def _arrival(notebook: Path, when: str | None) -> str | None:
+    """The line for an item whose files have not been published yet, or None.
+
+    A learner's clone only carries the weeks that have opened, so most session
+    directories are simply absent on day one. That is the schedule working, not
+    a fault, and it must not be reported as one.
+
+    THE SIGNAL IS THE DIRECTORY, not the notebook. The publisher withholds a
+    session whole, so an absent directory means "not yet"; a directory that
+    exists without its notebook means a damaged checkout, and that still has to
+    be shouted about.
+    """
+    if notebook.parent.is_dir():
+        return None
+    # The `when` column is a date for a session and a word for anything else
+    # ("project" for the capstone), and only a date can follow "arrives".
+    dated = when is not None and any(character.isdigit() for character in when)
+    return f"arrives {when}" if dated else "not published yet"
 
 
 def _submit(chapter_id: str, github: str, cohort: str, into: str | None) -> int:
@@ -245,6 +269,29 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None) -> int:
     return 0
 
 
+def _read(port: int, build_only: bool) -> int:
+    """Build the course pages and serve them, so they can be read as pages.
+
+    The pages are MDX with `<Question>` blocks in them. Opened as files they show
+    the quiz as raw JSX, which is the format's doing rather than ours -- Hugging
+    Face's own course reads the same way on GitHub. Rendering them locally is how
+    a learner gets the quiz, offline, with nothing to install beyond this repo.
+    """
+    import subprocess
+
+    script = Path(__file__).resolve().parent.parent.parent / "scripts" / "course_html.py"
+    if not script.is_file():
+        print("the site generator is not in this checkout", file=sys.stderr)
+        return 1
+    command = [sys.executable, str(script)]
+    if not build_only:
+        command += ["--serve", "--port", str(port)]
+    try:
+        return subprocess.call(command)
+    except KeyboardInterrupt:
+        return 0
+
+
 def bootcamp(argv: list[str] | None = None) -> int:
     """The participant's own command: check the setup, a chapter, or everything."""
     parser = argparse.ArgumentParser(
@@ -265,6 +312,9 @@ def bootcamp(argv: list[str] | None = None) -> int:
         metavar="FILE",
         help="write your own progress (outcomes only) to a file instead of running anything",
     )
+    reader = sub.add_parser("read", help="render the course pages and open them locally")
+    reader.add_argument("--port", type=int, default=8000)
+    reader.add_argument("--build-only", action="store_true", help="write site/ and stop")
     submitter = sub.add_parser("submit", help="build the submission bundle to hand in")
     submitter.add_argument(
         "chapter", help="a session (ch03), a week-0 unit (w05), or the capstone (cap01)"
@@ -282,6 +332,8 @@ def bootcamp(argv: list[str] | None = None) -> int:
         if getattr(args, "export", None):
             return _export(None if args.export == "-" else Path(args.export))
         return _progress()
+    if args.command == "read":
+        return _read(args.port, args.build_only)
     if args.command == "submit":
         return _submit(args.chapter, args.github, args.cohort, args.into)
     parser.print_help()
