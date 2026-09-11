@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/assets/github-cover.png"
+  <img src="docs/assets/github-cover.png"
        alt="Dev3Pack AI Engineering Bootcamp — from an LLM call to a verified agent. 14 September to 2 October 2026, demo day 2 October. MCP, loop engineering, graph engineering, RAG."
        width="100%" />
 </p>
@@ -156,7 +156,7 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (37 paths). |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (38 paths). |
 | Week 1 | Mon 14 Sep | unit1 |
 | Week 2 | Mon 21 Sep | unit2 |
 | Week 3 | Mon 28 Sep | unit3 |

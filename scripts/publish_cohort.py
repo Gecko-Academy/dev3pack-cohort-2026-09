@@ -104,6 +104,10 @@ ALWAYS = (
     "builder-kit",
     "integrations",
     "docs/guides",
+    # The README's cover image. It used to live under `.github/`, which never
+    # publishes, so the cohort repository rendered a broken image above the
+    # first heading a student ever reads.
+    "docs/assets",
     "docs/curriculum.md",
     "docs/course-index.md",
     "depth",
