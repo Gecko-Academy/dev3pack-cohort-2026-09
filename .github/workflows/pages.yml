@@ -1,0 +1,98 @@
+# Render the course and publish it, on every push that changes it.
+#
+# WHY THIS LIVES HERE AND NOT IN THE SOURCE REPOSITORY. The source repository
+# holds `units/en/*/solutions/` and `docs/instructor/`, which carry the answers.
+# Building a public site from it would publish them. This repository only ever
+# contains what has been released to the cohort, so it is the only safe origin.
+#
+# It is also why `.github` is on the publisher's always-exclude list: a publish
+# never touches this file, so the workflow survives every week that ships.
+#
+# Withheld weeks cannot leak. The generator builds from `units/en/_toctree.yml`
+# and skips any page with no file, so a session that has not been published has
+# nothing to render.
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "units/**"
+      - "src/**"
+      - "scripts/course_html.py"
+      - "pyproject.toml"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never two deploys at once, and let a newer push win: the site is derived, so
+# a half-finished older build has nothing to protect.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # The renderer arrives with the first publish that carries it. Until then
+      # this job succeeds and does nothing, rather than painting the students'
+      # repository red for a file that is simply not here yet.
+      - id: ready
+        run: |
+          if [ -f scripts/course_html.py ]; then
+            echo "ready=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=no" >> "$GITHUB_OUTPUT"
+            echo "::notice::scripts/course_html.py is not in this checkout yet; nothing to render."
+          fi
+
+      - if: steps.ready.outputs.ready == 'yes'
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - if: steps.ready.outputs.ready == 'yes'
+        run: uv sync --extra site --frozen
+
+      - if: steps.ready.outputs.ready == 'yes'
+        run: uv run --extra site python scripts/course_html.py --out site
+
+      # A site with no pages means the toctree and the disk disagree, and
+      # deploying it would replace a working course with an empty one.
+      - if: steps.ready.outputs.ready == 'yes'
+        run: |
+          pages=$(find site -name '*.html' | wc -l)
+          echo "rendered $pages pages"
+          test "$pages" -gt 0
+
+      - if: steps.ready.outputs.ready == 'yes'
+        uses: actions/configure-pages@v5
+
+      - if: steps.ready.outputs.ready == 'yes'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+    outputs:
+      ready: ${{ steps.ready.outputs.ready }}
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.ready == 'yes'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
