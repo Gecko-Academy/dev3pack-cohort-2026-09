@@ -66,6 +66,18 @@ cp .env.example .env
 (pytest, ruff, notebook tooling). You never activate the venv by hand — always
 prefix commands with `uv run`.
 
+**macOS only:** uv marks the files it installs into `.venv` with the Finder
+"hidden" flag, and Python's own `site.py` silently skips any hidden `.pth`
+file — including the one that makes `bootcamp_agent` importable. Clear it
+once per `uv sync`:
+
+```bash
+chflags -R nohidden .venv
+```
+
+(`scripts/check_setup.py` also clears this automatically each time it runs,
+so re-running the doctor after a `uv sync` self-heals it too.)
+
 ## 5. Run the doctor
 
 ```bash
@@ -149,6 +161,7 @@ git push mine main
 | Windows: `ExecutionPolicy` error | Run PowerShell as administrator once for the installer, or use WSL2 (recommended) |
 | A command is not found | You ran it bare — everything is prefixed `uv run` |
 | Doctor says corpus missing | You're not in the repo root — `cd` into the cloned folder |
+| `ModuleNotFoundError: No module named 'bootcamp_agent'` (macOS) | uv hid `.venv`'s `.pth` files again on the last `uv sync`; run `uv run python scripts/check_setup.py` (self-heals) or `chflags -R nohidden .venv`, then retry `uv run bootcamp doctor` |
 | `Permission denied (publickey)` or `Repository not found` when cloning | You have not accepted the invitation yet, or you accepted it with a different GitHub account. Check <https://github.com/notifications>, then step 3 above |
 | `git pull` says `Permission denied` | Same cause. Read access is per-account, and SSH keys are per-machine — add this machine's key at <https://github.com/settings/keys>, or clone over HTTPS |
 | Next week's folder is not there after `git pull` | It has not been published yet. Each week appears on its Monday |
