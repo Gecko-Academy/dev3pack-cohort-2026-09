@@ -1,0 +1,92 @@
+# Visual explainers
+
+Things you can open in a browser and *play with*, in the order the course meets
+them. Every link here was checked and loads; none needs an account.
+
+Use them the way you would use a diagram in a textbook — to get the shape of an
+idea before the code makes it precise. None of them is required, and nothing in
+the course is graded on them.
+
+---
+
+## Start here, whatever your background
+
+- **[Generative AI exists because of the transformer](https://ig.ft.com/generative-ai/)**
+  — the Financial Times, scroll-driven, no maths. If you read one thing on this
+  page, read this. It is the only one that assumes nothing at all.
+- **[The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)**
+  — Jay Alammar. Static rather than interactive, and still the clearest written
+  explanation there is. Good homework.
+
+---
+
+## Sessions 2–3 — what a model is, and what it returns
+
+- **[Transformer Explainer](https://poloclub.github.io/transformer-explainer/)**
+  — a real GPT-2 running in your browser. Type a sentence, watch attention move.
+- **[LLM Visualization](https://bbycroft.net/llm)** — the same machine rendered
+  in 3D, walked through layer by layer. Slower and deeper than the above.
+- **[Tiktokenizer](https://tiktokenizer.vercel.app/)** — paste any sentence and
+  see the tokens. Thirty seconds here and "the model reads tokens, not words"
+  stops being something you have to remember. Try your own name, then a number
+  like `1234567`, then a word in Portuguese.
+- **[Regexper](https://regexper.com/)** — paste a regular expression, get a
+  railway diagram. Relevant to session 3 for an unobvious reason: it shows you
+  exactly how much *shape* a regex is assuming about text a model wrote.
+
+---
+
+## Sessions 6–7 — retrieval, embeddings, grounding
+
+- **[TensorFlow Embedding Projector](https://projector.tensorflow.org/)** — real
+  embeddings in 3D. Drag them around, search a word, watch its neighbours light
+  up. "Similar things end up near each other" becomes something you have seen.
+- **[WizMap](https://poloclub.github.io/wizmap/)** — the same idea at the scale
+  of millions of points, which is where retrieval actually lives.
+
+---
+
+## Session 8 — loops and graphs
+
+The graph in session 8 is a **state machine**: states, declared transitions, and
+an event that is not legal from where you are.
+
+- **[Stately editor](https://stately.ai/editor)** and
+  **[visualizer](https://stately.ai/viz)** — build one, fire events at it, and
+  watch an illegal transition refuse to move you. That is the session, on screen.
+
+A different kind of graph, in case you meet it elsewhere: **graph neural
+networks**, which are machine learning *on* graph data. Nothing in this course
+uses them, and they are worth an hour of your curiosity.
+
+- **[GNN 101](https://visual-intelligence-umn.github.io/GNN-101/)** — the same
+  genre as Transformer Explainer, built at the University of Minnesota. Switches
+  between a node-link diagram and an adjacency matrix, which is the single most
+  useful thing to understand about representing a graph.
+- **[A Gentle Introduction to Graph Neural Networks](https://distill.pub/2021/gnn-intro/)**
+  and **[Understanding Convolutions on Graphs](https://distill.pub/2021/understanding-gnns/)**
+  — Distill. Interactive articles, and among the best technical writing anywhere.
+
+---
+
+## Week 0 — the Python underneath all of it
+
+- **[Python Tutor](https://pythontutor.com/)** — paste code, step through it one
+  line at a time, and watch memory change. If a reference, a mutable default or a
+  shallow copy has ever confused you, this is the fastest cure.
+- **[VisuAlgo](https://visualgo.net/en)** — data structures and algorithms,
+  animated. Pairs with w12, where you measure a list against a dict.
+
+---
+
+## Where these came from
+
+Most are from research groups that publish this work as papers as well as toys:
+the [Polo Club of Data Science](https://poloclub.github.io/) at Georgia Tech
+(Transformer Explainer, WizMap), the
+[Visual Intelligence Lab](https://github.com/Visual-Intelligence-UMN/GNN-101) at
+Minnesota (GNN 101, [paper](https://arxiv.org/abs/2411.17849)), and
+[Distill](https://distill.pub/).
+
+If you find a good one, open a pull request against this file. That is a real
+contribution and it is the kind the course wants.

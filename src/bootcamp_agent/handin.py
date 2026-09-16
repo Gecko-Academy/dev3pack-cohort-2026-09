@@ -118,13 +118,18 @@ def push(bundle: Path, github: str, item_id: str, run: object = _run) -> str:
     if started.code != 0:
         raise HandInError(f"could not start a branch from {default} in your fork:\n{started.out}")
 
-    destination = work / github / item_id
+    # UNDER `submissions/`, WHICH IS NOT A DETAIL. The submissions repository
+    # triggers CI on `paths: ["submissions/**"]` and its collector globs
+    # `submissions/*/*/submission.json`. A bundle one level up gets no checks
+    # at all, so the collector correctly refuses to merge it and the pull
+    # request sits open for ever, looking like a stuck scheduler.
+    destination = work / "submissions" / github / item_id
     if destination.exists():
         shutil.rmtree(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(bundle, destination)
 
-    run(["git", "add", f"{github}/{item_id}"], work)
+    run(["git", "add", f"submissions/{github}/{item_id}"], work)
     committed = run(["git", "commit", "-m", f"{item_id} — {github}"], work)
     if committed.code != 0 and "nothing to commit" not in committed.out.lower():
         raise HandInError(f"could not commit your submission:\n{committed.out}")

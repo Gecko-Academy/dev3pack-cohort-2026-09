@@ -109,6 +109,19 @@ uv sync --group dev
 cp .env.example .env
 ```
 
+**macOS only, and it bites before anything can tell you why.** uv marks what it
+installs into `.venv` as hidden, and Python skips a hidden `.pth` file —
+including the one that makes `bootcamp_agent` importable. Every command then
+fails with `ModuleNotFoundError: No module named 'bootcamp_agent'` on a machine
+where nothing is actually wrong.
+
+`uv run bootcamp doctor` repairs it automatically every time it runs. To do it
+by hand:
+
+```bash
+chflags -R nohidden .venv
+```
+
 `uv sync` creates `.venv/` and installs everything, including the dev tools
 (pytest, ruff, notebook tooling). You never activate the venv by hand — always
 prefix commands with `uv run`.
@@ -160,7 +173,7 @@ answers, pick ONE. The first row needs no key and no account.
 
 | Provider | Setup |
 |---|---|
-| Ollama (local, free, no key; needs 8 GB RAM) | Install from <https://ollama.com>, then `ollama pull qwen2.5:7b-instruct` → in `.env`: `BOOTCAMP_PROVIDER=ollama`. Nothing else to install. The doctor checks the server and the model. |
+| Ollama (local, free, no key; wants ~8 GB of RAM free) | Install from <https://ollama.com>, then `ollama pull qwen2.5:7b-instruct` → in `.env`: `BOOTCAMP_PROVIDER=ollama`. Nothing else to install. The doctor checks the server and the model. |
 | Anthropic | Get a key at <https://console.anthropic.com> → in `.env`: `BOOTCAMP_PROVIDER=anthropic`, `ANTHROPIC_API_KEY=...` and `uv sync --extra anthropic` |
 | OpenRouter (one key, many models, has free models) | Key at <https://openrouter.ai> → `BOOTCAMP_PROVIDER=openai`, `OPENAI_API_KEY=...`, `OPENAI_BASE_URL=https://openrouter.ai/api/v1` and `uv sync --extra openai` |
 | OpenAI | Key at <https://platform.openai.com> → `BOOTCAMP_PROVIDER=openai`, `OPENAI_API_KEY=...` and `uv sync --extra openai` |
@@ -193,6 +206,26 @@ model, **Ollama is free and local** — that is the first row for a reason.
 **Never commit `.env`. Never paste a key into a prompt, an issue, or a config
 file that gets committed.**
 
+### If 8 GB is all you have: run the model on Colab instead
+
+Do not fight your laptop. Google Colab is free, needs no card, and gives you more
+memory than your machine plus a GPU — and the model runs *there*, so nothing is
+installed locally.
+
+**[demos/04_ollama_on_colab.ipynb](demos/04_ollama_on_colab.ipynb)**
+
+Open it in Colab, set **Runtime → Change runtime type → T4 GPU** *first*, then run
+the cells in order. It installs Ollama there, pulls `qwen2.5:7b-instruct`, and
+points the course at it.
+
+One measured warning, so you do not lose an evening to it: **a 1B model cannot do
+session 3.** It fails to produce a valid `confidence`, twice, and the parser
+refuses it — correctly. Use the 7B.
+
+The cost of this route is that Colab forgets: a new machine means pulling the
+model again, about three minutes. Your submissions still happen on your own
+laptop, because `bootcamp submit` needs your checkout.
+
 ## Saving your own work
 
 You have **read access**, which is deliberate: it means nothing you do can break
@@ -222,6 +255,7 @@ git push mine main
 | A command is not found | You ran it bare — everything is prefixed `uv run` |
 | Doctor says corpus missing | You're not in the repo root — `cd` into the cloned folder |
 | `Permission denied (publickey)` or `Repository not found` when cloning | The repository is public, so this is an SSH key problem, not an access one. Clone over HTTPS instead: `git clone https://github.com/Gecko-Academy/dev3pack-cohort-2026-09.git` |
+| `ModuleNotFoundError: No module named 'bootcamp_agent'` on macOS | uv hid `.venv`'s `.pth` files on the last `uv sync`. `uv run bootcamp doctor` clears it, or `chflags -R nohidden .venv` |
 | Next week's folder is not there after `git pull` | It has not been published yet. Each week appears on its Monday |
 
 Stuck longer than 15 minutes? Post the doctor output (never your `.env`) in the

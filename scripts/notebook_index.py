@@ -66,6 +66,16 @@ def collections() -> tuple[tuple[tuple[str, ...], str, str], ...]:
         (("depth",), "Depth track — optional", "Software engineering fundamentals. Ungraded."),
         (("cookbook",), "Cookbook", "Gecko reference notebooks, not part of any week."),
         (("workspaces",), "Workspaces", "Open-ended labs, one per week."),
+        (
+            ("demos",),
+            "Demos",
+            "Run in class and again afterwards. Never graded.",
+        ),
+        (
+            ("ship-it",),
+            "Ship It track — optional",
+            "Turn your capstone into a surface another agent can buy from. Ungraded.",
+        ),
     ]
     return tuple(groups)
 

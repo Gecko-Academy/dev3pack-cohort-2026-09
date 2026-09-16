@@ -15,7 +15,10 @@ and says something true after the last one.
 
 from __future__ import annotations
 
+import os
 import shutil
+import site
+import stat
 import sys
 from datetime import date
 from pathlib import Path
@@ -45,6 +48,48 @@ def _next_session(today: date | None = None) -> str:
     return f"Next up: session {session.number}, {session.title} — {when}."
 
 
+def _unhide_venv_pth_files() -> bool:
+    """Clear macOS's hidden flag from `.venv`'s `.pth` files.
+
+    FOUND BY A LEARNER ON DAY TWO -- Karol Rojas, in a pull request against the
+    cohort repository -- and it is the worst shape an onboarding bug can have:
+    every `uv run bootcamp ...` dies with `ModuleNotFoundError: No module named
+    'bootcamp_agent'` BEFORE the doctor that would have explained it gets to run.
+
+    uv marks what it installs into `.venv` hidden on macOS, and `site.py` skips
+    a hidden `.pth` -- including the editable-install one that points at `src/`.
+    So the package never reaches `sys.path`, on a machine where nothing is
+    actually wrong.
+
+    Clearing the flag alone only fixes the NEXT process, because `site.py` has
+    already run by the time this does. Re-adding the directory puts the package
+    on `sys.path` for this run too, which is what makes the doctor self-healing
+    rather than merely informative.
+
+    A no-op anywhere without `os.chflags`, which is everywhere but macOS.
+    """
+    if not hasattr(os, "chflags"):
+        return False
+    library = ROOT / ".venv" / "lib"
+    if not library.is_dir():
+        return False
+
+    cleared = False
+    directories: set[Path] = set()
+    for pth in library.glob("python*/site-packages/*.pth"):
+        try:
+            if os.stat(pth).st_flags & stat.UF_HIDDEN:
+                os.chflags(pth, 0)
+                cleared = True
+                directories.add(pth.parent)
+        except OSError:
+            # One unreadable file must not stop the others being repaired.
+            pass
+    for directory in directories:
+        site.addsitedir(str(directory))
+    return cleared
+
+
 def main() -> int:
     failures = 0
 
@@ -65,6 +110,9 @@ def main() -> int:
         "install with: uv python install 3.11",
     )
     check("uv on PATH", shutil.which("uv") is not None, "https://docs.astral.sh/uv/")
+
+    if _unhide_venv_pth_files():
+        check("macOS had hidden the .venv .pth files — cleared", True)
 
     try:
         import bootcamp_agent

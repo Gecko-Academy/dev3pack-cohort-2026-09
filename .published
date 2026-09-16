@@ -39,6 +39,11 @@ data/corpus/rag-basics.md
 data/corpus/structured-outputs.md
 data/evals/coach.jsonl
 data/evals/golden.jsonl
+demos/01_api_request_up_close.ipynb
+demos/02_one_question_three_ways.ipynb
+demos/03_regex_parsing_retrieval.ipynb
+demos/04_ollama_on_colab.ipynb
+demos/README.md
 depth/01-full-stack/notebook.ipynb
 depth/01-full-stack/solutions/notebook.ipynb
 depth/02-managing-data/notebook.ipynb
@@ -60,6 +65,7 @@ docs/guides/graph-engineering.md
 docs/guides/harness-engineering.md
 docs/guides/loop-engineering.md
 docs/guides/solana-agent-stacks.md
+docs/guides/visual-explainers.md
 final_assignment/README.md
 final_assignment/agent.py
 final_assignment/app.py
@@ -93,6 +99,11 @@ scripts/start_ollama.sh
 scripts/submit_all.py
 scripts/track.py
 scripts/verify_submission.py
+ship-it/README.md
+ship-it/fixtures/README.md
+ship-it/fixtures/geckocoffee-store.b64
+ship-it/notebook.ipynb
+ship-it/seed/RUNBOOK.md
 src/bootcamp_agent/__init__.py
 src/bootcamp_agent/agent.py
 src/bootcamp_agent/bonus.py
@@ -124,6 +135,11 @@ src/bootcamp_agent/session_checks/ch11.py
 src/bootcamp_agent/session_checks/ch12.py
 src/bootcamp_agent/session_checks/ch13.py
 src/bootcamp_agent/session_checks/ch14.py
+src/bootcamp_agent/shipit/__init__.py
+src/bootcamp_agent/shipit/bonus_checks.py
+src/bootcamp_agent/shipit/borsh_store.py
+src/bootcamp_agent/shipit/server.py
+src/bootcamp_agent/shipit/storefront.py
 src/bootcamp_agent/submission.py
 src/bootcamp_agent/tools.py
 src/bootcamp_agent/track.py
@@ -144,6 +160,7 @@ units/en/bonus/b06-improve-the-coach/introduction.mdx
 units/en/tracks/cookbook/introduction.mdx
 units/en/tracks/depth/introduction.mdx
 units/en/tracks/final-assignment/introduction.mdx
+units/en/tracks/ship-it/introduction.mdx
 units/en/tracks/workspaces/introduction.mdx
 units/en/unit0/ask-your-assistant.mdx
 units/en/unit0/get-settled.mdx
@@ -222,10 +239,12 @@ units/en/unit1/session-02-model-adapter/demo.ipynb
 units/en/unit1/session-02-model-adapter/introduction.mdx
 units/en/unit1/session-02-model-adapter/notebook.ipynb
 units/en/unit1/session-02-model-adapter/quiz.mdx
+units/en/unit1/session-02-model-adapter/solutions/notebook.ipynb
 units/en/unit1/session-03-structured-outputs/concepts-1.mdx
 units/en/unit1/session-03-structured-outputs/concepts-2.mdx
 units/en/unit1/session-03-structured-outputs/concepts-3.mdx
 units/en/unit1/session-03-structured-outputs/conclusion.mdx
+units/en/unit1/session-03-structured-outputs/demo.ipynb
 units/en/unit1/session-03-structured-outputs/introduction.mdx
 units/en/unit1/session-03-structured-outputs/notebook.ipynb
 units/en/unit1/session-03-structured-outputs/quiz.mdx
