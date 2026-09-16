@@ -118,6 +118,16 @@ REPO_MAP: tuple[tuple[str, str], ...] = (
         "Optional.",
     ),
     ("workspaces/", "Four open projects to build in. Optional, unmarked, no checks."),
+    (
+        "demos/",
+        "Short notebooks to run in class and again afterwards. Never graded, never "
+        "submitted; they make one idea concrete in a few minutes.",
+    ),
+    (
+        "ship-it/",
+        "The optional launch track: turn the capstone into an MCP server somebody else can "
+        "call, and a storefront an agent can buy from. Offline and never counted.",
+    ),
     ("integrations/", "Worked integrations the sessions link into rather than re-explain."),
     ("builder-kit/", "Templates a learner copies from when starting their own surface."),
     (
@@ -171,6 +181,7 @@ TRAILING = (
     ("cookbook", "Cookbook"),
     ("workspaces", "Workspaces"),
     ("final-assignment", "Final assignment"),
+    ("ship-it", "Ship It track (optional)"),
 )
 
 HEADING = re.compile(r"^#\s+(.+?)\s*(?:\[\[[^\]]*\]\])?\s*$", re.M)

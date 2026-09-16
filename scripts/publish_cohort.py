@@ -120,6 +120,8 @@ ALWAYS = (
     "docs/curriculum.md",
     "docs/course-index.md",
     "depth",
+    "demos",
+    "ship-it",
     "final_assignment",
     "README.md",
     "SETUP.md",
@@ -155,10 +157,40 @@ ALWAYS = (
 #: our business: we do not ship it, and we do not get to delete it either.
 UNMANAGED = (".github",)
 
+#: Directories that belong to whoever is holding the checkout, at ANY depth.
+#:
+#: WHY THIS EXISTS, AND IT IS NOT THEORETICAL. `_stale()` walks the whole
+#: destination and withdraws anything this release does not write. A student's
+#: virtualenv is not in the release, so every file under `.venv/` read as stale
+#: and the publisher started deleting them -- then died on `lib64`, which is a
+#: symlink to `lib`, so the file had already gone by its other name. The publish
+#: aborted with a broken virtualenv behind it.
+#:
+#: These are all gitignored, none is ever shipped, and not one of them is ours to
+#: reap. A publish must be safe to run against a checkout somebody works in.
+NOT_OURS = frozenset(
+    {
+        ".venv",
+        "venv",
+        ".git",
+        "__pycache__",
+        ".ipynb_checkpoints",
+        ".pytest_cache",
+        ".ruff_cache",
+        ".mypy_cache",
+        ".idea",
+        ".vscode",
+        "node_modules",
+        ".DS_Store",
+    }
+)
+
 
 def _unmanaged(relative: Path) -> bool:
-    """Is this path the student repository's own business, not ours?"""
-    return relative.parts[:1] and relative.parts[0] in UNMANAGED
+    """Is this path somebody else's business rather than ours to ship or reap?"""
+    if any(part in NOT_OURS for part in relative.parts):
+        return True
+    return bool(relative.parts[:1]) and relative.parts[0] in UNMANAGED
 
 
 NEVER = {

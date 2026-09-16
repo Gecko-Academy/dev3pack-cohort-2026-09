@@ -143,6 +143,10 @@
   sections:
   - local: tracks/final-assignment/introduction
     title: "Final assignment"
+- title: "Ship It track (optional)"
+  sections:
+  - local: tracks/ship-it/introduction
+    title: "Ship It track (optional)"
 - title: "(Optional) Bonus units"
   sections:
   - title: "Bonus 1. Graph RAG and hybrid search"
