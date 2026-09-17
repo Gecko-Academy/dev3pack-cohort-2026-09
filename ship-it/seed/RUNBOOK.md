@@ -35,9 +35,12 @@ the rest are not.
 Export your storefront in the shape the seeder takes:
 
 ```python
+import json
+from pathlib import Path
+
 from bootcamp_agent.shipit.storefront import to_seed_config
-import json, pathlib
-pathlib.Path("my-store.json").write_text(json.dumps(to_seed_config(MY_STORE), indent=2))
+
+Path("my-store.json").write_text(json.dumps(to_seed_config(MY_STORE), indent=2))
 ```
 
 Then, from the Gecko repository:

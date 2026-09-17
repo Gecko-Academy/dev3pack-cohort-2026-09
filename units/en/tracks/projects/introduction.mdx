@@ -1,0 +1,70 @@
+
+# Real-world projects
+
+A brief, open data, and named things to deliver — the way work actually arrives.
+Each project runs on **a model on your own machine** and **a vector database**.
+No API key, no account, nothing sent anywhere.
+
+Optional and never counted. Each task has a check, and the checks are there so you
+know when you are done, not to score you.
+
+| Project | What you build |
+|---|---|
+| [01 — What are customers really saying?](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/01-clothing-reviews/notebook.ipynb) | Embeddings of 958 real clothing reviews, a 2-D map of them, topics, and a "find reviews like this one" search with ChromaDB |
+
+## Before you start
+
+```bash
+uv sync --extra projects          # ChromaDB, scikit-learn, pandas, matplotlib
+ollama pull nomic-embed-text      # a 274 MB embedding model
+```
+
+Only 8 GB of RAM? Run the model on Google Colab instead — see
+`demos/04_ollama_on_colab.ipynb`, then `ollama pull nomic-embed-text` there.
+
+## The ideas you need, in one page
+
+### An embedding is meaning, turned into position
+
+An embedding model reads a piece of text and returns a long list of numbers — 768
+of them for `nomic-embed-text`. The numbers are placed so that texts which *mean*
+similar things end up close together, even when they share no words. "Runs small"
+and "order a size up" land near each other.
+
+### Close means similar: cosine distance
+
+To compare two embeddings, measure the angle between them. **Cosine distance** is
+`0` when two vectors point the same way and grows as they diverge. In Python,
+`scipy.spatial.distance.cosine(a, b)`. Everything else in the project is built on
+this one comparison.
+
+### Nobody can look at 768 dimensions: t-SNE
+
+**t-SNE** squeezes high-dimensional points down to two, trying to keep neighbours
+as neighbours, so you can plot them. Read the plot for *neighbourhoods*. The gap
+between two far-apart clusters means very little — t-SNE does not preserve large
+distances, so do not read one cluster as "twice as different" as another.
+
+### A vector database stores vectors and answers "what is nearest?"
+
+Comparing a query against 958 reviews one at a time is fine. Against a million it
+is not. A **vector database** such as **ChromaDB** stores the embeddings once and
+finds the nearest ones quickly. You give it an embedding function, add documents
+with ids, and query with text.
+
+### The nearest thing to a review is that review
+
+Search a vector database with a review that is already in it, and the first
+result is **the review itself**. Ask for one more than you need, and leave it out.
+
+### Read the whole result, and measure before you claim an improvement
+
+A search that looks wrong from the first line of each result can be right: a
+review that opens with the colour of a skirt may be a complaint about its quality
+two sentences later. And a setting the documentation recommends is still a
+hypothesis about *your* data until you have counted what it changed.
+
+## Data and licences
+
+Project 01 uses a sample of *Women's E-Commerce Clothing Reviews*, released into
+the public domain (CC0) on Kaggle. See each project's `data/LICENSE.md`.

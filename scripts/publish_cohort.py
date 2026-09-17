@@ -121,6 +121,7 @@ ALWAYS = (
     "docs/course-index.md",
     "depth",
     "demos",
+    "projects",
     "ship-it",
     "final_assignment",
     "README.md",
@@ -803,6 +804,10 @@ def week_in_progress(today: date | None = None) -> int:
     return max(started, default=0)
 
 
+#: The last day the schedule releases solutions on its own. See `solutions_due`.
+SOLUTIONS_FROZEN_ON = date(2026, 9, 17)
+
+
 def solutions_due(today: date | None = None) -> set[str]:
     """Solution directories the schedule has opened, as repo-relative paths.
 
@@ -821,7 +826,13 @@ def solutions_due(today: date | None = None) -> set[str]:
     Week 0 is self-paced with nothing after it, so its units open together with
     session 1 -- the point at which a learner who is stuck has a class to ask in.
     """
-    day = today or date.today()
+    # FROZEN ON 17 SEPTEMBER 2026, by decision. Every session ships with its floor
+    # already passing and exactly one cell that does not; a released solution is
+    # that one cell, answered. So the schedule stops here: what was released by
+    # this date stays released -- it is in public history and cannot honestly be
+    # withdrawn -- and nothing after it is released automatically. Releasing one
+    # anyway is still possible, and deliberate: `--release-solutions`.
+    day = min(today or date.today(), SOLUTIONS_FROZEN_ON)
     due: set[str] = set()
 
     first_session = min(chapter.on for chapter in CHAPTERS)

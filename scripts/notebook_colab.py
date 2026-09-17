@@ -129,8 +129,13 @@ def notebooks() -> list[Path]:
 
     Solutions are published one session at a time, and when one IS released a
     learner opens it the same way as any other page.
+
+    Jupyter's own checkpoints are skipped, as `check_notebooks` and
+    `notebook_index` already skip them. They are gitignored copies nobody opens,
+    and without this the `--check` fails for anyone who has opened a notebook
+    locally -- a red build caused entirely by the editor.
     """
-    return sorted(UNITS.rglob("*.ipynb"))
+    return sorted(path for path in UNITS.rglob("*.ipynb") if ".ipynb_checkpoints" not in path.parts)
 
 
 def _lines(source: object) -> list[str]:

@@ -18,6 +18,7 @@ Three weeks. **15 sessions**. One source-grounded research assistant you can tes
 ## Contents
 
 - [Start here](#start-here)
+- [Find your way](#find-your-way)
 - [For coding assistants](#for-coding-assistants)
 - [What you will learn](#what-you-will-learn)
 - [Units, sessions, extras](#units-sessions-extras)
@@ -50,7 +51,42 @@ works too. HTTPS is above because it needs nothing configured first.
 
 Open **`00-START-HERE.ipynb`**. It lists every notebook in order and ticks what you have finished.
 
-New to the repo? [`SETUP.md`](SETUP.md) is the half-hour path to a green doctor. No API key is required: every scored notebook runs offline against `FakeLLM`. This repository is read-only for you — open a pull request against the submissions repository rather than this one; week 0 is here now, later weeks land on 14 / 21 / 28 September — `git pull` at the start of each week.
+New to the repo? [`SETUP.md`](SETUP.md) is the half-hour path to a green doctor. No API key is required: every scored notebook runs offline against `FakeLLM`. This repository is read-only for you — hand in to [the submissions repository](https://github.com/Gecko-Academy/dev3pack-submissions) instead (see [Handing in](#handing-in)); week 0 is here now, later weeks land on 14 / 21 / 28 September — `git pull` at the start of each week.
+
+## Find your way
+
+**Looking for today's exercise?** It is the `notebook.ipynb` inside the session's
+folder. Every link below opens the file itself, not a folder to search.
+
+| I want to… | Go straight to |
+|---|---|
+| **do today's exercise** | the **Exercise** column in [the sessions table](#weeks-1-3) |
+| **watch it work first** | the **Demo** column in the same table, or [`demos/`](demos/) |
+| **build something real** | [`projects/`](projects/) — open data, a local model, ChromaDB |
+| **see the ideas visually** | [Demos and explainers](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/demos/introduction) — interactive pages, mapped to sessions |
+| **get unstuck** | `coach("your question")` in any notebook — answers from the course pages, offline, no key. [Demo 5](demos/05_the_coach_up_close.ipynb) shows how to use it |
+| **contribute** | [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md) — add a question the coach gets wrong: ten minutes, no code |
+| **hand in** | `uv run bootcamp submit chNN --github <you> --push` — see [Handing in](#handing-in) |
+| **see the leaderboard** | [`TRACK.md` in the submissions repository](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md) |
+| **run a model on a small laptop** | [`demos/04_ollama_on_colab.ipynb`](demos/04_ollama_on_colab.ipynb) |
+| **read the course as a website** | [gecko-academy.github.io/dev3pack-cohort-2026-09/](https://gecko-academy.github.io/dev3pack-cohort-2026-09/) |
+
+Inside a notebook, **everything that runs as shipped is already done for you**.
+Each session has exactly one cell that does not — its heading says
+**"Challenge"**, and it tells you what it is worth, what done looks like, and gives
+you a tip.
+
+### Handing in
+
+```bash
+git pull                                              # always first: fixes reach you this way
+uv run bootcamp check ch04                            # the scorecard, before you submit
+uv run bootcamp submit ch04 --github <you> --push     # opens the pull request for you
+```
+
+Submissions go to **[Gecko-Academy/dev3pack-submissions](https://github.com/Gecko-Academy/dev3pack-submissions)**, never to this
+repository. In the pull request's *Files changed* tab, every file should start
+with `submissions/<you>/`. It merges on its own once its check is green.
 
 ## For coding assistants
 
@@ -92,7 +128,7 @@ Three threads recur: [loop](docs/guides/loop-engineering.md), [graph](docs/guide
 | Kind | Where | Role |
 |---|---|---|
 | **Week 0 units** (`w01`–`w12`) | [units/en/](units/en/) | Self-paced, ungraded, available now. The fast lane is the floor Session 1 assumes. |
-| **Sessions** (`session-01`–`15`) | same tree | Live, weekday, two hours. Introduction, concepts, quiz, exercise notebook, solutions. Session 15 has no notebook. |
+| **Sessions** (`session-01`–`15`) | same tree | Live, weekday, two hours. Introduction, concepts, quiz, exercise notebook, and a demo. Solutions for sessions 1–3 only. Session 15 has no notebook. |
 | **Capstone** | units/en/unit2/capstone/ — opens with week 2 | Built between sessions from week 2. `src/bootcamp_agent/` is the finished shape. |
 | **Bonus / depth / cookbook / workspaces** | linked below | Optional. Never counted. |
 
@@ -117,6 +153,7 @@ Where everything lives, and what a student receives.
 | `depth/` | Six optional software-engineering modules, about 45 minutes each. Never counted. | day one |
 | `cookbook/` | Ten Gecko notebooks, from comprehending an OpenAPI spec to a verified loop on a fork. Optional. | day one |
 | `workspaces/` | Four open projects to build in. Optional, unmarked, no checks. | day one |
+| `projects/` | Real-world projects: a brief, open data, a local model and ChromaDB. Optional, never counted; needs `uv sync --extra projects`. | day one |
 | `demos/` | Short notebooks to run in class and again afterwards. Never graded, never submitted; they make one idea concrete in a few minutes. | day one |
 | `ship-it/` | The optional launch track: turn the capstone into an MCP server somebody else can call, and a storefront an agent can buy from. Offline and never counted. | day one |
 | `integrations/` | Worked integrations the sessions link into rather than re-explain. | day one |
@@ -165,7 +202,7 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (44 paths). |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (47 paths). |
 | Week 1 | Mon 14 Sep | unit1 |
 | Week 2 | Mon 21 Sep | unit2 |
 | Week 3 | Mon 28 Sep | unit3 |
@@ -175,9 +212,11 @@ more week lands and you `git pull`.
 A correction is withdrawn as well as added: the publisher removes a file the current week no longer contains, so a fix actually reaches somebody who already pulled.
 
 <!-- release-plan:end -->
-Solutions are separate again: a session's `solutions/` notebook is released
-after that session, so you meet an exercise before its answer is one folder
-away. Until then, `hint(reveal=True)` is the worked answer, and it costs marks.
+Solutions: week 0 and sessions 1–3 carry a `solutions/` notebook. From session 4
+on, they do not. Each session ships with everything running except one cell, and
+that cell is yours to solve — a solution would only be that cell, answered. When
+you are stuck, `hint(reveal=True)` is the worked answer (it costs marks), and
+`coach(...)` answers from the course pages for free.
 
 ## Week 0
 
@@ -185,57 +224,57 @@ Self-paced. Handed in as a record, never marked. Short on time? Do the four 45-m
 
 ### Fast lane
 
-| # | Unit | You leave able to |
-|---|---|---|
-| 1 | [The environment](units/en/unit0/w01-environment/) | Prove which Python and repo environment will run the course |
-| 2 | [Packages and documentation](units/en/unit0/w02-packages-and-docs/) | Read an installed package instead of guessing its API |
-| 3 | [Classes and contracts](units/en/unit0/w03-classes-and-contracts/) | Turn a prose requirement into a typed boundary |
-| 4 | [Calling a real API](units/en/unit0/w04-real-apis/) | Make one bounded HTTP call through an adapter you own |
+| # | Unit | You leave able to | Exercise |
+|---|---|---|---|
+| 1 | [The environment](units/en/unit0/w01-environment/) | Prove which Python and repo environment will run the course | [notebook](units/en/unit0/w01-environment/notebook.ipynb) |
+| 2 | [Packages and documentation](units/en/unit0/w02-packages-and-docs/) | Read an installed package instead of guessing its API | [notebook](units/en/unit0/w02-packages-and-docs/notebook.ipynb) |
+| 3 | [Classes and contracts](units/en/unit0/w03-classes-and-contracts/) | Turn a prose requirement into a typed boundary | [notebook](units/en/unit0/w03-classes-and-contracts/notebook.ipynb) |
+| 4 | [Calling a real API](units/en/unit0/w04-real-apis/) | Make one bounded HTTP call through an adapter you own | [notebook](units/en/unit0/w04-real-apis/notebook.ipynb) |
 
 ### Course A — Software engineering foundations
 
-| # | Unit |
-|---|---|
-| 5 | [Packages, PyPI and PEP 8](units/en/unit0/w05-packages-and-pep8/) |
-| 6 | [A portable package](units/en/unit0/w06-portable-packages/) |
-| 7 | [Classes in a package](units/en/unit0/w07-classes-in-packages/) |
-| 8 | [Documentation, tests and readability](units/en/unit0/w08-docs-tests-readability/) |
+| # | Unit | Exercise |
+|---|---|---|
+| 5 | [Packages, PyPI and PEP 8](units/en/unit0/w05-packages-and-pep8/) | [notebook](units/en/unit0/w05-packages-and-pep8/notebook.ipynb) |
+| 6 | [A portable package](units/en/unit0/w06-portable-packages/) | [notebook](units/en/unit0/w06-portable-packages/notebook.ipynb) |
+| 7 | [Classes in a package](units/en/unit0/w07-classes-in-packages/) | [notebook](units/en/unit0/w07-classes-in-packages/notebook.ipynb) |
+| 8 | [Documentation, tests and readability](units/en/unit0/w08-docs-tests-readability/) | [notebook](units/en/unit0/w08-docs-tests-readability/notebook.ipynb) |
 
 ### Course B — MCP
 
-| # | Unit |
-|---|---|
-| 9 | [Your first MCP server](units/en/unit0/w09-mcp-first-server/) |
-| 10 | [Resources, prompts, and the LLM](units/en/unit0/w10-mcp-resources-prompts-llms/) |
-| 11 | [Databases, APIs, and third-party servers](units/en/unit0/w11-mcp-data-apis-third-party/) |
+| # | Unit | Exercise |
+|---|---|---|
+| 9 | [Your first MCP server](units/en/unit0/w09-mcp-first-server/) | [notebook](units/en/unit0/w09-mcp-first-server/notebook.ipynb) |
+| 10 | [Resources, prompts, and the LLM](units/en/unit0/w10-mcp-resources-prompts-llms/) | [notebook](units/en/unit0/w10-mcp-resources-prompts-llms/notebook.ipynb) |
+| 11 | [Databases, APIs, and third-party servers](units/en/unit0/w11-mcp-data-apis-third-party/) | [notebook](units/en/unit0/w11-mcp-data-apis-third-party/notebook.ipynb) |
 
 ### Course C — Data structures for agents
 
-| # | Unit |
-|---|---|
-| 12 | [Data structures for agents](units/en/unit0/w12-dsa-for-agents/) |
+| # | Unit | Exercise |
+|---|---|---|
+| 12 | [Data structures for agents](units/en/unit0/w12-dsa-for-agents/) | [notebook](units/en/unit0/w12-dsa-for-agents/notebook.ipynb) |
 
 ## Weeks 1-3
 
-Each live session is one directory under `units/en/session-NN-*/`.
+Each live session is one directory under `units/en/unit1/`, `unit2/` or `unit3/`. **Exercise** opens the notebook you work in; **Demo** is the one run in class. A session that has not happened yet may not be in your copy — `git pull`.
 
-| # | Day | Session | You leave with |
-|---|---|---|---|
-| 1 | Mon 14 Sep | [Configure the assistant](units/en/unit1/session-01-assistant-configuration/) | Repo instructions the assistant must read before it edits |
-| 2 | Tue 15 Sep | [Call a model through the adapter](units/en/unit1/session-02-model-adapter/) | One adapter, two lanes, failures that refuse instead of traceback |
-| 3 | Wed 16 Sep | [Structured outputs](units/en/unit1/session-03-structured-outputs/) | A typed answer; retry once, then refuse |
-| 4 | Thu 17 Sep | [Bounded tools](units/en/unit1/session-04-bounded-tools/) | Read-only tools whose boundaries you can prove |
-| 5 | Fri 18 Sep | [A deterministic mini-agent](units/en/unit1/session-05-deterministic-mini-agent/) | A loop that stops, notices repeats, and exits safely |
-| 6 | Mon 21 Sep | A retrieval baseline — not yet | A corpus loader and lexical retrieval — plus the ways it fails |
-| 7 | Tue 22 Sep | Retrieval and grounding metrics — not yet | Hit rate, grounding rate, and the cost of one fix |
-| 8 | Wed 23 Sep | Loops and graphs — not yet | Chain vs loop vs graph; illegal edges do not move |
-| 9 | Thu 24 Sep | Trace and evaluate — not yet | A redacted event log and named error buckets |
-| 10 | Fri 25 Sep | Skills and an ADR — not yet | A `SKILL.md` and a decision that names its reversal |
-| 11 | Mon 28 Sep | State and memory — not yet | Session state, a retention policy, cross-user isolation |
-| 12 | Tue 29 Sep | MCP architecture — not yet | Host / client / server; a surface read as claims |
-| 13 | Wed 30 Sep | Build and secure an MCP server — not yet | A fetch guard that refuses *before* it fetches |
-| 14 | Thu 1 Oct | Deploy and operate — opens Thu 01 Oct | A smoke test and the rollback sentence |
-| 15 | Fri 2 Oct | Defend the capstone — opens Fri 02 Oct | A demo, then a failure diagnosed from your own traces |
+| # | Day | Session | You leave with | Exercise | Demo |
+|---|---|---|---|---|---|
+| 1 | Mon 14 Sep | [Configure the assistant](units/en/unit1/session-01-assistant-configuration/) | Repo instructions the assistant must read before it edits | [notebook](units/en/unit1/session-01-assistant-configuration/notebook.ipynb) | — |
+| 2 | Tue 15 Sep | [Call a model through the adapter](units/en/unit1/session-02-model-adapter/) | One adapter, two lanes, failures that refuse instead of traceback | [notebook](units/en/unit1/session-02-model-adapter/notebook.ipynb) | [demo](units/en/unit1/session-02-model-adapter/demo.ipynb) |
+| 3 | Wed 16 Sep | [Structured outputs](units/en/unit1/session-03-structured-outputs/) | A typed answer; retry once, then refuse | [notebook](units/en/unit1/session-03-structured-outputs/notebook.ipynb) | [demo](units/en/unit1/session-03-structured-outputs/demo.ipynb) |
+| 4 | Thu 17 Sep | [Bounded tools](units/en/unit1/session-04-bounded-tools/) | Read-only tools whose boundaries you can prove | [notebook](units/en/unit1/session-04-bounded-tools/notebook.ipynb) | [demo](units/en/unit1/session-04-bounded-tools/demo.ipynb) |
+| 5 | Fri 18 Sep | [A deterministic mini-agent](units/en/unit1/session-05-deterministic-mini-agent/) | A loop that stops, notices repeats, and exits safely | [notebook](units/en/unit1/session-05-deterministic-mini-agent/notebook.ipynb) | — |
+| 6 | Mon 21 Sep | A retrieval baseline — not yet | A corpus loader and lexical retrieval — plus the ways it fails | notebook — not yet | — |
+| 7 | Tue 22 Sep | Retrieval and grounding metrics — not yet | Hit rate, grounding rate, and the cost of one fix | notebook — not yet | — |
+| 8 | Wed 23 Sep | Loops and graphs — not yet | Chain vs loop vs graph; illegal edges do not move | notebook — not yet | — |
+| 9 | Thu 24 Sep | Trace and evaluate — not yet | A redacted event log and named error buckets | notebook — not yet | — |
+| 10 | Fri 25 Sep | Skills and an ADR — not yet | A `SKILL.md` and a decision that names its reversal | notebook — not yet | — |
+| 11 | Mon 28 Sep | State and memory — not yet | Session state, a retention policy, cross-user isolation | notebook — not yet | — |
+| 12 | Tue 29 Sep | MCP architecture — not yet | Host / client / server; a surface read as claims | notebook — not yet | — |
+| 13 | Wed 30 Sep | Build and secure an MCP server — not yet | A fetch guard that refuses *before* it fetches | notebook — not yet | — |
+| 14 | Thu 1 Oct | Deploy and operate — not yet | A smoke test and the rollback sentence | notebook — not yet | — |
+| 15 | Fri 2 Oct | Defend the capstone — opens Fri 02 Oct | A demo, then a failure diagnosed from your own traces | — | — |
 
 Session 13 uses an instructor-hosted Gecko MCP surface; the URL is handed out in class.
 
@@ -257,6 +296,11 @@ Optional. Never counted. Never required for the certificate.
 | 4 | [Long-term memory, consent, and deletion](units/en/bonus/b04-memory-consent-deletion/) |
 | 5 | [Deploy, evaluate, and tear down](units/en/bonus/b05-deploy-evaluate-teardown/) |
 
+- **[demos/](demos/)** — notebooks run in class, to run again afterwards: [an API request up close](demos/01_api_request_up_close.ipynb) (real calls to a public pet API), [one question three ways](demos/02_one_question_three_ways.ipynb) (prompt vs API vs MCP), [regex, parsing and retrieval](demos/03_regex_parsing_retrieval.ipynb), [Ollama on Colab](demos/04_ollama_on_colab.ipynb) for small laptops, and [the coach up close](demos/05_the_coach_up_close.ipynb).
+- **[projects/](projects/)** — real-world projects on open data with a local model and ChromaDB. [Project 01: what are customers really saying?](projects/01-clothing-reviews/notebook.ipynb) Needs `uv sync --extra projects`.
+- **[ship-it/](ship-it/)** — turn the capstone into a surface somebody else can call, and a storefront an agent can buy from.
+- **[Demos and explainers](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/demos/introduction)** — Transformer Explainer, LLM Visualization, Tiktokenizer, Regexper, the Embedding Projector and more, each mapped to the session it helps.
+- **Two helpers inside every notebook:** `coach("…")` answers from the course pages, and `bootcamp_agent.patterns` builds a regular expression from plain words — `phrase("you must now")`, `near(one_of("send"), one_of("api key"))` — so nobody has to write regex by hand.
 - **[depth/](depth/)** — six software-engineering modules (~45 minutes each): boundaries, data, architecture, reliability, production, graph RAG.
 - **[cookbook/](cookbook/)** — ten Gecko notebooks, from comprehending an OpenAPI spec to a verified loop on an instructor-hosted fork.
 - **[workspaces/](workspaces/)** — four open projects (corpus Q&A, retrieval lab, Autonomous Store, news-to-Telegram).

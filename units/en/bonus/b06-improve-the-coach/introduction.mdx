@@ -4,24 +4,63 @@
 
 ## Outcome
 
-Take a tool you use daily, measure how bad it is, change one thing, measure
-again, and report both numbers — including whatever got worse. Then open the
-pull request.
+Make the coach better for everyone in the cohort, prove it with a number, and
+open a pull request.
 
-## The tool
+**You do not need to know how retrieval works to start.** The smallest
+contribution takes ten minutes and no code: find a question the coach gets
+wrong, and write it down.
 
-The coach you call in your notebook:
+## Where the coach lives
 
-```python
-from bootcamp_agent.coach import coach
-coach("what is AGENTS.md for?")
+There are two copies, and each has a job:
+
+| | Where | What you do there |
+|---|---|---|
+| **In your notebooks** | `bootcamp_agent.coach` | **use** it: `coach("your question")` |
+| **Its own repository** | [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach) | **improve** it: change, measure, open a pull request |
+
+Both rank pages the same way. Contributions go to **gecko-ai-coach**. The course
+repository is published fresh every week, so a pull request against your clone
+of it has nowhere to land.
+
+## Before you change anything
+
+Run [demo 5 — the coach, up close](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/05_the_coach_up_close.ipynb).
+In ten minutes you ask the coach a question, see why one page beat another,
+watch it refuse, and find a question it gets wrong and the reason why. That
+reason is where every improvement starts.
+
+## Pick your size
+
+Each step is a complete contribution. Start at the top.
+
+| Step | Time | Code? | What you hand in |
+|---|---|---|---|
+| [1 — Add a question the coach gets wrong](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md#rung-1--add-a-question-the-coach-gets-wrong) | 10 min | no | one file, made by one command |
+| [2 — Explain a miss](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md#rung-2--explain-a-miss) | 30 min | no | an issue, or a corrected label |
+| [Translate the README](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md#translate-the-readme) | 30 min | no | a reviewed Portuguese or Spanish draft, or a new language |
+| [3 — Change one knob, and measure it](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md#rung-3--change-one-knob-and-measure-it) | 1–2 h | a few lines | before and after, on named sets |
+
+Step 1 is one command, and it tells you whether your question is really a miss
+before it saves anything:
+
+```bash
+uv run ai-coach propose "how do I hand in a session" --page unit0/how-to-submit \
+  --pages ../dev3pack-cohort-2026-09/units/en --write
 ```
 
-It is a keyword retriever over the course pages. It is deliberately plain: every
-knob is visible in one short file, and the baseline is the same lexical overlap
-you build in session 6. You already know how it works.
+[CONTRIBUTING.md](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md)
+has every git step, from the first clone to the pull request. The
+[good first issues](https://github.com/Gecko-Academy/gecko-ai-coach/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+are real misses, each with the command that reproduces it.
 
 ## The number
+
+Every change is judged by one number: on a set of labelled questions, how often
+is the right page in the top three?
+
+In a notebook:
 
 ```python
 from bootcamp_agent.coach_eval import measure
@@ -29,45 +68,50 @@ measure()
 ```
 
 ```
-hit rate 18/25 = 72% (top-k)
+hit rate 21/25 = 84% (top-k)
 
 missed:
-  how do I hand my work in
-      got: tracks/final-assignment/introduction, unit0/ask-your-assistant, unit0/get-settled
   ...
 ```
 
-Twenty-five labelled questions in `data/evals/coach.jsonl`, each with the pages
-that should have answered it. A hit means the right **page** was reached. That
-metric is weak on purpose — it says nothing about whether the passage answers
-the question, and replacing it with a better one is itself a contribution.
+In gecko-ai-coach, on three sets:
 
-## A worked example, and it does not end how you expect
+```bash
+uv run ai-coach measure --pages ../dev3pack-cohort-2026-09/units/en --cases data/dev3pack.jsonl
+```
 
-The retriever returns three passages. Is three right? Nobody measured it. So
-measure it:
+Your number depends on **which weeks are in your clone**: a page you do not have
+yet cannot be found. Measure before and after on the same clone, or the
+difference means nothing.
+
+A hit means the right **page** was reached. That metric is weak on purpose: it
+says nothing about whether the passage answers the question. A better metric is
+itself a contribution.
+
+## Two lessons the number teaches
+
+### A bigger number is not always a better coach
+
+The coach returns three passages. Is three right? Measure it:
 
 ```python
-measure()            # 18/25 = 72%   as shipped
-measure(top_k=5)     # 20/25 = 80%
-measure(top_k=8)     # 22/25 = 88%
+measure()            # 20/25 = 80%   as shipped
+measure(top_k=5)     # 22/25 = 88%
+measure(top_k=8)     # 22/25 = 88%   and no further: the curve flattened
 ```
 
 Eight points for one argument. Take the win?
 
-**No — read what you bought.** The metric asks "was the right page anywhere in
-what came back". Of course returning more passages wins: at `top_k=25` it would
-score 100% and be useless. You did not make retrieval better, you made the
-learner read more and moved the work onto them. The number went up because the
-metric cannot see the cost.
+**No. Read what you bought.** The metric asks "was the right page anywhere in
+what came back". Of course more passages win: at `top_k=25` it would score 100%
+and be useless. Retrieval did not get better. The learner now reads more, and the
+metric cannot see that cost.
 
-That is the first thing to learn here: **a metric you can game is a metric you
-will game by accident.** A better one — did the returned passage actually answer
-the question — is itself a contribution, and a more valuable one than any knob.
+**A metric you can game is a metric you will game by accident.**
 
-### And one that was a real win, until it was not
+### A win on one snapshot can vanish on the next
 
-Chunk size looked like the answer. Measured on an earlier corpus:
+Chunk size looked like a real win on an earlier corpus:
 
 ```
 max_chars=800   18/25 = 72%     as shipped
@@ -75,53 +119,42 @@ max_chars=400   19/25 = 76%     smaller chunks concentrate the signal
 max_chars=300   17/25 = 68%     too small; the curve is not monotonic
 ```
 
-A genuine four-point win, and the non-monotonic curve is exactly why you measure
-instead of reasoning.
-
-**Then two pages were added to the course, and it vanished.** On today's corpus
-every chunk size from 200 to 1200 scores 18/25 or worse. Nothing was changed in
-the retriever — the *corpus grew*, the new pages competed, and a tuned constant
+Then two pages were added to the course, and the gain disappeared. Nobody changed
+the retriever. The corpus grew, the new pages competed, and a tuned constant
 stopped being tuned.
 
-Nothing about that is a failure. It is what a measurement is for. An improvement
-that only holds for one snapshot of the data is a fact about that snapshot, and
-the only way you ever find out is by running the number again.
-
-## Things worth trying
-
-- **Chunk size** — worked above; there is more in it
-- **The stopword list** in `retrieval.py` — which words are you throwing away that carry meaning here?
-- **Title weighting** — a page titled "Handing work in" should win a question about handing work in. *I tried this and it moved nothing. Find out why, or find the version that works*
-- **Query expansion** — "submit" and "hand in" are the same question
-- **A better metric** — does the passage answer the question, or did we just reach its page?
-- **More labelled questions** — twenty-five is thin, and the set is a contribution too
-
-## Not only code
-
-The same bar applies to **translating the course**. `units/<lang>/` is a mirror
-of `units/en/`, and the layout was built for it from the start. A README or a
-unit-0 page in another language is a real contribution to a real course, and for
-many people it is the most useful pull request they can make.
+That is not a failure. It is what measuring is for: **an improvement that holds
+for one snapshot of the data is a fact about that snapshot.** You only find out
+by running the number again. This is why gecko-ai-coach keeps a **held-out set**
+that nobody tunes on.
 
 ## Evidence artifact
 
-- The before number and the after number, both from `measure()`
-- **One thing that got worse**, or an honest statement that nothing did
-- The pull request, in [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach) or in the course repository
+- **Step 1:** the pull request that adds your question, with what the coach
+  returned
+- **Step 2:** the issue or label fix, naming the pages and the cause
+- **Step 3:** the before and after numbers on every set, **one thing that got
+  worse** (or an honest statement that nothing did), and the pull request
 
 ## Failure clinic
 
-- **A number with no before.** "76%" alone says nothing
-- **Measuring on the questions you tuned against.** Add your new questions *after* you measure, or you are grading your own homework — session 7 is exactly this
-- **A change you cannot explain.** If you do not know why it helped, you do not know when it will stop helping
-- **Reporting only the win.** The regression you hide is the one that bites somebody else
+- **A number with no before.** "76%" alone says nothing.
+- **Tuning on the held-out set.** Run it once, at the end. If you change the code
+  after you see it, it is no longer held out. Session 7 is exactly this.
+- **Reporting only the win.** The regression you hide is the one that bites
+  somebody else.
+- **A change you cannot explain.** If you do not know why it helped, you do not
+  know when it will stop helping.
+- **A pull request against the course clone.** It is regenerated every week.
+  Contribute in [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach) instead.
 
 ## Reference
 
-- `src/bootcamp_agent/coach.py` — the retriever and the corpus
-- `src/bootcamp_agent/coach_eval.py` — the measurement
-- `data/evals/coach.jsonl` — the labelled set
-- [Give the course to your assistant](../../unit0/ask-your-assistant.mdx) — the same engine, as an MCP server
+- [Demo 5 — the coach, up close](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/05_the_coach_up_close.ipynb): use it, read it, find a miss
+- [gecko-ai-coach CONTRIBUTING.md](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md): every step, with git commands
+- [Good first issues](https://github.com/Gecko-Academy/gecko-ai-coach/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- `src/bootcamp_agent/coach.py` and `coach_eval.py`: the copy in your notebooks
+- [Give the course to your assistant](../../unit0/ask-your-assistant.mdx): the same coach, as an MCP server
 
 <!-- navigation:start -->
 <!-- navigation:end -->

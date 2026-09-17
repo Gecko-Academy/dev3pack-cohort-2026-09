@@ -1,0 +1,24 @@
+{"question": "where do I send my finished notebook", "expected_doc_ids": ["unit0/how-to-submit"]}
+{"question": "my pull request has no checks and never merges", "expected_doc_ids": ["unit0/how-to-submit"]}
+{"question": "what does --push do", "expected_doc_ids": ["unit0/how-to-submit"]}
+{"question": "is ollama free and does it need a key", "expected_doc_ids": ["unit0/local-model", "unit0/runtime-lanes"]}
+{"question": "my laptop only has 8GB of RAM", "expected_doc_ids": ["unit0/local-model", "tracks/demos/introduction"]}
+{"question": "what is a lane", "expected_doc_ids": ["unit0/runtime-lanes"]}
+{"question": "why does my parser reject the extra field", "expected_doc_ids": ["unit1/session-03-structured-outputs/concepts-2"]}
+{"question": "confidence of 7 is rejected why", "expected_doc_ids": ["unit1/session-03-structured-outputs/concepts-2"]}
+{"question": "what is a golden question", "expected_doc_ids": ["unit1/session-03-structured-outputs/concepts-3"]}
+{"question": "my unsupported question still retrieves a document", "expected_doc_ids": ["unit1/session-03-structured-outputs/concepts-3"]}
+{"question": "what makes a function a good tool", "expected_doc_ids": ["unit1/session-04-bounded-tools/concepts-1"]}
+{"question": "should I clamp max_results or trust it", "expected_doc_ids": ["unit1/session-04-bounded-tools/concepts-2"]}
+{"question": "why refuse file:///etc/passwd", "expected_doc_ids": ["unit1/session-04-bounded-tools/concepts-2"]}
+{"question": "what is prompt injection in tool output", "expected_doc_ids": ["unit1/session-04-bounded-tools/concepts-3"]}
+{"question": "my guard flags an innocent sentence", "expected_doc_ids": ["unit1/session-04-bounded-tools/concepts-3"]}
+{"question": "when should an agent loop stop", "expected_doc_ids": ["unit1/session-05-deterministic-mini-agent/concepts-2", "unit1/session-05-deterministic-mini-agent/concepts-3"]}
+{"question": "the same tool is called twice in a row", "expected_doc_ids": ["unit1/session-05-deterministic-mini-agent/concepts-2"]}
+{"question": "where are the demos", "expected_doc_ids": ["tracks/demos/introduction"]}
+{"question": "what is an embedding", "expected_doc_ids": ["tracks/projects/introduction"]}
+{"question": "how do I read a t-SNE plot", "expected_doc_ids": ["tracks/projects/introduction"]}
+{"question": "why is my review its own nearest neighbour", "expected_doc_ids": ["tracks/projects/introduction"]}
+{"question": "how can I contribute to the coach", "expected_doc_ids": ["bonus/b06-improve-the-coach/introduction"]}
+{"question": "what is the final assignment", "expected_doc_ids": ["tracks/final-assignment/introduction"]}
+{"question": "how do I give the course to claude code", "expected_doc_ids": ["unit0/ask-your-assistant"]}

@@ -109,6 +109,10 @@
       title: "Boundary tests: oversized input, forbidden targets"
     - local: unit1/session-04-bounded-tools/concepts-3
       title: "Tool output is untrusted"
+    - local: unit1/session-04-bounded-tools/contract-in-plain-words
+      title: "What \"contract\" means, in plain words"
+    - local: unit1/session-04-bounded-tools/follow-along
+      title: "Follow along: today's class"
     - local: unit1/session-04-bounded-tools/quiz
       title: "Quick quiz (ungraded)"
     - local: unit1/session-04-bounded-tools/conclusion
@@ -147,6 +151,14 @@
   sections:
   - local: tracks/ship-it/introduction
     title: "Ship It track (optional)"
+- title: "Demos and explainers"
+  sections:
+  - local: tracks/demos/introduction
+    title: "Demos and explainers"
+- title: "Real-world projects"
+  sections:
+  - local: tracks/projects/introduction
+    title: "Real-world projects"
 - title: "(Optional) Bonus units"
   sections:
   - title: "Bonus 1. Graph RAG and hybrid search"

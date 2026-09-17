@@ -13,6 +13,7 @@ intent.
 | [2 — One question, three ways](02_one_question_three_ways.ipynb) | A prompt, an API, and an MCP tool answering the same question — and why the third exists |
 | [3 — Regex, parsing, retrieval](03_regex_parsing_retrieval.ipynb) | Three ways to get data out of text, each doing its job and then failing at somebody else's |
 | [4 — Ollama on Google Colab](04_ollama_on_colab.ipynb) | **If your laptop has 8 GB of RAM.** Run a real 7B model on Colab's free GPU instead — no key, no card, nothing installed locally |
+| [5 — The coach, up close](05_the_coach_up_close.ipynb) | Ask the course a question, open the page it came from, watch it refuse and miss, find out why — and turn a wrong answer into your first pull request |
 
 ## They run offline
 
@@ -36,5 +37,5 @@ If you have twenty minutes before a session, run **3** first. Regex, parsing and
 retrieval turn up in almost every session after week 0, and the silent-failure
 example in section 1 is the one people remember a month later.
 
-See also [docs/guides/visual-explainers.md](../docs/guides/visual-explainers.md)
-— things to open in a browser and play with, mapped to the sessions they help.
+The same list, plus things to open in a browser and play with, is on the course
+site under **Demos and explainers**.

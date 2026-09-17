@@ -25,6 +25,17 @@ spreadsheet = ["openpyxl>=3.1"]
 # The readable course site. MDX with `<Question>` blocks renders as raw JSX
 # anywhere that just reads the file, so the pages are built rather than read.
 site = ["markdown-it-py>=3.0", "pyyaml>=6.0"]
+# Real-world projects: embeddings, a 2-D map and a vector database. Heavy (ChromaDB
+# alone brings dozens of packages), so it never lands on a learner's default
+# `uv sync`. The checks that grade these projects import none of it.
+projects = [
+  "chromadb>=1.0,<2",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "scikit-learn>=1.4",
+  "scipy>=1.12",
+  "matplotlib>=3.8",
+]
 
 [dependency-groups]
 dev = [

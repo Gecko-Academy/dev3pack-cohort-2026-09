@@ -72,6 +72,11 @@ def collections() -> tuple[tuple[tuple[str, ...], str, str], ...]:
             "Run in class and again afterwards. Never graded.",
         ),
         (
+            ("projects",),
+            "Real-world projects",
+            "Open data, a local model and ChromaDB. Needs the `projects` extra.",
+        ),
+        (
             ("ship-it",),
             "Ship It track — optional",
             "Turn your capstone into a surface another agent can buy from. Ungraded.",

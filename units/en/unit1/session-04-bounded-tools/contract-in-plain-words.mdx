@@ -1,0 +1,78 @@
+# What "contract" means, in plain words
+
+Today you hear the word **contract** many times. This page says what it means,
+with no jargon.
+
+## The short version
+
+A **contract** is the written promise a tool makes:
+
+- what it **accepts**
+- what it **gives back**
+- what it **refuses**
+
+The model reads only that promise. It never reads your Python. So the promise
+has to be exact, and your code has to keep it.
+
+> **A tool is a function with a promise written on it. The model reads the
+> promise; your code keeps it.**
+
+## The four parts of a contract
+
+| Part | The question it answers | Example: `convert_currency` |
+|---|---|---|
+| **Inputs** | What may I pass? | `amount`: a positive number. `source` and `target`: three uppercase letters |
+| **Output** | What do I get back? | `100 USD = 86.66 EUR (rate 0.8666)` |
+| **Limits** | How much, and where? | One host only: `api.frankfurter.dev` |
+| **Refusals** | What happens when I break the rules? | `-5` is refused. `usd` is refused. `XYZ` is refused **with the list of currencies that do exist** |
+
+## Why "contract", and not just "function"
+
+A normal function trusts whoever calls it, because a programmer wrote the call.
+
+A tool is called by a **model**, and a model **guesses**:
+
+- `"Taxi"` instead of `"taxi"`
+- `"real"` instead of `"BRL"`
+- `-900` instead of `900`
+
+So the tool checks its contract **itself**, on every call:
+
+- **A good argument** gets the promised output.
+- **A bad argument** gets a clear refusal, **before** anything happens. The
+  refusal says what would have worked, so the model can fix its next guess.
+
+A refusal like `unknown tag` leaves the model guessing again. A refusal like
+`unknown tag 'nonsense'; valid tags: ['agents', 'mcp', ...]` lets it correct
+itself on the next call.
+
+## Today's example: four clauses
+
+Challenge `ch04-e1` is a contract with four clauses. Two of them are refusals.
+
+| Call | Must do |
+|---|---|
+| `list_documents()` | return every document id |
+| `list_documents(tag="retrieval")` | return only the documents with that tag |
+| `list_documents(tag="nonsense")` | refuse, and **name the valid tags** |
+| `list_documents(tag="")` | refuse: an empty tag is not "no tag" |
+
+The check turns green only when the tool keeps **all four** promises.
+
+## The contract has two halves
+
+| Half | Who reads it | Where it lives |
+|---|---|---|
+| **The description** | the model | the tool's `name`, `description` and input schema |
+| **The enforcement** | nobody. It just runs | the checks at the top of your function |
+
+If the description promises something the code does not check, the model
+trusts a promise nobody keeps. If the code refuses something the description
+never mentioned, the model cannot learn why it keeps failing. **Write both, and
+make them say the same thing.**
+
+## Where to go next
+
+- [A tool is a contract](concepts-1.mdx): the registry and the narrow schema
+- [Boundary tests](concepts-2.mdx): refusing oversized input and forbidden targets
+- [Tool output is untrusted](concepts-3.mdx): the other direction, what a tool **returns**
