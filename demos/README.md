@@ -17,6 +17,7 @@ intent.
 | [6 — Jupyter for beginners](06_jupyter_for_beginners.ipynb) | **Never used a notebook?** Cells, run order, the kernel, how to read an error, and the restart habit that saves the most time |
 | [7 — The coach, in a chat](07_the_coach_in_a_chat.ipynb) | Session 5's four exits as four replies to a person, on a recorded chat — then a real one, if you have a token |
 | [8 — The weekly challenge](08_the_weekly_challenge.ipynb) | Ana's expense bot: three tools that refuse by name, a page that talks to the model, and the week-1 challenge scored 300/500 |
+| [9 — RAG on your laptop](09_rag_on_your_laptop.ipynb) | Today's retriever plus a model on your laptop. Alone, the model invents. With the right pages it answers and cites them. An empty search refuses before the model runs, and the wrong pages still come back with confidence 1.0 |
 
 ## They run offline
 
@@ -24,6 +25,8 @@ Every one works with no key and no account. Demo 1 makes **real** calls to the
 public [Swagger Petstore](https://petstore3.swagger.io/) — including a write —
 and every cell degrades to a printed "offline" note if there is no network, so a
 bad conference connection costs you nothing. Demo 2 does the same against GitHub.
+Demo 9 uses a local model through Ollama, and without one it replays a single
+recorded run and says so.
 
 Nothing in any demo can cost money or needs a credential.
 

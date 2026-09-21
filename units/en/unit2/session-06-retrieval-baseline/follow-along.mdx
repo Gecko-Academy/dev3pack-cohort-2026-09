@@ -6,7 +6,7 @@ run, in the order we run it in class.
 | Part | What | Time |
 |---|---|---|
 | [0](#0-before-we-start) | Before we start: pull week 2 | 5 min |
-| [1](#1-live-demo-one-question-two-retrievers) | Live demo: one question, two retrievers | 15 min |
+| [1](#1-live-demo-rag-on-your-laptop) | Live demo: RAG on your laptop | 15 min |
 | [2](#2-how-the-baseline-scores-a-passage) | How the baseline scores a passage | 15 min |
 | [3](#3-your-exercise) | Your exercise: a loader, a tag index, a failure table | 50 min |
 | [4](#4-break-it-on-purpose) | Break it on purpose: two failures that raise nothing | 15 min |
@@ -30,49 +30,43 @@ in milliseconds.
 Open two files:
 
 - `units/en/unit2/session-06-retrieval-baseline/notebook.ipynb` — today's exercise
-- [`demos/05_the_coach_up_close.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/05_the_coach_up_close.ipynb) — the demo we run together
+- [`demos/09_rag_on_your_laptop.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/09_rag_on_your_laptop.ipynb) — the demo we run together
 
 **No setup on your laptop?** Open the notebook in Colab. Its first cell fetches
 the course for you, in about 20 seconds.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/session-06-retrieval-baseline/notebook.ipynb)
 
-## 1. Live demo: one question, two retrievers
+## 1. Live demo: RAG on your laptop
 
 You have used a retriever all week without building one: the coach. Today you
-build its core. First, watch it fail.
+build its core. First, see what it is for.
 
-Two retrievers read **the same course pages**:
+Open [`demos/09_rag_on_your_laptop.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/09_rag_on_your_laptop.ipynb)
+and run it from the top. It puts a model after today's retriever, over the
+course pages. The model runs on your laptop: no key, no bill. **No Ollama?** The
+first cell says `[recorded]` and plays one real run instead. Nothing fails.
 
-- **the coach in your notebooks** — `bootcamp_agent.coach`
-- **[@gecko_coach_bot](https://t.me/gecko_coach_bot)** on Telegram — the same
-  coach, with two fixes it got this week
+Watch for four moments:
 
-In demo 5, run sections 1 and 2, then **section 6: Two retrievers, the same
-pages**. It asks your notebook two questions. Send the same two to the bot,
-from your phone, and compare.
+| Section | What happens |
+|---|---|
+| **2. The model alone** | Asked about this course with no pages, it answers fluently, and wrongly. |
+| **3. Retrieval first** | Given the right page, it answers correctly and cites that page. |
+| **4. Nothing retrieved** | It refuses before the model runs. There is no `llm_call` line. |
+| **5. The wrong pages** | Three unrelated pages come back, and so does an answer, with confidence 1.0. |
 
-**What to look for:**
+**The point of the demo:** the model is only as right as the pages it gets.
+Today you build the part that picks the pages.
 
-- **A word and its other forms are different words.** To a word counter, two
-  forms of one word never match. A contributor fixed one of these this weekend
-  and [measured it before and after](https://github.com/Gecko-Academy/gecko-ai-coach/pull/21):
-  **76% → 80%** on 25 course questions, and nothing got worse.
-- **A score is not an answer.** The coach in your notebook always returns its
-  top three, even when the best page shares one common word with your
-  question. The bot refuses when its best page covers too few of your words.
+**Why the questions are in the notebook, not on this page.** If this page quoted
+them, it would contain their words. It would rank first for them, and sections
+4 and 5 would stop working. A page that quotes a question wins, whether or not
+it answers it. That is today's third failure, one confident hit on the wrong
+document.
 
-**The point of the demo:** same pages, same question, different rules,
-different answers. The number above a passage counts shared words. It never
-says whether the passage answers you.
-
-**Why the questions are in the notebook, not on this page.** If this page
-quoted them, it would contain every word of both. It would rank first for both,
-and the bot would stop refusing. That is today's third failure, one confident
-hit on the wrong document, and it is the easiest one to cause by accident.
-
-Now go back to demo 5, section 2, and run the cell that switches all three
-adjustments off:
+Now open [demo 5](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/05_the_coach_up_close.ipynb),
+run sections 1 and 2, and run the cell that switches all three adjustments off:
 
 ```python
 show("where do I submit my work", bm25=False, title_weight=0, one_per_page=False)

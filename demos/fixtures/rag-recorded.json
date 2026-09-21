@@ -1,0 +1,15 @@
+{
+ "_provenance": {
+  "recorded": "2026-09-21",
+  "model": "qwen2.5:7b-instruct",
+  "lane": "one real run of the local model, replayed when no model is running",
+  "auth_sent": "none",
+  "is_evidence_of": "what this model returned for these three prompts on that run, byte for byte",
+  "is_not_evidence_of": "what it returns every time. No temperature is pinned, so a live run words things differently. Run it live to see yours."
+ },
+ "responses": {
+  "Question: what are the four stop reasons of the mini agent": "{\"answer\": \"The four stop reasons of the mini agent are `answered`, `budget`, `repeated_call`, and `tool_error`. \", \"citations\": [\"unit1/session-05-deterministic-mini-agent/introduction\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Question: what is the refund policy for the bootcamp": "{\"answer\": \"The assistant, controlled by the context and verification parts, would write a response based on the information available in the policy file. Since the policy file is written by the user, it could contain the refund policy for the bootcamp. However, the assistant would not invent or alter this policy; it would only provide the information as per the policy file.\", \"citations\": [\"unit1/session-01-assistant-configuration/concepts-1\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "what are the four stop reasons of the mini agent": "The four stop reasons of the mini agent are resource constraints, policy violations, task completion, and safety concerns. These reasons ensure the mini agent operates efficiently, safely, and legally."
+ }
+}
