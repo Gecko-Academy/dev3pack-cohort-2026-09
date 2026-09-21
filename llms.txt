@@ -55,11 +55,11 @@ uv run bootcamp submit chNN --github YOU  # build the hand-in bundle
 
 ## Unit 2 — Retrieval, graphs, evaluation, skills
 
-- Session 6. A retrieval baseline: arrives Mon 21 Sep, not published yet.
-- Session 7. Retrieval and grounding metrics: arrives Tue 22 Sep, not published yet.
-- Session 8. Loops and graphs: arrives Wed 23 Sep, not published yet.
-- Session 9. Trace and evaluate an agent: arrives Thu 24 Sep, not published yet.
-- Session 10. Skills and an architecture decision record: arrives Fri 25 Sep, not published yet.
+- [Session 6. A retrieval baseline](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit2/session-06-retrieval-baseline/introduction.html): Mon 21 Sep.
+- [Session 7. Retrieval and grounding metrics](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit2/session-07-grounding-metrics/introduction.html): Tue 22 Sep.
+- [Session 8. Loops and graphs](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit2/session-08-loops-and-graphs/introduction.html): Wed 23 Sep.
+- [Session 9. Trace and evaluate an agent](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit2/session-09-trace-and-evaluate/introduction.html): Thu 24 Sep.
+- [Session 10. Skills and an architecture decision record](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit2/session-10-skills-and-adr/introduction.html): Fri 25 Sep.
 
 ## Unit 3 — State, MCP, deployment, defense
 

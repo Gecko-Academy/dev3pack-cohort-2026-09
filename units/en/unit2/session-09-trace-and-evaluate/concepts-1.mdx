@@ -1,0 +1,87 @@
+# A trace, and what an event has to carry [[trace-anatomy]]
+
+## "It seemed to work" is a report about one run
+
+It is also a report by a motivated observer, on a run they chose to remember.
+Nothing in it survives a model upgrade, a prompt edit, or a colleague asking
+"are you sure".
+
+```bash
+uv run bootcamp-agent --eval
+```
+
+That is a report about the system: fixed cases, a defined pass condition,
+rerunnable by anyone. The difference between the two sentences is the whole of
+this session. Everything below is either the measurement or the evidence you
+read when the measurement goes red.
+
+## The event
+
+An agent that returns only an answer cannot be debugged. `answer_question`
+returns what it did as well:
+
+```python
+@dataclass(frozen=True)
+class TraceEvent:
+    kind: str  # "retrieve" | "tool_call" | "llm_call" | "decision"
+    detail: str
+```
+
+Two fields, and they are enough to bucket a failure:
+
+```
+[retrieve ] top_k=3 -> [('rag-basics', 0), ('rag-basics', 1), ('rag-basics', 2)]
+[llm_call ] attempt 1: 121 chars
+[decision ] answered with citations []
+```
+
+Retrieval returned `rag-basics`, three chunks of it. The model was called once.
+The answer cited nothing. Three lines, and the failure already has a name.
+
+## What an event has to carry to be worth keeping
+
+A trace is read by someone who was not there, later, in a hurry. Four questions
+get asked every time, and an event that cannot answer them is decoration.
+
+| Question | The field | What goes wrong without it |
+|---|---|---|
+| What kind of step was this? | `kind` | you cannot filter, count, or group anything |
+| What happened in it? | `detail` | you know a step occurred and nothing else |
+| Which run was this? | a run id | two runs interleave in one file and read as one |
+| When, and for how long? | a timestamp, a duration | you cannot tell slow from stuck |
+
+`kind` carries most of the weight, and it is worth being strict about the
+values. Four names you chose beat free text: `retrieve`, `tool_call`,
+`llm_call`, `decision` can be counted. "called the model (retry)" cannot.
+
+## Provider-neutral, on purpose
+
+Name the step you took, never the vendor you took it with.
+
+```python
+TraceEvent("llm_call", "attempt 1: 121 chars")          # yours
+TraceEvent("anthropic.messages.create", "200 in 840ms")  # theirs
+```
+
+The second line ties your log to one provider's API shape. Swap the provider in
+session 2's adapter and every dashboard, filter and comparison built on that log
+breaks — and worse, last month's runs stop being comparable with this month's.
+The provider belongs *inside* `detail` as a value. It does not belong in the
+name of the step.
+
+The same reasoning already shaped `LLMClient`: one seam, many providers behind
+it. A trace is that seam pointed at the past.
+
+## The trace is the input to everything else
+
+| Built on the trace | Session |
+|---|---|
+| the budget you can prove was respected | 5 |
+| the bucket a failure lands in | 9, this one |
+| the eval report's "why" column | 9 |
+| the incident you reconstruct after the fact | 14 |
+
+The next page spends that trace: it turns a red eval into a named bucket. The
+one after it asks the other question — what a trace must **not** carry, and what
+happens when part of it is missing. A trace is durable and it is trusted. Those
+are its two best properties, and its two worst failure modes.

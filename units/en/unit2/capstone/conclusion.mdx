@@ -1,0 +1,40 @@
+# Conclusion
+
+You shipped a source-grounded research assistant: it answers from a versioned
+corpus, names the documents behind each claim, refuses when nothing supports an
+answer, and keeps a trace of which of the two it did.
+
+## What you did
+
+- Nothing in it was written for the capstone — every part arrived as one
+  session's deliverable, with its own tests, and the project is the wiring.
+- The integration rule held that together: wiring, never logic, so a failing run
+  has one layer to look at instead of six.
+- `cap01-e1` read a cited answer, `cap01-e3` read the trace kinds, `cap01-e4`
+  read a green eval gate over the golden set.
+- `cap01-e5` is the one you wrote, and it is the list that makes session 14 a
+  backlog rather than a blank page.
+
+## The failure you handled
+
+A question the corpus does not answer. Retrieval comes back empty, the run
+refuses before a model call is spent, and `cap01-e2` reads the empty `calls` list
+as the proof.
+
+The second one behind it: a citation retrieval never returned, stripped rather
+than printed, with the flag and the trace line that say so.
+
+## What to carry forward
+
+That list is also demo day's honest limitation, prioritised weeks before anybody
+asked for it.
+
+## Into session 15
+
+Session 15 assumes the traces are on, the eval report is a number you produced,
+and you can say which architecture decision you would defend and what would
+reverse it.
+
+It does not assume the demo goes well: you draw a failure you did not prepare
+for, and failing safely with an accurate sentence is a pass. The one answer that
+fails is claiming it worked when the trace says otherwise.

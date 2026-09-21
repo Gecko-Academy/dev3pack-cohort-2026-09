@@ -139,6 +139,92 @@
       title: "Quick quiz (ungraded)"
     - local: unit1/session-05-deterministic-mini-agent/conclusion
       title: "Conclusion"
+- title: "Unit 2. Retrieval, graphs, evaluation, skills"
+  sections:
+  - title: "Session 6. A retrieval baseline — Mon 21 Sep"
+    sections:
+    - local: unit2/session-06-retrieval-baseline/introduction
+      title: "Introduction"
+    - local: unit2/session-06-retrieval-baseline/concepts-1
+      title: "The corpus, and a loader that refuses"
+    - local: unit2/session-06-retrieval-baseline/concepts-2
+      title: "Lexical retrieval, and what it cannot do"
+    - local: unit2/session-06-retrieval-baseline/concepts-3
+      title: "Three failures, and what each looks like"
+    - local: unit2/session-06-retrieval-baseline/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit2/session-06-retrieval-baseline/conclusion
+      title: "Conclusion"
+  - title: "Session 7. Retrieval and grounding metrics — Tue 22 Sep"
+    sections:
+    - local: unit2/session-07-grounding-metrics/introduction
+      title: "Introduction"
+    - local: unit2/session-07-grounding-metrics/concepts-1
+      title: "Measure before you optimize"
+    - local: unit2/session-07-grounding-metrics/concepts-2
+      title: "The cheapest fix, and what it cost"
+    - local: unit2/session-07-grounding-metrics/concepts-3
+      title: "Attack your own evaluator"
+    - local: unit2/session-07-grounding-metrics/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit2/session-07-grounding-metrics/conclusion
+      title: "Conclusion"
+  - title: "Session 8. Loops and graphs — Wed 23 Sep"
+    sections:
+    - local: unit2/session-08-loops-and-graphs/introduction
+      title: "Introduction"
+    - local: unit2/session-08-loops-and-graphs/concepts-1
+      title: "When a chain is enough, and when it is not"
+    - local: unit2/session-08-loops-and-graphs/concepts-2
+      title: "The same work as a graph"
+    - local: unit2/session-08-loops-and-graphs/concepts-3
+      title: "Typed transitions, and the edge you refuse to follow"
+    - local: unit2/session-08-loops-and-graphs/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit2/session-08-loops-and-graphs/conclusion
+      title: "Conclusion"
+  - title: "Session 9. Trace and evaluate an agent — Thu 24 Sep"
+    sections:
+    - local: unit2/session-09-trace-and-evaluate/introduction
+      title: "Introduction"
+    - local: unit2/session-09-trace-and-evaluate/concepts-1
+      title: "A trace, and what an event has to carry"
+    - local: unit2/session-09-trace-and-evaluate/concepts-2
+      title: "Error analysis: name the bucket, then aim the fix"
+    - local: unit2/session-09-trace-and-evaluate/concepts-3
+      title: "Redaction, and the missing span"
+    - local: unit2/session-09-trace-and-evaluate/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit2/session-09-trace-and-evaluate/conclusion
+      title: "Conclusion"
+  - title: "Session 10. Skills and an architecture decision record — Fri 25 Sep"
+    sections:
+    - local: unit2/session-10-skills-and-adr/introduction
+      title: "Introduction"
+    - local: unit2/session-10-skills-and-adr/concepts-1
+      title: "A skill is an instruction artifact"
+    - local: unit2/session-10-skills-and-adr/concepts-2
+      title: "The same task twice: your code, or a framework"
+    - local: unit2/session-10-skills-and-adr/concepts-3
+      title: "The decision record, and the reversal test"
+    - local: unit2/session-10-skills-and-adr/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit2/session-10-skills-and-adr/conclusion
+      title: "Conclusion"
+  - title: "Capstone: the source-grounded research assistant"
+    sections:
+    - local: unit2/capstone/introduction
+      title: "Introduction"
+    - local: unit2/capstone/concepts-1
+      title: "The brief"
+    - local: unit2/capstone/concepts-2
+      title: "Assembled from the sessions"
+    - local: unit2/capstone/concepts-3
+      title: "What done means"
+    - local: unit2/capstone/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit2/capstone/conclusion
+      title: "Conclusion"
 - title: "Depth track (optional)"
   sections:
   - local: tracks/depth/introduction
@@ -208,5 +294,4 @@
 
 # Not in this repository yet. Each arrives on its Monday and
 # `git pull` brings it; the dates are in the README.
-#   Unit 2. Retrieval, graphs, evaluation, skills
 #   Unit 3. State, MCP, deployment, defense

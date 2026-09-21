@@ -1,0 +1,142 @@
+# The corpus, and a loader that refuses [[corpus-and-loader]]
+
+## Retrieval is only as honest as its input
+
+A retriever scores what it was given. Hand it five documents when the directory
+holds six and every score is still a plausible number, every ranking still
+looks reasonable, and the answer you get is missing a source nobody will ever
+notice is missing. That failure has no exception, no red output and no smell.
+
+So the baseline starts at the loader, and the loader's job is to refuse.
+
+## Data that crosses a boundary gets a type
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class MiniDocument:
+    doc_id: str
+    title: str
+    text: str
+
+
+sample = MiniDocument(doc_id="demo", title="Demo", text="Hello corpus.")
+print(sample)
+```
+
+```
+MiniDocument(doc_id='demo', title='Demo', text='Hello corpus.')
+```
+
+Three named fields, all typed, and `frozen=True` so nothing downstream edits
+the corpus in place while retrieval is reading it.
+
+| | `dict` | frozen dataclass |
+|---|---|---|
+| A typo in a field name | `KeyError`, far from the cause | fails where you wrote it |
+| The type of a field | anything at all | declared, and `mypy` checks it |
+| Mutation | anywhere, by anyone | refused |
+| Reads as | data | a contract |
+
+The rule is the one from session 3, pointed the other way. There it kept model
+output honest. Here it keeps your own input honest.
+
+## Errors are the contract
+
+```python
+def load_mini(path: Path) -> MiniDocument:
+    if not path.is_file():
+        raise ValueError(f"no such file: {path}")
+    lines = path.read_text(encoding="utf-8").splitlines()
+    if not lines or not lines[0].startswith("# "):
+        raise ValueError(f"{path.name}: first line must be '# <title>'")
+    return MiniDocument(
+        doc_id=path.stem,
+        title=lines[0][2:].strip(),
+        text="\n".join(lines[1:]).strip(),
+    )
+```
+
+Two guards, both before the object is built, both naming the file and the rule
+they enforce.
+
+| Input | Behaviour | The message names |
+|---|---|---|
+| a good file | a `MiniDocument` | nothing, there is nothing to say |
+| a missing file | `ValueError` | the path it looked for |
+| first line is not `# <title>` | `ValueError` | the file and the rule |
+| anything, with `except: pass` around it | a half-loaded corpus | nothing, which is the bug |
+
+The last row is the one that costs you a day. A loader that returns a
+`MiniDocument` with an empty title on bad input has not handled the error; it
+has hidden it, and the wrong retrieval result three steps later is the first
+symptom.
+
+`ch06-e2` judges exactly this. It writes a good file and a headerless file into
+a temp directory, asks for a third that does not exist, and requires a
+`ValueError` with a non-empty message for both bad cases. A refusal with an
+empty message fails the check, because a message nobody can read is the same as
+no message.
+
+## The real loader
+
+`src/bootcamp_agent/documents.py` does the same job for the teaching corpus.
+The format is markdown with HTML-comment headers, so a document renders
+normally anywhere while still carrying its metadata:
+
+```
+<!-- title: RAG Basics -->
+<!-- tags: retrieval, rag, chunking, citations, grounding -->
+
+# RAG Basics
+
+Retrieval-augmented generation (RAG) grounds a model's answer in documents you
+control...
+```
+
+Four decisions in that file are worth naming, because each one is a failure it
+declines to have:
+
+- **`CorpusError`, a typed exception.** Callers catch the corpus failing, not
+  everything failing. `except Exception` around a load is how a missing
+  directory becomes an empty result.
+- **A missing title raises.** So does an empty body. A document with no title
+  is not a document with a blank title.
+- **`sorted(directory.glob("*.md"))`.** Filesystem order is not defined.
+  Sorting by path makes the load order the same on every machine, which is what
+  makes a retrieval score reproducible rather than approximately reproducible.
+- **The whole directory or nothing.** One bad header fails the load. Five
+  documents out of six is the silent corpus failure this loader exists to
+  prevent.
+
+```python
+from bootcamp_agent.documents import load_corpus
+
+documents = load_corpus(CORPUS_DIR)
+for doc in documents:
+    print(f"{doc.doc_id:22} {doc.title:22} tags={list(doc.tags)}")
+```
+
+```
+agent-loops            Agent Loops            tags=['agent', 'loop', 'tools', 'budget', 'autonomy']
+evaluation-basics      Evaluation Basics      tags=['evaluation', 'testing', 'golden-set', 'tracing', 'reliability']
+mcp-overview           MCP Overview           tags=['mcp', 'tools', 'protocol', 'integration', 'agents']
+prompt-injection       Prompt Injection       tags=['security', 'injection', 'untrusted-input', 'safety']
+rag-basics             RAG Basics             tags=['retrieval', 'rag', 'chunking', 'citations', 'grounding']
+structured-outputs     Structured Outputs     tags=['llm', 'json', 'validation', 'schema']
+```
+
+## Fixed and versioned, and why that matters
+
+Six documents, in git, changing only when someone commits a change. That is
+the whole reason today's numbers are worth writing down: the same query returns
+the same chunks with the same scores for everyone in the room, so when your
+neighbour's failure table disagrees with yours, one of you misread the output
+and it is worth finding out which.
+
+It also draws the line the rest of the course keeps. The corpus is an input.
+Nothing in this session writes to `data/corpus/`, and the index you build in
+the next page is derived from it — throwaway, rebuildable, and never the source
+of truth. Session 11 revisits that line when state stops being throwaway.

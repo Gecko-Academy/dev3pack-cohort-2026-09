@@ -1,0 +1,82 @@
+# Loops and graphs
+
+**Wednesday, September 23, 2026 · 2h · Threads: loop + graph engineering**
+
+## Outcome
+
+You build one task three ways — a chain, the tool loop you already have, and a
+capped reflection — and you fill the comparison table from counted calls rather
+than from taste. Then you write the workflow down as a graph: five states, six
+declared edges, and `step(state, event)` as the only thing that moves between
+them. An event that is not legal from where you are does not move you and does
+not raise. It comes back with the state unchanged and a sentence naming what was
+refused. You leave able to say, about any workflow you ship, which transitions
+exist — and to show that the others cannot happen.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | A question, the six-document corpus in `data/corpus/`, `FakeLLM` behind the `LLMClient` seam, and an **event log**: the outcomes a run produced, written down as `{"name": "no_hits"}` and driven through the machine. |
+| Output | Three implementations of the same task with their measured call counts, and `step(state, event) -> state` over `planning · retrieving · answering · refusing · done`. Every state carries `visited`, the route so far, and `rejected`, empty until something is refused. |
+| Budget | The chain spends 1 model call. The loop spends 1, plus at most one corrective retry. Reflection is capped at exactly one revision — 3 calls, counted, not "about 3". The state machine spends nothing: there is no model inside it. |
+| Failures this session must handle | **A retry storm.** One edge back to the state it came from, nothing counting, so the run never ends. **A partial tool failure.** Two retrieval sources, one down, half the passages back — and a decision about which event that is. **An invalid transition.** `answered` arriving while the run is still retrieving: refused, unchanged, and said out loud. |
+
+The threat is not a hostile model. It is an edge nobody drew. A workflow written
+as prose has every edge and none: ask two engineers what happens after a parse
+failure and you get two answers. A workflow written as `if`/`elif` has an
+implicit edge for every case nobody wrote — the fall-through — and it is
+reachable in production long before anybody notices it exists.
+
+A table has no fall-through. A pair that is not in it is not an edge, so "can
+this run go from `refusing` to `answering`?" has an answer you read instead of a
+maintainer you have to ask.
+
+One thing this does not buy: a legal transition can still be the wrong one. The
+table shows the run stayed inside the graph you drew. Whether that graph is the
+right graph is what session 9's evaluation is for.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. Say
+   out loud what `answer_question` does after two parse failures. Then find the
+   line. How long that took is the diagnostic.
+2. **Contract and threat boundary (15m).** The autonomy ladder, and the rule
+   that governs it: climb a rung only when a measured failure justifies it. The
+   contract table above, read aloud.
+3. **Concept and live implementation (30m).** The same task three ways —
+   `chain()`, `answer_question`, `reflect_once()` — with `len(llm.calls)` on the
+   screen for each. Then the five states and six edges, drawn before any code.
+4. **Guided lab (35m).** `notebook.ipynb`: the comparison table (`ch08-e1`),
+   the graph appendix and what its trace showed (`ch08-e2`), then `step` and its
+   transition table (`ch08-e3`). Read the event log back afterwards.
+5. **Failure injection (15m).** Sections 10 and 11: add `retrieving --retry-->
+   retrieving` and watch a legal graph never end, then cap it with `visited`.
+   Then a partial tool failure, and which event you emit for it.
+6. **Evaluation and artifact receipt (10m).** `review("ch08")` in Jupyter, or
+   `uv run bootcamp check ch08` in the terminal. Then read one `rejected`
+   sentence out loud and ask whether a colleague could act on it.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: draw the state machine of something you have shipped,
+   failure edges included, and mark every edge nobody declared.
+
+## Evidence
+
+This session runs unattended. Every cell works offline on `FakeLLM`, so the
+notebook is its own arbiter:
+
+```bash
+uv run bootcamp check ch08                    # runs the notebook, prints the scorecard
+uv run bootcamp submit ch08 --github <you>    # re-runs it and writes the bundle you hand in
+```
+
+Three checks decide it. `ch08-e1` re-reads how the three implementations
+behave and compares that with the table you filled in. `ch08-e2` takes either a
+measured comparison of the graph appendix or a stated reason you did not run it,
+and refuses a blank. `ch08-e3` drives your `step` over every state and every
+event — the answer path, both refusal paths, every event fired at `done`, and
+every pair your table never declared.
+
+<!-- navigation:start -->
+[Previous: Retrieval and grounding metrics](../session-07-grounding-metrics/introduction.mdx) · [Next: Trace and evaluate an agent](../session-09-trace-and-evaluate/introduction.mdx)
+<!-- navigation:end -->

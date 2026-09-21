@@ -1,0 +1,87 @@
+# Assembled from the sessions [[assembly]]
+
+## One piece per session
+
+Nothing in the capstone is built for the capstone. Every part of it arrives as
+one session's deliverable, with its own tests, and the project is what happens
+when you wire them together.
+
+| Session | The piece | Where it lives |
+|---|---|---|
+| 1 | The instructions your assistant reads before it edits, and the acceptance checks that decide when a change is done | `AGENTS.md` |
+| 2 | The adapter: one `complete(system, user)` method behind a Protocol, a missing key that fails before the request, a timeout that becomes a flagged refusal | `llm.py` |
+| 3 | The schema: `ResearchAnswer`, a strict parser, and retry-once-then-refuse | `schema.py` |
+| 4 | The tools: a read-only registry with validated inputs, hard caps, and errors that name the valid options | `tools.py` |
+| 5 | The loop: `run_loop(plan, tools, budget)` with four designed exits and a receipt of what ran | your session-5 notebook |
+| 6 | Retrieval, and the loader under it: markdown to typed `Document` values, chunked and scored | `documents.py`, `retrieval.py` |
+| 7 | The metrics: hit rate at k, the golden set's pass rate, and the measured cost of one change | your labeled set |
+| 8 | The graph: five states, six declared edges, and `step(state, event)` as the only way between them | your session-8 notebook |
+| 9 | The traces and the evals: `TraceEvent`, `redact`, and `run_evals` as one command | `agent.py`, `evals.py`, and your `redact` |
+| 10 | The skill file and the decision record, each written so it can be shown to have failed | `SKILL.md`, your ADR |
+| 11 | The state: a preference the model sees, a capped episode list, a retention policy, and a store that keeps two owners apart | your session-11 notebook |
+| 12 | The capability map: every tool on a surface classified as reading or mutating, before anything is called | your session-12 notebook |
+| 13 | One external surface met through comprehension, in the recorded lane, with the provenance of what you took from it | session-13 fixtures |
+| 14 | Deployment and hardening: regression tests, timeouts, the injection test, and before/after evidence | your test suite |
+
+## The arrows, and who owns each one
+
+```
+question
+   -> retrieve                       6, over a corpus 6 also taught you to load
+   -> [refuse before any model call]  3, and cap01-e2 counts the calls
+   -> prompt: context + JSON contract 3, plus 11's preference when you add it
+   -> LLM behind the seam             2, with 2's timeout around it
+   -> parse, strictly                 3, and one corrective retry
+   -> check citations against retrieval  3 writes it, 7 measures whether it is enough
+   -> AgentResult(answer, trace)      9
+```
+
+Two pieces sit beside that line rather than inside it. The tool registry from
+session 4 is what an assistant calls into the corpus; `answer_question` is the
+single-shot grounded path. They share `retrieve`, which is why a retrieval fix
+improves both and why neither owns it. And `run_loop` from session 5 is the
+shape you reach for when one question needs more than one retrieval — a budget,
+a repetition guard, and a receipt on every exit.
+
+## The integration rule
+
+Integration adds wiring, never logic.
+
+If gluing two components together needs an `if`, one of them has the wrong
+contract. Fix the component, not the glue. The consequence is the property that
+makes the whole thing debuggable three weeks later: every part stays
+independently testable, so a failing run has one layer to look at rather than
+six.
+
+The notebook holds you to it. Its four checkpoints are gates over code that
+already exists — you run them and read the verdict. No new logic goes in the
+notebook, because logic in a notebook is logic without a test.
+
+## The least autonomy that passes the eval
+
+Session 8 has you build one task three ways and count the model calls. Bring
+that number here, because the capstone does not owe anybody an agent.
+
+| Shape | Cost | When it is the right answer |
+|---|---|---|
+| Chain | 1 call | The steps are known in advance. Fewer failure modes, a trace you can predict. |
+| Loop | 1 call, plus at most one retry | The next step depends on what the last one returned. |
+| Reflection | 3 calls, capped at one revision | Only if the eval improves enough to pay for the two extra calls. |
+
+Pick the cheapest shape that passes, and write down what you measured. That
+sentence is minute 4 of the demo, and it is also the decision record from
+session 10: a choice that does not name the measurement which would overturn it
+is an opinion.
+
+## Where the pieces stop
+
+Be exact about what is wired in and what is not, because a reviewer will ask.
+
+- The MCP work from sessions 12 and 13 is a **surface you inspected**, in the
+  recorded lane. Wire a read-only tool from it if you want; nothing there is
+  required to be live, and no lane in either session can spend money.
+- The memory from session 11 is in-process. It dies with the run, and that is
+  the retention policy rather than an omission.
+- The redaction from session 9 belongs at the sink, on the way into a log. It is
+  the last line of defence, not the first: the first is that credentials are
+  injected at the transport edge and the model never sees one.

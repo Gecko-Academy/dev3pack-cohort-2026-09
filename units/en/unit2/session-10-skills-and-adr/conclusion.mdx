@@ -1,0 +1,43 @@
+# Conclusion
+
+You wrote a skill: five sections, in a file, loaded when its description matches
+the task instead of retyped every time.
+
+## What you did
+
+- The `description` is routing and the body is the instructions, which is why ten
+  skills cost you ten lines of context until one of them is needed.
+- The failure rules are the part that changes an output; the safety boundary is a
+  sentence, and the thing that actually stops a write is still the tool contract.
+- You proved the skill did something the only way it can be proved: the same task
+  run without it and with it, two excerpts that differ, and one instruction you
+  fixed after watching it fail. `ch10-e1` refuses two identical runs, because two
+  identical runs are the evidence that nothing happened.
+- Then you ran one assistant two ways — the framework-free loop and the same four
+  nodes as a declared graph — and counted the model calls in each.
+- You recorded one architecture decision you actually made: what you chose, the
+  option you turned down, why it lost today, and the number that reverses it.
+
+## The failure you handled
+
+A framework used where a fixed workflow would have been better. Known steps, an
+unvarying sequence, and a planner bought to make a decision the code already knew
+how to make.
+
+## What to carry forward
+
+`ch10-e2` refuses "when it gets slow" and accepts "p95 over 2000 ms for 15
+minutes", the same standard the depth track's architecture module uses, because a
+decision nobody can falsify is a preference.
+
+## Into session 11
+
+Session 11 assumes both artifacts exist and starts week 3 on state and memory,
+where the storage policy gets the same treatment: written down, with something it
+refuses to remember.
+
+## Homework
+
+Swap both artifacts with another learner. Review their skill for ambiguity and
+unbounded permissions, then ask whether you could tell, this week, if their
+trigger had fired.

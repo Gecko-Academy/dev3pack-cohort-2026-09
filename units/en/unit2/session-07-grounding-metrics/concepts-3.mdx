@@ -1,0 +1,176 @@
+# Attack your own evaluator [[attack-the-evaluator]]
+
+## Grounding is the second measurement
+
+Hit rate says the right passage reached the prompt. It says nothing about what
+the model did next. A system can retrieve perfectly and still answer from
+memory, cite a document it ignored, or invent a sentence and attach a real doc id
+to it. Measuring that needs the whole agent and a different set.
+
+`data/evals/golden.jsonl` is eight cases: five that must be answered with a named
+citation, three that must be refused. `run_evals` runs the agent on each one and
+applies a pass condition written in code, not in prose:
+
+| Case kind | Passes when |
+|---|---|
+| grounded | every expected doc id appears in `citations`, and `needs_human_review` is false |
+| refusal | `needs_human_review` is true and `citations` is empty |
+
+Code checks, not a model grading a model. They are fast, free and deterministic,
+and for mechanical properties — did it cite X, did it refuse — that is the right
+tool. An LLM judge earns its place on properties no `if` can express; it does not
+earn its place here.
+
+## Baseline, one change, rerun
+
+```
+before: 38%  after: 100%
+```
+
+The plain `FakeLLM` refuses everything, so it passes all three refusal cases and
+fails all five grounded ones: **3/8, 38%**. The one change is a fake that reads
+context and cites the document it read. Rerun: **8/8, 100%**.
+
+Same discipline as page 2. One change, one rerun, both numbers kept.
+
+## 100% is when to get suspicious
+
+A perfect score is evidence about two things at once — the system, and the
+evaluator. You cannot tell which one it is evidence about until you try to break
+the evaluator on purpose.
+
+So build a model that deserves zero. It ignores the question, answers every case
+with the same sentence, and cites the same document every time:
+
+```python
+cite_all = FakeLLM(
+    default=json.dumps(
+        {
+            "answer": "Everything is in rag-basics, trust me.",
+            "citations": ["rag-basics"],
+            "confidence": 0.9,
+            "needs_human_review": False,
+        }
+    )
+)
+```
+
+```
+| 1 | How does chunking work in retrieval-augmented generation? | PASS | cited ['rag-basics'] |
+| 2 | Why should structured outputs be validated by the applicatio | FAIL | missing citations ['structured-outputs'] |
+| 3 | What stopping conditions should an agent loop have?         | FAIL | missing citations ['agent-loops'] |
+| 4 | What is the difference between a tool, a skill, and an MCP s | FAIL | missing citations ['mcp-overview'] |
+| 5 | What defenses help against prompt injection in retrieved con | FAIL | missing citations ['prompt-injection'] |
+| 6 | What is the capital of Mars?                                 | PASS | refused as expected |
+| 7 | zxqv wubble frobnicate                                       | PASS | refused as expected |
+| 8 | Qual foi o placar do jogo de ontem?                          | PASS | refused as expected |
+
+**4/8 passed** (pass rate 50%)
+```
+
+**50%.** Half marks for a model that never read a question.
+
+## Where those four passes came from
+
+Read them one at a time, because they are not the same kind of pass.
+
+| Case | Why it passed |
+|---|---|
+| 6, 7, 8 | retrieval returned nothing, so the agent refused **before any model call**. The cheat's answer never ran. |
+| 1 | the cheat guessed `rag-basics`, retrieval did return `rag-basics`, and the pass condition was satisfied by that doc id alone. |
+
+Three of the four passes are free. Those cases measure the retriever and the
+refusal path, and the model's contribution to them is nothing at all — it was
+never asked. A pass rate that mixes "the model got it right" with "the model was
+never consulted" is not a grounding metric. **Report refusal cases and grounded
+cases separately** and this fake scores 1/5 on the half that is about grounding.
+
+The fourth is the real defect. Look at what passed:
+
+> answer: "Everything is in rag-basics, trust me." · citations: `["rag-basics"]`
+
+The citation is correct. The sentence is supported by nothing. The pass condition
+asks **which document was cited** and never asks **whether the answer follows from
+it**. That is citation-support evaluation, and it is missing.
+
+## What the evaluator does check, and what it does not
+
+Give it credit where it is due, because knowing the shape of the hole matters
+more than being disappointed by it.
+
+| Property | Checked here? | What it would take |
+|---|---|---|
+| citation recall — expected doc ids present | yes | already in the pass condition; it is what fails cases 2 to 5 |
+| refusal behaviour — flag on, citations empty | yes | already there |
+| citation precision — nothing cited beyond an allowed list | no | label each case with allowed doc ids, assert the citation set is a subset |
+| claim support — the answer follows from the cited passage | no | label each case with required concepts, assert the answer contains them; or judge the answer against the cited chunk |
+| over-citation — cite everything and let recall do the rest | no | precision plus a cap on citation count |
+
+One more thing helped and it was not the evaluator: the agent itself strips
+citations retrieval never returned. That is why the cheat could not simply cite
+all six documents and pass everything on recall. Two independent layers had to be
+weak for a fake to score 100%, and only one of them was. Layers are why the
+number is 50% and not higher — but a fake scoring half on a set it never read is
+still a broken measurement.
+
+## What this means for the capstone's grading
+
+The capstone is graded on a question set you have not seen, by
+`final_assignment/grade.py`, and that grader is what today's exercise looks like
+after this lesson has been applied. Its gates for an answerable case:
+
+`citation_recall` · `citation_precision` · `claim_support` · `citation_unique` ·
+`forbidden_absent` · `answered` · `no_review_flag`
+
+For a refusal case: `review_flag` · `no_citations` · `calibrated_confidence` ·
+`refusal_language`, plus the two gates every case carries (`citation_unique`,
+`forbidden_absent`).
+
+Three of those close exactly the holes you just found. `citation_precision`
+bounds the citation set to an allowed list, so citing everything stops paying.
+`claim_support` requires the answer text to contain the concepts the case
+demands, so a citation with an empty sentence beside it fails. `forbidden_absent`
+fails an answer that contains a term the case forbids.
+
+Two consequences, and neither is optional reading.
+
+**The aggregate is not the assessment.** A safety failure blocks the certificate
+at any score, and the pass bar alone is trivially reachable by refusing
+everything you are supposed to refuse. The bar you are actually held to is:
+refuse correctly **and** answer something with support.
+
+**The question set is private for the reason page 2 gave.** A system tuned
+against the cases it will be graded on measures its own homework. Your practice
+set is public so you can build; the graded set is one you cannot tune to.
+
+## An evaluator you have not attacked is a guess
+
+That is the sentence to leave with. Not "evaluators are unreliable" — this one
+told the truth about four cases out of eight and caught a plain model failing
+five. The point is narrower and harsher: until you have deliberately built
+something that should score zero and watched what it scores, you do not know what
+your pass rate means. You know what you hoped it meant.
+
+The attack costs one fake and one rerun. It bought a number — 50% — that changes
+how you read every future report from the same harness.
+
+## Recap
+
+| Page | One line |
+|---|---|
+| Measure before you optimize | five labeled cases and hit rate @k; the per-case MISS is worth more than the total |
+| The cheapest fix, and what it cost | expansion took 80% to 100% on the tuning set and probe hit@1 to 0%; report both |
+| Attack your own evaluator | a cite-everything fake scores 50%; three passes were free and one was a false positive |
+
+## Exit ticket and homework
+
+Write three more labeled cases, and make one of them a question whose correct
+answer is "not found" — a hit there means retrieval returns nothing. Refusal is a
+result, and a golden set without refusal cases grades a system on charisma.
+
+Then answer the harder one in a sentence: which of your new cases could a
+cite-everything fake still pass, and what would you have to check to stop it?
+
+Session 8 builds the loop the answer travels through. It has its own version of
+today's problem: a metric measured on the path you designed, on the failures you
+thought of.

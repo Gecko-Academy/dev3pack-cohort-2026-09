@@ -1,0 +1,105 @@
+# Error analysis: name the bucket, then aim the fix [[error-analysis]]
+
+## The regression dataset
+
+Eight cases, one JSONL file, one line each:
+
+```json
+{"question": "How does chunking work in retrieval-augmented generation?",
+ "expected_doc_ids": ["rag-basics"], "expect_refusal": false}
+{"question": "What is the capital of Mars?",
+ "expected_doc_ids": [], "expect_refusal": true}
+```
+
+Five expect a grounded answer, three expect a refusal. Both are graded, and the
+refusals are the half most people skip: a system that answers everything scores
+well until you ask it something it cannot know.
+
+The pass condition is code, in `evals.py`:
+
+| Case | Passes when |
+|---|---|
+| refusal | `needs_human_review` is true **and** citations are empty |
+| grounded | every expected `doc_id` is in the citations, and nothing was flagged |
+
+The set grows one case per bug, forever. That is what makes it a regression
+dataset rather than a demo: a fixed bug that comes back arrives as a red line
+instead of a support ticket.
+
+## The lifecycle
+
+**baseline → trace → inspect → evaluate → change ONE component → rerun.**
+
+- Two changes between measurements and you learned nothing about either.
+- Report the regression your improvement caused, not only the improvement.
+- The baseline is the number you are allowed to be proud of beating. Write it
+  down before you touch anything.
+
+## Code checks or a model as judge
+
+| | Code check | Model as judge |
+|---|---|---|
+| Cost | free | a model call per case |
+| Deterministic | yes | no |
+| Good for | citations, parsing, budgets, refusals | tone, coherence, "is this helpful" |
+| Risk | narrow — it measures what you thought to check | inherits the judge's biases, silently |
+
+Prefer code. Reach for a judge only for the properties code genuinely cannot
+express, and when you do, spot-check it against human labels on a sample. A
+judge that agrees with you 70% of the time is a measurement instrument with a
+30% error bar, and the error bar never appears in the report.
+
+## Five buckets
+
+Every failure goes in exactly one. The bucket is the work item.
+
+| Bucket | What it means | Where the fix lives |
+|---|---|---|
+| `retrieval` | the right passage never reached the prompt | chunking, the index, the query |
+| `tool_selection` | wrong tool, or right tool with wrong arguments | the tool description, the contract |
+| `instruction_following` | the context was there and the model ignored it | the prompt, the model, the schema |
+| `formatting` | the reply broke the output contract | the parser, the retry, the instructions |
+| `unsupported_claim` | fluent, well-formed, not in any source | citation verification, the refusal path |
+
+Fix the biggest bucket first. Four buckets full of one case each and one bucket
+full of nine is not five problems, it is one.
+
+## The worked example, and why the trace decides it
+
+Run the baseline. The plain `FakeLLM` scores **3/8**: it passes all three
+refusal cases and fails all five grounded ones.
+
+Two buckets fit that report equally well. `retrieval` — the passage never
+arrived. `instruction_following` — it arrived and was ignored. The report cannot
+separate them. Read one trace and the ambiguity is gone:
+
+```
+[retrieve ] top_k=3 -> [('rag-basics', 0), ('rag-basics', 1), ('rag-basics', 2)]
+[llm_call ] attempt 1: 121 chars
+[decision ] answered with citations []
+```
+
+Retrieval returned the right document three times over. The model was called. It cited
+nothing. That is `instruction_following`, and now the fix has an address: the
+prompt or the model, not the index.
+
+`ch09-e1` asks you for exactly that string — the bucket, and why. It rejects an
+answer that starts with `retrieval`, because the trace says otherwise.
+
+## What the fix is allowed to prove
+
+The notebook's fix is a fake seeded to read its context. It scores 8/8. That
+number proves the harness responds to a real change; it does not prove the agent
+is good, because the fake was written to pass. Real fixes are the same shape —
+a prompt edit, a `top_k`, a rerank — and they need the same suspicion.
+
+Session 7 attacked this evaluator directly and found what its pass condition
+never checks. Keep that in view: a green report is evidence that the cases you
+wrote pass, and nothing more.
+
+## Traces make failures cheap
+
+Without a trace, a red case is an investigation: reproduce it, add prints, guess.
+With one, it is a lookup — was the chunk retrieved, or retrieved and ignored.
+That is the whole return on writing `answer_question` so it cannot hand back an
+answer without also handing back what it did.

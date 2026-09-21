@@ -1,0 +1,96 @@
+# The brief [[the-brief]]
+
+## Six behaviours, and the contract each one has to meet
+
+The capstone is one program with six required behaviours. Each one has a
+contract, and the contract is what a reviewer checks — not the wording of the
+answer.
+
+| Behaviour | The contract |
+|---|---|
+| Answers questions about a small versioned corpus | Every answer is built from passages `retrieve` returned for that question. The corpus is an input under version control; nothing in the answer path writes to it. |
+| Cites the documents that support each claim | Every id in `citations` came back from retrieval for that question. An id that did not is stripped, and the answer is flagged. |
+| Refuses or qualifies when nothing supports an answer | The refusal is a value, not an empty string: `needs_human_review` true, `citations` empty, `confidence` at the floor. Empty retrieval refuses before the model is called at all. |
+| Uses a bounded read-only tool | A narrow schema, a cap the caller cannot raise, an error that names the valid options, and no write, spend or mutation anywhere. |
+| Exposes a reusable skill or instruction file | Five sections — when to use, workflow, output format, failure rules, safety boundary — plus two runs of one task that show what the file changed. |
+| Ships a regression test and an evaluation report | One command anybody can rerun, a pass rate printed by code, and a written sentence about what the pass condition does not look at. |
+
+## Grounded is not the same as relevant
+
+Retrieval returns overlap. A score of `3.18` says the query and the chunk share
+tokens this corpus treats as rare. It says nothing about whether the chunk
+supports the claim you are about to make from it.
+
+So grounding is two separate jobs, and the capstone does both:
+
+1. **Constrain the generation.** The prompt carries only the retrieved passages,
+   and the system instruction says to answer from them alone.
+2. **Check the result.** After parsing, every citation is compared against the
+   ids retrieval actually returned:
+
+```python
+fabricated = [c for c in answer.citations if c not in retrieved_ids]
+```
+
+Skip the second job and you have an assistant that cites confidently and is
+never contradicted, because nothing in the program is looking. A citation nobody
+checks is decoration with a source-shaped font.
+
+## The refusal has two doors, and they are not equally reliable
+
+| Door | When it fires | How certain it is |
+|---|---|---|
+| Empty retrieval | The question shares no token with any chunk | Deterministic. No model call is spent, so nothing can talk you out of it. |
+| The model's own refusal | Passages came back but support nothing | Probabilistic. The instructions ask for empty citations and `confidence: 0.0`, and a model can ignore them. |
+| The citation check | The model cited something retrieval never returned | Deterministic, and it runs after the model, so it catches what door two let through. |
+
+Door one is why `cap01-e2` reads `len(probe.calls)` and not just the answer. A
+refusal that arrives after a model call is still a refusal, but it cost money to
+learn something retrieval already knew for free.
+
+Door three is why a fabricated citation is stripped rather than rejected whole.
+The sentence may still be useful to a human; the source claim beside it is not.
+Confidence drops, the flag goes up, and both facts survive into the trace.
+
+## One shape on every path
+
+Every path returns the same four fields. A caller reads `needs_human_review`
+without branching on the outcome first, exactly like session 5's receipt keeps
+its four keys on all four exits.
+
+```
+answer            "I don't know based on the provided corpus."
+citations         ()
+confidence        0.0
+needs_human_review True
+```
+
+A refusal that returns `None`, or an empty string, or raises, pushes the
+decision to a caller who may not make it. Fail into a value.
+
+## Read-only, on purpose
+
+Nothing the capstone can call writes, spends, or mutates. That is not a
+limitation to apologise for on demo day. It is what makes it safe to run the
+thing unattended in front of a room, and it is the reason session 12 has you
+classify every tool as reading or mutating before wiring any of them in.
+
+The bounds are per tool, and each one is testable on its own:
+
+| Bound | Example from `tools.py` |
+|---|---|
+| Validate at the boundary | an empty `query` raises `ToolError` before anything runs |
+| Cap what the caller asks for | `max_results=999` is clamped to `MAX_SEARCH_RESULTS` |
+| Name the valid options in the error | an unknown `doc_id` comes back with `sorted(by_id)` in the message |
+| No side effects | every tool reads the corpus; none of them touches it |
+
+## What the capstone is not
+
+It is a bounded prototype with its controls visible. It is not a system that has
+run in production for a year, and claiming otherwise on demo day is the one
+answer that fails.
+
+Carry session 7's finding with you too: an evaluation says a run met its pass
+condition. It never says the answer was right. A fake that cites the same
+document for every question scores 50% on the golden set, so the pass rate is a
+claim about your harness as much as about your agent.

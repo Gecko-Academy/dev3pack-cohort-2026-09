@@ -1,0 +1,135 @@
+# The cheapest fix, and what it cost [[query-expansion]]
+
+## Add the words the document uses
+
+The MISS was a vocabulary gap. The query said *instructions inside documents*;
+the document says *injection*, *untrusted*, *delimiters*. Nothing about the index
+is broken. The query is simply written in the wrong language.
+
+So rewrite the query before it reaches retrieval:
+
+```python
+SYNONYMS = {
+    "instructions": "injection untrusted delimiters",
+}
+
+
+def expand(query: str) -> str:
+    expanded = query
+    for phrase, extra in SYNONYMS.items():
+        if phrase in query.lower():
+            expanded += " " + extra
+    return expanded
+```
+
+```
+HIT   prompt-injection     <- How do I defend against instructions inside documents? injection untrusted delimiters
+
+expanded hit rate @3: 100%
+```
+
+80% to 100%. No new dependency, no index rebuild, no embedding model, and the
+whole change fits in a dict you can read out loud. That last property is the one
+to notice: when this fix misbehaves you can see why in the printed query. A dense
+retriever that misbehaves gives you a vector.
+
+**One change per measurement.** The cell changed exactly one thing and re-ran the
+same five cases. Change the expansion and `top_k` together and the number moves
+for a reason you cannot name.
+
+## Now measure it somewhere it was not tuned
+
+The rule was written by looking at the case it had to fix. So 100% is a
+measurement of the fix on its own homework. Here are four queries it never saw,
+all containing the word `instructions`, none of them about injection:
+
+```python
+probes = [
+    ("What instructions should a skill file contain?", "mcp-overview"),
+    ("How do I write instructions for chunking documents?", "rag-basics"),
+    ("What instructions make an agent loop stop?", "agent-loops"),
+    ("What instructions produce strict JSON?", "structured-outputs"),
+]
+```
+
+```
+probe hit rate @1: 75% -> 0%
+probe hit rate @3: 75% -> 50%
+
+top-1 for each probe, after expansion:
+  ['prompt-injection'] (expected mcp-overview)
+  ['prompt-injection'] (expected rag-basics)
+  ['prompt-injection'] (expected agent-loops)
+  ['prompt-injection'] (expected structured-outputs)
+```
+
+Every probe now returns `prompt-injection` first. The rule fires on the ordinary
+word *instructions*, and the three words it injects are rare in this corpus, so
+they carry high inverse-document-frequency weight and swamp everything the user
+actually asked. The fix did not add knowledge. It added a bias, and the bias
+points at whichever document the last miss belonged to.
+
+Two numbers, one change:
+
+| Set | Metric | Before | After |
+|---|---|---|---|
+| labeled (tuned on) | hit rate @3 | 80% | **100%** |
+| probes (not tuned on) | hit rate @1 | 75% | **0%** |
+| probes (not tuned on) | hit rate @3 | 75% | **50%** |
+
+Report only the first row and you have not lied about any single number. You have
+still misled everyone who reads it.
+
+## The honest report
+
+```python
+report = {
+    "improvement": (
+        "Hit rate @3 on the labeled set went from 80% to 100%: case 5 now reaches "
+        "prompt-injection, which the question's own words never scored high enough to find."
+    ),
+    "regression_or_risk": (
+        "The rule fires on every query containing 'instructions', and on four probe queries "
+        "it was never tuned on it pushed prompt-injection to rank 1 in all four: probe hit "
+        "rate @1 fell from 75% to 0%, and @3 from 75% to 50%."
+    ),
+}
+```
+
+The shape is fixed and it is two fields, because a report with one field is a
+sales pitch. `ch07-e2` rejects an empty `regression_or_risk`, and it rejects
+"none", because "none" is almost never true. If you genuinely cannot find a cost,
+you have not measured off the tuning set yet.
+
+What a good regression sentence contains: what fires, on what, and the number it
+moved. "May cause false positives" is not a regression, it is a mood.
+
+## Where the other fixes sit
+
+Query expansion is the first tool because it is the cheapest and the most
+inspectable. It is not the only one, and each of the others trades the same way.
+
+| Fix | Buys | Costs |
+|---|---|---|
+| Query expansion | paraphrase recall, today, in a readable dict | hand-kept lists rot; broad keys poison unrelated queries |
+| Metadata filtering | precision, by excluding whole documents up front | a wrong filter makes the right answer unreachable, and silently |
+| Embeddings | real paraphrase matching, no word overlap needed | a dependency, an index to rebuild, and a failure you cannot read |
+| Reranking | ordering, when recall is fine and rank is not | latency and a second model in the path |
+| Prompt compression | context budget | the sentence you dropped was the one that mattered |
+
+Pre-filter or post-filter is the same trade in miniature. Filtering before
+retrieval is fast and can make a document invisible; filtering after is safer and
+you pay to retrieve things you then discard.
+
+None of these is "the upgrade". Each is a change you make one at a time, against
+a set you wrote first, and report with both of its numbers.
+
+## The habit this page is really teaching
+
+Measure, change one thing, re-measure, then re-measure somewhere the change was
+not designed for. The last step is the one people skip, and skipping it is how a
+team ships a retriever that scores beautifully on the eval and worse in
+production. The eval was not wrong. It was tuned.
+
+The same trap has a bigger version, and it is the next page: not a fix tuned to
+the set, but a system tuned to the pass condition.

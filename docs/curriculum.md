@@ -153,31 +153,31 @@ Complete a small tool-calling loop end to end, with `FakeLLM`, and prove three t
 
 ### Session 6 — A retrieval baseline (Mon 21 Sep)
 
-`ch06` · 3 checks · page — opens Mon 21 Sep
+`ch06` · 3 checks · [page](../units/en/unit2/session-06-retrieval-baseline/introduction.mdx)
 
 You leave with both halves of a retrieval baseline, and with the failures that come with it. The first half is the corpus: a typed loader that turns a directory of markdown into `Document` values or refuses out loud, and the smallest index there is, a tag mapped to the documents that carry it. The second half is retrieval over what that loader produced: chunk each document, score the chunks by token overlap weighted by inverse document frequency, return the top k with their scores. Then you classify what came back for three queries, and you watch the baseline fail in the three ways it fails: nothing comes back, the index is older than the corpus, and one confident hit points at the wrong document.
 
 ### Session 7 — Retrieval and grounding metrics (Tue 22 Sep)
 
-`ch07` · 3 checks · page — opens Tue 22 Sep
+`ch07` · 3 checks · [page](../units/en/unit2/session-07-grounding-metrics/introduction.mdx)
 
 You leave with three numbers you produced yourself and can defend: a retrieval baseline (hit rate at k on a labeled set), a grounding baseline (the golden set's pass rate), and the cost of the one change you made between them. You write the labeled set, find a query that breaks lexical retrieval, fix it with query expansion, and measure the fix twice — on the cases it was written for and on four it never saw. Then you turn on the evaluator itself: a fake that answers every question with the same sentence and cites the same document scores **50%** on the golden set, and you write down why.
 
 ### Session 8 — Loops and graphs (Wed 23 Sep)
 
-`ch08` · 3 checks · page — opens Wed 23 Sep
+`ch08` · 3 checks · [page](../units/en/unit2/session-08-loops-and-graphs/introduction.mdx)
 
 You build one task three ways — a chain, the tool loop you already have, and a capped reflection — and you fill the comparison table from counted calls rather than from taste. Then you write the workflow down as a graph: five states, six declared edges, and `step(state, event)` as the only thing that moves between them. An event that is not legal from where you are does not move you and does not raise. It comes back with the state unchanged and a sentence naming what was refused. You leave able to say, about any workflow you ship, which transitions exist — and to show that the others cannot happen.
 
 ### Session 9 — Trace and evaluate an agent (Thu 24 Sep)
 
-`ch09` · 2 checks · page — opens Thu 24 Sep
+`ch09` · 2 checks · [page](../units/en/unit2/session-09-trace-and-evaluate/introduction.mdx)
 
 You leave with two artifacts and one habit. The artifacts: a provider-neutral event log — `kind`, `detail`, and the fields a reader needs, with nothing in it you are not allowed to keep — and a regression dataset, the eight-case golden set run by one command anybody can rerun. The habit is error analysis: read the trace, put the failure in a named bucket, fix the bucket. You also write `redact(event)`, the function that decides what a trace is allowed to carry, and you see what a trace looks like when one event goes missing.
 
 ### Session 10 — Skills and an architecture decision record (Fri 25 Sep)
 
-`ch10` · 2 checks, marked from what you save · page — opens Fri 25 Sep
+`ch10` · 2 checks, marked from what you save · [page](../units/en/unit2/session-10-skills-and-adr/introduction.mdx)
 
 You leave with two artifacts and one habit. The artifacts: a `SKILL.md` your assistant loads on demand, with a before-and-after pair of runs that shows what it changed, and a decision record for one architecture choice you already made in the capstone. The habit is the reversal test — a decision that does not name the measurement which would overturn it is an opinion, and week 2 ends by writing one that is not.
 
@@ -215,7 +215,7 @@ You present the capstone, and then you are handed one failure you did not prepar
 
 ## Capstone: the source-grounded research assistant
 
-`cap01` · 5 checks · opens with week 2 · page — opens with week 2
+`cap01` · 5 checks · opens with week 2 · [page](../units/en/unit2/capstone/introduction.mdx)
 
 You ship a research assistant that answers developer questions from a small versioned corpus, names the documents behind each claim, and refuses when the corpus supports nothing. It calls a bounded read-only tool, it exposes a skill file another assistant can load, and it arrives with a regression test and an evaluation report whose numbers you produced. Five checks judge the behaviour. Session 15 judges you: you demo it, and then diagnose a failure you did not prepare for, from your own traces.
 

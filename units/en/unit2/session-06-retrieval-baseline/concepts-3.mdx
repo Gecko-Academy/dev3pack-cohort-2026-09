@@ -1,0 +1,181 @@
+# Three failures, and what each looks like [[three-failures]]
+
+## Failure 1: an empty result
+
+```python
+retrieve("vector embeddings cosine similarity", documents, top_k=3)
+```
+
+```
+  (nothing retrieved)
+```
+
+No scores, no chunks, no error. Every query token — `vector`, `embeddings`,
+`cosine`, `similarity` — is absent from all twenty-three chunks, so nothing is
+ever scored and `retrieve` returns `[]`.
+
+An empty list is the honest answer, and the failure is what happens next.
+Nothing goes into the prompt, so a model asked anyway would answer from memory
+and cite whatever sounded right. `agent.py` refuses instead, before it spends
+the call:
+
+```
+trace[retrieve] top_k=3 -> []
+trace[decision] no relevant chunks; refusing without an LLM call
+```
+
+No `llm_call` line. The refusal cost nothing and cannot hallucinate, because
+the part capable of hallucinating was never asked. The empty result is the
+easiest of the three failures to handle for exactly one reason: it is visible.
+
+The wrong response is to make the retriever return something. Lowering a
+threshold until every query gets three chunks converts this failure into the
+third one, where the same nothing arrives dressed as an answer.
+
+## Failure 2: a stale index
+
+```python
+snapshot = load_corpus(scratch)  # the index is built ONCE, from this snapshot
+indexed = sorted(doc.doc_id for doc in snapshot)
+tags_seen = sorted({tag for doc in snapshot for tag in doc.tags})
+
+(scratch / "two.md").write_text(...)  # the corpus moves on; the index does not
+```
+
+```
+on disk : ['one', 'two']
+indexed : ['one']
+tags    : ['alpha'] ->  'beta' in tags: False
+rebuilt : ['one', 'two']
+```
+
+Nothing raised. Nothing was logged. The document is on disk, readable, correct,
+and invisible to every query, because the index is a value that was computed
+once from a corpus that has since moved.
+
+This is the dangerous one, and the reason is in the output: the two other
+failures show up in the result, and this one shows up as a result that is
+merely *old*. It is right about the world it was built from. In production the
+usual cause is not a new file; it is an edited one, so the index still returns
+the document and the passage it returns no longer exists.
+
+Three rules keep it from biting:
+
+- **The index is derived, never a source.** If losing it costs you anything
+  other than time, it stopped being an index.
+- **Rebuild from the same input, in one place.** Two code paths that build the
+  index differently drift, and the difference is invisible until a query needs
+  it.
+- **Stamp it.** Carry the corpus version, or the newest file mtime, beside the
+  index and compare on load. An index that can say "I am older than the corpus"
+  turns a silent failure into a loud one.
+
+Today the whole corpus loads in milliseconds, so the notebook rebuilds instead
+of stamping. Say that out loud rather than pretending the problem is gone:
+rebuilding every time is a legitimate strategy at six documents and stops being
+one somewhere before six thousand.
+
+## Failure 3: the wrong document returned
+
+```python
+retrieve("what is a good chunk size", documents, top_k=3)
+```
+
+```
+  3.18  structured-outputs#2
+```
+
+One hit, a score in the normal range, and the wrong document. `3.18` looks like
+the scores that come back when retrieval works, because it is the same
+arithmetic: the query and the chunk share the token `good`, which is rare
+enough in this corpus to be worth 3.18.
+
+That is the whole lesson about scores. **A score measures word overlap, not
+relevance.** It cannot go wrong, and it cannot tell you it went wrong, because
+being wrong is not a thing the number can express.
+
+The same failure has a quieter version. Ask `How does chunking work?` and three
+chunks come back, tied at `2.53`, on the word `work`:
+
+```
+  2.53  evaluation-basics#0
+  2.53  prompt-injection#2
+  2.53  rag-basics#1
+```
+
+The right passage is there — third, behind two documents that have nothing to
+do with chunking, and third only because the tie-break sorts by `doc_id`. At
+`top_k=3` you keep it. At `top_k=2` it is gone, and the prompt is filled with
+two irrelevant passages instead. Cutting `top_k` to reduce noise is exactly how
+that happens.
+
+Which leaves one defence, and it is the habit this session exists to install:
+
+> Read the chunk, not the score.
+
+Two lines of output — the id and the first sentence — are enough to see that
+`structured-outputs#2` is not about chunk size. Nothing else in the pipeline
+will notice for you.
+
+## The diagnostic question
+
+An answer comes back wrong. Ask one question before you touch anything:
+
+> **Did the right passage reach the prompt?**
+
+| Answer | The failure | Where the fix goes |
+|---|---|---|
+| No | retrieval | chunking, the index, the query |
+| Yes | generation | instructions, schema, model |
+
+Never prompt-engineer a retrieval failure. A better instruction cannot recover
+a passage the model was never shown, and the hour you spend rewriting the
+prompt is an hour the retriever spends unchanged. That single question is worth
+more than any rule in this session, and answering it takes one `print`.
+
+## Metadata is what makes a citation checkable
+
+Every chunk carries `doc_id` and `position`; every document carries `tags` and
+`source`. That is why `agent.py` can compare the ids the model cited against
+the ids retrieval actually returned, strip a citation nobody retrieved, cap the
+confidence and flag the answer for review.
+
+```
+trace[decision] fabricated citations stripped: ['internal-wiki']; flagged for human review
+```
+
+Without the metadata the citation is a plausible string. With it, the citation
+is a claim you can check against a list you already have. Session 7 turns that
+check into a number.
+
+## The failure table
+
+The lab asks for a verdict per query, in four words, each of which names a
+different shape of result:
+
+| Verdict | What came back |
+|---|---|
+| `good` | the right document, ranked where it should be |
+| `missed` | the right document is absent, sometimes because nothing came back at all |
+| `irrelevant` | a wrong document is present |
+| `duplicated` | one document fills several slots and crowds the rest out |
+
+`ch06-e1` re-runs retrieval for each query and compares your verdict with what
+happened. A query that retrieves nothing can only be `missed`, and a query that
+retrieves something cannot be. The check has no opinion about your reason, and
+it does require you to write one — a verdict without a reason is a label, and a
+label teaches nobody anything next week.
+
+## Recap
+
+| Page | One line |
+|---|---|
+| The corpus and its loader | a typed loader refuses loudly, because a half-loaded corpus produces normal-looking scores |
+| Lexical retrieval | tokens, overlap, IDF, a deterministic sort — explainable, and blind to paraphrase |
+| Three failures | empty is visible, stale is silent, wrong-document looks exactly like success |
+
+## Exit ticket and homework
+
+Change `max_chars` or `top_k`, rerun the failure table, and write down ONE
+improvement and ONE regression. There is always both, and a report with only
+the improvement in it is the thing session 7 is built to catch.

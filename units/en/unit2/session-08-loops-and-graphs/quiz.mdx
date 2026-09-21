@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: Retrieval returns nothing. Which of the three implementations can refuse before spending a model call?
+
+<Question
+  choices={[
+    { text: "All three; refusing is free", explain: "It is free, and the chain has nowhere to do it. There is no branch between its retrieve step and its prompt." },
+    { text: "The tool loop and reflection", explain: "Correct. Both have a branch after retrieval. The chain sends whatever came back straight into the prompt.", correct: true },
+    { text: "Only reflection, because the critic catches it", explain: "The critic runs after a draft exists, so the call is already spent. That is one call too late." },
+  ]}
+/>
+
+### Q2: The event `answered` arrives while the machine is in `retrieving`. What does `step` return?
+
+<Question
+  choices={[
+    { text: "The state moved to `done`, since answering is where it was heading", explain: "That is the fall-through an `if`/`elif` gives you for free. The run continues in a state the design never allowed, and the bug surfaces somewhere else." },
+    { text: "A raised `ValueError`, so the caller notices", explain: "Every caller then has to remember a `try`, and the one that forgets takes the process down over a late retry. An out-of-order event is ordinary." },
+    { text: "The same state, with `rejected` naming the event and the state it was refused from", explain: "Correct. Nothing moves, nothing raises, and the reason is in the return value where the caller reads it.", correct: true },
+  ]}
+/>
+
+### Q3: What makes `done` terminal?
+
+<Question
+  choices={[
+    { text: "An `if current == \"done\": return state` guard at the top of `step`", explain: "That works and it is code somebody can delete in a refactor. Terminality then disappears with it, silently." },
+    { text: "No row in the table starts with `done`, so every event there is undeclared", explain: "Correct. It is a fact about the data, and adding an outgoing edge would be a deliberate line in a diff.", correct: true },
+    { text: "The graph library enforces it once `END` is reached", explain: "There is no library here. Five states and six edges are a dict, and the dict is what decides." },
+  ]}
+/>
+
+### Q4: Why must `visited` only ever grow?
+
+<Question
+  choices={[
+    { text: "For the audit log; the machine itself does not read it", explain: "The machine does read it. Without the history there is nothing to count, and a retry cap is a count." },
+    { text: "Because a cap on a repeated state is a rule about the history", explain: "Correct. `visited.count('retrieving')` is what stops a retry storm, and rewriting the list to the current state erases exactly that.", correct: true },
+    { text: "So the states stay in alphabetical order", explain: "It is the order they were entered, which is the only order that tells you what the run did." },
+  ]}
+/>
+
+### Q5: You add one edge, `retrieving --retry--> retrieving`. The graph is still legal. What did you just ship?
+
+<Question
+  choices={[
+    { text: "Nothing risky; a retry is a normal recovery", explain: "A retry is normal. An edge back to the same state with nothing counting on it is a run that never ends." },
+    { text: "A run that can loop forever until something external stops it", explain: "Correct. The storm is not in the retry, it is in the missing counter. Cap it with `visited.count(...)` before the move.", correct: true },
+    { text: "A parse failure, which the retry-once rule already covers", explain: "That rule lives in `answer_question` and bounds model calls. It says nothing about a self-edge in your graph." },
+  ]}
+/>

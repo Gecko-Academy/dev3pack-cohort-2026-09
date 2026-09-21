@@ -1,0 +1,93 @@
+# What done means [[done]]
+
+Done is three things, and they are judged by three different readers: five
+checks judged by code, a six-minute defence judged by the room, and a rubric
+judged on evidence.
+
+## The five checks
+
+Run them with `uv run bootcamp check cap01`. All five are deterministic and
+model-free — `FakeLLM` throughout, no key, no network — so they give the same
+verdict on every machine.
+
+| Check | What it judges | What fails it |
+|---|---|---|
+| `cap01-e1` | A supported question answered with its citation checked | The answer text was passed instead of the `AgentResult`; the citations are not exactly `('rag-basics',)`; a cited answer is flagged for review anyway |
+| `cap01-e2` | An unsupported question refused **before** any model call | The refusal is not flagged; it cites something; `probe.calls` is not empty, which means retrieval's verdict was paid for twice |
+| `cap01-e3` | A trace a reviewer can follow | Any of `retrieve`, `llm_call`, `decision` is missing from the kinds |
+| `cap01-e4` | The eval gate | Any golden case fails. The gate is green at 100% and reports the rate it actually saw |
+| `cap01-e5` | The ranked issue list | Fewer than three rows; a row missing `rank`, `issue` or `impact`; an issue or impact left as a placeholder; ranks with a gap or a tie |
+
+`cap01-e2` is the one worth reading twice. It takes a dictionary, not a result:
+
+```python
+check("cap01-e2", {"result": unsupported, "probe_calls": len(probe.calls)})
+```
+
+The refusal alone would prove nothing about *when* it happened. A `FakeLLM` that
+was never called keeps an empty `calls` list, so the second field is the evidence
+that retrieval decided this and the model was never asked.
+
+`cap01-e5` refuses ties for a reason. Two issues ranked 1 is a list that has not
+been prioritised — and the point of the exercise is the ordering, not the
+inventory. The impact is what orders it, which is why the check demands one for
+every row.
+
+## What the checks do not judge
+
+They run your code and read its behaviour. They do not read your wording, and
+they cannot tell you the answer was right — `cap01-e4` says eight cases met a
+pass condition you can attack, and session 7 already showed you how. Nor is the
+scorecard your grade. It is formative, and what it is good for is finding the
+gap you would rather not meet on stage.
+
+## The defence, in session 15
+
+Six minutes, hard-timed, and the last one is not yours to plan.
+
+| Minute | What |
+|---:|---|
+| 1 | The problem, and who has it |
+| 2–3 | The demo: one supported answer with citations, one refusal |
+| 4 | The architecture decision you would defend, and what would reverse it |
+| 5 | Measured evidence: your evaluation report, not an impression |
+| 6 | The injected failure, drawn at the start of your slot, diagnosed from your traces |
+
+Every injected failure is one you already met: empty retrieval, a citation that
+supports nothing, a tool that times out mid-loop, an instruction inside
+retrieved text, a call that repeats until the budget ends it, an illegal state
+transition.
+
+Recovery is not the only pass. **Failing safely is a pass**: a refusal the
+caller can read, a trace showing where the run stopped, and one accurate
+sentence about what you would fix. Claiming it worked when the trace says
+otherwise is the one answer that fails.
+
+## The rubric
+
+You are graded on the
+assessment rubric — not in your copy: six areas,
+each scored 0 to 3, weighted. Evidence, not polish. Here is what the capstone
+puts in front of each area.
+
+| Area | Weight | What the capstone shows |
+|---|---:|---|
+| Environment and assistant workflow | 15% | Doctor green, project instructions that describe this repository, and a diff you reviewed. A 3 needs instructions you improved after they failed you, and one unsafe change you refused, written down. |
+| Python and application foundations | 15% | Typed signatures, typed exceptions, failure cases tested. A 3 needs clean seams — the provider behind a Protocol — and tests that read as documentation of behaviour. |
+| Grounding and tool use | 20% | Citations checked against retrieval, tools that validate their inputs, unsupported questions refused. A 3 needs boundary tests for every tool and a fabricated-citation case caught by a test. |
+| Reliability and evaluation | 20% | A reproducible eval command, failures classified, one targeted fix with numbers before and after. A 3 needs a regression test guarding that fix, and the evaluator itself inspected for false positives. |
+| Skills/MCP integration | 15% | A skill with when-to-use, workflow and failure rules, its before/after evidence, and an MCP connection made in safe mode. A 3 needs a skill improved from an observed failure and the provenance of the external surface explained. |
+| Capstone explanation | 15% | The demo meeting all five requirements above. A 3 also names one honest limitation with a concrete, prioritised next step. |
+
+Read the last row against `cap01-e5`. The ranked issue list you wrote in the
+notebook *is* the honest limitation, already prioritised, already written down
+weeks before anyone asked for it. Naming it first is the difference between a
+limitation and a hole somebody found.
+
+## Recap
+
+| Reader | Asks | Answered by |
+|---|---|---|
+| The checks | Does it behave? | `uv run bootcamp check cap01` |
+| The room | Can you explain it while it breaks? | Six minutes, and your traces |
+| The rubric | Is there evidence? | Tests, numbers, the skill file, the ADR, the issue list |

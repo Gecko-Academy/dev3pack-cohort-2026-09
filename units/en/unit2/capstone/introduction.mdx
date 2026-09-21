@@ -1,0 +1,81 @@
+# Capstone: the source-grounded research assistant
+
+**No date, no two-hour flow · built between sessions from week 2 · 5 checks, scored**
+
+## Outcome
+
+You ship a research assistant that answers developer questions from a small
+versioned corpus, names the documents behind each claim, and refuses when the
+corpus supports nothing. It calls a bounded read-only tool, it exposes a skill
+file another assistant can load, and it arrives with a regression test and an
+evaluation report whose numbers you produced. Five checks judge the behaviour.
+Session 15 judges you: you demo it, and then diagnose a failure you did not
+prepare for, from your own traces.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | The six markdown documents in `data/corpus/`, under version control and written to by nothing you build. One question at a time. One model behind the `LLMClient` seam — `FakeLLM` offline, the lane your `.env` names when you have one. |
+| Output | An `AgentResult`: a `ResearchAnswer` (`answer`, `citations`, `confidence`, `needs_human_review`) and the trace of the run. Every id in `citations` is one retrieval returned for that question. When nothing supports an answer, the shape does not change — `needs_human_review` is true and `citations` is empty. |
+| Budget | One model call per question, one corrective retry, then a refusal. Tools read; none writes, spends or mutates. No new dependency, no database, no network in the answer path. Every check runs offline on `FakeLLM`, so the verdict is the same on every machine. |
+| Failures the project must handle | **A question the corpus does not answer.** Retrieval comes back empty and the run refuses before a model call is spent. **A citation for a document retrieval never returned.** Stripped from the answer, confidence dropped, flagged for a human. **An instruction inside retrieved text.** Passages are data to quote, never orders to follow. **A provider that hangs.** A flagged refusal the caller can read, not a traceback. |
+
+The threat is not a hostile user. It is an assistant that answers everything.
+Fluent prose about a document that says nothing of the kind reads exactly like
+fluent prose about a document that does, and no reader can tell the two apart at
+speed. So the system has to. The citation names the source, the refusal is a
+state rather than a silence, and the trace says which of the two the run
+produced.
+
+## How to work on it
+
+This is not a session. It has no date and no two-hour rhythm, because you build
+it in the hours between sessions from week 2 onward. Each session hands you one
+piece. Below is what to do with that piece before the next one, so the next
+increment is never a blank page.
+
+1. **After session 6.** Load `data/corpus/` with the strict loader and run
+   `retrieve` over it, so a supported question returns chunks and an unsupported
+   one returns nothing at all — checkpoints 1 and 2 both stand on that.
+2. **After session 7.** Run the golden set, write the pass rate down as your
+   baseline, and note the weakness you found in the evaluator itself; the report
+   needs a "before" and an honest caveat, and today is when both are cheap.
+3. **After session 8.** Pick the shape of the run — chain, loop, or graph — and
+   record the model calls each one cost, because that count is the architecture
+   decision you defend in minute 4 of the demo.
+4. **After session 9.** Turn the trace on for a whole run, rerun `run_evals`,
+   and put the first failure in a named bucket with the trace line that decided
+   it; `cap01-e3` and `cap01-e4` go green here.
+5. **After session 10.** Write the `SKILL.md` with its before-and-after pair of
+   runs, and the decision record for the choice you made in step 3, including
+   the measurement that would reverse it.
+6. **After session 11.** Decide what a session remembers, cap it, and write the
+   retention policy — including the line naming what you refuse to store.
+7. **After session 12.** Classify every tool your assistant can reach as reading
+   or mutating, and keep only the readers wired to the capstone.
+8. **After session 13.** Work one external surface in the recorded lane, and
+   write down the provenance of anything you carry back from it.
+9. **After session 14.** Harden: the injection test, the timeout, and the
+   regression test for rank 1 of your issue list, with the evaluation numbers
+   from before and after the fix saved side by side.
+
+Ranked issue list first, fixes second. An unfinished item you have diagnosed is
+worth more on demo day than a finished one you cannot explain.
+
+## Evidence
+
+```bash
+uv run bootcamp check cap01                    # runs the notebook, prints its scorecard
+uv run bootcamp submit cap01 --github <you>    # hands it in as it stands
+```
+
+Four of the five checks are gates over code that already exists: `cap01-e1`
+reads a cited answer, `cap01-e2` reads a refusal and the model-call count beside
+it, `cap01-e3` reads the trace kinds, `cap01-e4` reads the eval report.
+`cap01-e5` is the one you write — the ranked issue list, which is also session
+14's backlog and demo day's honest limitation.
+
+<!-- navigation:start -->
+[Previous: Skills and an architecture decision record](../session-10-skills-and-adr/introduction.mdx) · Next: State and memory — opens Mon 28 Sep
+<!-- navigation:end -->

@@ -1,0 +1,117 @@
+# The decision record, and the reversal test [[reversal-test]]
+
+## Why anything gets written down
+
+Six months from now somebody opens the capstone and asks why the retriever is
+TF-IDF. Three answers are possible. "Because it is" — that is the code
+describing itself, and it tells them nothing. "Because embeddings were overkill
+for forty documents" — better, but they still cannot tell whether it is *still*
+true. Or: "because embeddings were overkill for forty documents, and we change
+our minds when the corpus passes 500 documents or recall@3 drops below 0.7 on
+the golden set" — now they can go and look.
+
+That third answer is a decision record. Four fields, and one of them does all
+the work.
+
+## The four fields
+
+```python
+adr = {
+    "decision": "",            # what you chose, phrased as a choice
+    "options_considered": [],  # at least two
+    "why_not": "",             # why the one you turned down lost, today
+    "reverses_it": "",         # the measurement or event that changes your mind
+}
+```
+
+**`decision` is a choice, not a description.** "The capstone loop is
+hand-written" describes the code as it stands. "We keep the hand-written loop in
+`agent.py`, and leave the graph framework out" records that a person decided
+something, which means a person can undecide it. `ch10-e2` refuses the first
+shape and tells you how to rewrite it.
+
+**`options_considered` needs at least two.** One option is not a decision. It is
+a justification written afterwards for the only thing you tried, and the giveaway
+is that it never mentions anything you did not do. Two options is the smallest
+record of an actual choice. Naming the same option twice in different words is
+still one option, and the check says so.
+
+**`why_not` is the reason, not the verdict.** "It was worse" is a verdict. "It
+adds a dependency and a second vocabulary for four nodes I can already read top
+to bottom" is a reason, and the difference matters because a reason can go stale
+in a way a verdict cannot. When you have twelve nodes, that sentence stops being
+true and you can see that it stopped.
+
+**`reverses_it` is the exercise.** Everything above is context; this is the part
+that makes the record engineering rather than an essay.
+
+## The reversal test
+
+A decision that cannot be reversed by evidence is not a decision, it is a
+preference. So write the evidence down in advance, while you are still honest,
+before you are attached to being right.
+
+The rule the check enforces: **a number and a unit.**
+
+| Not a trigger | A trigger |
+|---|---|
+| when it gets slow | p95 for one answer stays over 2000 ms for 15 minutes |
+| if quality drops | the golden set falls below 0.8 pass rate on two consecutive runs |
+| when we have more users | the corpus passes 500 documents |
+| when the loop gets complicated | the graph passes 8 nodes, or one run has to survive a restart |
+| if it becomes a problem | we spend more than 3 hours in one week debugging control flow |
+
+Every row on the left could be argued about forever, by people who all believe
+they are describing the same situation. Every row on the right is something
+somebody could check on a Tuesday and get one answer.
+
+The good ones have another property: the measurement already exists, or you know
+how to make it. Session 7 gave you recall@k and grounding on the golden set,
+session 9 gave you traces and an eval command. A trigger that depends on a
+number nobody is collecting is a trigger that never fires.
+
+## The check
+
+`ch10-e2` reads the four fields and refuses:
+
+- a `decision` that describes the code instead of naming a choice;
+- fewer than two `options_considered`, or the same option listed twice;
+- a `why_not` left unwritten, or one that repeats the decision;
+- a `reverses_it` with no number in it — the failure message says exactly this:
+  "when it gets slow" is an opinion, "when p95 stays over 2000 ms for 15
+  minutes" is a trigger somebody can check;
+- a `reverses_it` with a number and no unit, because a bare number cannot be
+  compared against anything.
+
+That last rule is the same one the optional depth track applies in
+`depth/03-architecture`, and the check imports its unit vocabulary from there
+rather than copying it, so the course has one standard for a reversal trigger
+instead of two that drift apart. If you want the longer version of this material
+— boundaries, imports that cross them, the synchronous-versus-queue decision —
+that module is where it lives.
+
+## A worked record
+
+```python
+adr = {
+    "decision": "Keep the hand-written loop in agent.py for the capstone; no graph framework.",
+    "options_considered": [
+        "the hand-written loop in agent.py",
+        "a LangGraph StateGraph over the same LLMClient seam",
+    ],
+    "why_not": (
+        "The graph declares its edges, but it adds a dependency and a second vocabulary "
+        "for four nodes I can already read top to bottom, and both traces refuse the "
+        "same unsupported question."
+    ),
+    "reverses_it": (
+        "When the capstone passes 8 nodes, or a run has to survive a restart and resume, "
+        "or p95 for one answer passes 5 seconds and only concurrent nodes would cut it."
+    ),
+}
+```
+
+Three triggers, because a decision can expire for more than one reason, and each
+of them names something you could go and look at. Write yours about a decision
+you actually made this fortnight. A record of a decision you never made is the
+same essay, with better formatting.

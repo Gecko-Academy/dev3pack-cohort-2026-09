@@ -1,0 +1,119 @@
+# Measure before you optimize [[hit-rate]]
+
+## "It seemed better" is not a result
+
+Session 6 left you with a retrieval pipeline and a habit: look at the chunks
+before blaming the model. Looking is diagnosis. It does not tell you whether
+yesterday's change helped, because you cannot hold twenty retrievals in your head
+and compare them with twenty from last week.
+
+A measurement can. It needs three things, and none of them is infrastructure: a
+fixed set of cases, a pass condition, and a command anyone can run.
+
+## The metrics, and the one you can afford today
+
+| Metric | The question it answers | What it costs to compute |
+|---|---|---|
+| **Hit rate @k** | did the expected document make the top k? | one labeled pair per case |
+| Recall | of all the relevant passages, how many came back? | every relevant passage labeled, per query |
+| Precision | of what came back, how much was relevant? | every returned passage judged, per query |
+| Latency | how long did the user wait? | a timer |
+| Context size | how much of the prompt budget did retrieval burn? | a token count |
+
+Recall and precision are the honest pair, and they are expensive: they need
+someone to label every passage in the corpus for every query. Hit rate needs one
+doc id per query. That is why the session lives on hit rate — not because it is
+the best metric, because it is the one that exists by lunchtime.
+
+Know what you gave up. Hit rate at 3 says the right document was somewhere in the
+top three. It does not say it was first, does not say the other two were junk,
+and does not say the passage that came back is the passage that answers the
+question. It catches regressions, which is most of the value, and it flatters you
+about everything else.
+
+## A labeled set is ten minutes of work
+
+```python
+labeled = [
+    ("How does chunking work in RAG?", "rag-basics"),
+    ("What stopping conditions should a loop have?", "agent-loops"),
+    ("Why validate structured output strictly?", "structured-outputs"),
+    ("What is an MCP server?", "mcp-overview"),
+    ("How do I defend against instructions inside documents?", "prompt-injection"),
+]
+```
+
+Query, expected doc id. No database, no framework, no annotation tool. Five cases
+beat zero cases by infinity, because zero cases means every claim you make about
+retrieval is a memory of one query you tried on Tuesday.
+
+Two rules make the set worth having. **Write it before the fix.** A set written
+after you know what you want it to say is a mirror. And **write it against the
+real corpus**, so a label is a fact about `data/corpus/`, not a guess.
+
+## Scoring it
+
+```python
+def hit_rate(cases, top_k=3):
+    hits = 0
+    for query, expected in cases:
+        got = {s.chunk.doc_id for s in retrieve(query, documents, top_k=top_k)}
+        hits += expected in got
+        print(f"{'HIT ' if expected in got else 'MISS'}  {expected:20} <- {query}")
+    return hits / len(cases)
+```
+
+```
+HIT   rag-basics           <- How does chunking work in RAG?
+HIT   agent-loops          <- What stopping conditions should a loop have?
+HIT   structured-outputs   <- Why validate structured output strictly?
+HIT   mcp-overview         <- What is an MCP server?
+MISS  prompt-injection     <- How do I defend against instructions inside documents?
+
+baseline hit rate @3: 80%
+```
+
+Eleven lines of code, one number, and a per-case line that says which case to go
+look at. The per-case print matters more than the total: `80%` tells you to do
+something, `MISS prompt-injection` tells you what.
+
+## The MISS, read as words
+
+The query asks about *instructions inside documents*. `prompt-injection.md` calls
+the same thing **injection**, arriving from **untrusted** content, defended with
+**delimiters**. One topic, two vocabularies, no shared content word — so a
+lexical scorer has nothing to add up, and four documents that share the ordinary
+words *instructions* and *documents* outrank the one that is actually about it.
+
+This is the paraphrase gap, and it is the measured case for embeddings: semantic
+search closes exactly this, and buys a dependency and a failure mode you cannot
+read by eye. Quantify the gap before you pay for it. Right now the gap is worth
+one case out of five, and the next page fixes it for free.
+
+## Fewer, better passages
+
+The other reflex to kill early: raising `top_k` to 10 "to be safe". It is not
+safe.
+
+- Irrelevant context invites unsupported claims. A passage in the prompt is a
+  passage the model may quote.
+- Attention is a budget. Ten chunks of context leave less room, and less
+  attention, for the two that matter.
+- It hides the regression. Hit rate at 10 goes up while the answer gets worse,
+  and your metric says you won.
+
+Post-filtering and reranking (score the top 50 cheaply, reorder them with a
+stronger model, keep 3) and prompt compression (drop the sentences the query does
+not touch) both attack the same problem from the other end: fewer, better
+passages. Both are real tools and neither is in today's budget. They earn their
+place after a measurement says the cheap fix ran out — which is the whole point
+of having the measurement first.
+
+## Two things a hit rate cannot tell you
+
+It cannot tell you whether the model used the passage that arrived. That is
+grounding, and it needs the full agent and a different set — page 3.
+
+And it cannot tell you whether the number is honest. The next page takes hit rate
+from 80% to 100% with three words, and the number is a lie by omission until you
+measure it somewhere it was not tuned.

@@ -1,0 +1,39 @@
+# Conclusion
+
+You built both halves of a retrieval baseline: a loader that refuses, and lexical
+retrieval over what it loaded.
+
+## What you did
+
+- `load_mini` names the file and the rule on a missing file and on a file with no
+  title, and the check judged it on files it wrote itself rather than on your
+  description of them.
+- You indexed the real corpus, tag to sorted doc ids, and saw why exact keys run
+  out — twenty-six of twenty-seven tags point at exactly one document.
+- Then chunks, token overlap weighted by rarity, and a sort key of
+  `(-score, doc_id, position)` that makes the same query return the same three
+  chunks on every machine in the room.
+- You filled the failure table for three queries and the check re-ran retrieval
+  to confirm each verdict against what actually came back.
+
+## The failure you handled
+
+An empty result. `vector embeddings cosine similarity` shares no token with any
+chunk, `retrieve` returns `[]`, and the agent refuses before it spends a model
+call — no `llm_call` line in the trace at all.
+
+You also ran the two failures that do not announce themselves: an index older
+than its corpus, which raises nothing and hides a document that is sitting right
+there, and one confident hit from the wrong document, because a score measures
+word overlap and never relevance.
+
+## What to carry forward
+
+That is the habit to keep: read the chunk, not the score, and ask whether the
+right passage reached the prompt before touching a prompt.
+
+## Into session 7
+
+Session 7 assumes you can load a corpus, retrieve over it, and read a scored
+result without help. It turns today's "missed" into a number, so the upgrade that
+closes the gap has a baseline to beat.

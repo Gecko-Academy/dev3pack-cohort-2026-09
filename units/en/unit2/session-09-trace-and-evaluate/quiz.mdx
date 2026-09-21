@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: The baseline fails all five grounded cases. The trace shows `retrieve` returned the expected document. Which bucket?
+
+<Question
+  choices={[
+    { text: "retrieval — five grounded cases failed, so retrieval is the suspect", explain: "The report alone leaves both buckets open. The trace closes one of them: the passage reached the prompt." },
+    { text: "instruction_following — the context arrived and the model ignored it", explain: "Correct. Retrieval did its job, one llm_call happened, and the answer cited nothing. The fix lives in the prompt or the model, not the index.", correct: true },
+    { text: "formatting — the reply must have broken the schema", explain: "A schema break shows up as a parse failure and a retry in the trace. There is neither here." },
+  ]}
+/>
+
+### Q2: Your redactor deletes any field that contained an API key. What has it cost you?
+
+<Question
+  choices={[
+    { text: "Nothing; the safest thing to do with a secret is remove it", explain: "The secret is gone either way. What is also gone is the fact that there was one." },
+    { text: "A reader can no longer tell a removed credential from one that was never there", explain: "Correct. Those two facts lead to different next steps, and a missing field cannot express either. Replace with a placeholder that says a value was removed.", correct: true },
+    { text: "Only readability; the eval still passes", explain: "The eval never looked at the log. The cost lands on the person reading it during an incident." },
+  ]}
+/>
+
+### Q3: Three attempts, three keys, and every one becomes the string `[redacted]`. What does the log now hide?
+
+<Question
+  choices={[
+    { text: "Nothing — the placeholder is consistent, which is what consistency means", explain: "Consistent across different secrets is exactly the problem: it makes them indistinguishable." },
+    { text: "That attempt 3 used a different key from attempts 1 and 2", explain: "Correct. Derive the placeholder from the secret — a short digest — and the log shows two distinct values without printing either.", correct: true },
+    { text: "The status codes, which the redactor overwrote", explain: "The status codes survive; a redactor replaces the secret and keeps every byte around it." },
+  ]}
+/>
+
+### Q4: One `llm_call` event never reaches the log. Nothing raises. What is the danger?
+
+<Question
+  choices={[
+    { text: "The trace is incomplete, so the next reader will treat it with caution", explain: "There is nothing in the file that says it is incomplete. That is the danger." },
+    { text: "The trace reads as a run where no model call happened, and sends the reader to the wrong bucket", explain: "Correct. A gap does not look like a gap; it looks like a different run. Hold the trace to a shape — at least one retrieve, exactly one decision — so a broken logger is detectable.", correct: true },
+    { text: "The evaluation will fail, which surfaces the problem", explain: "The evaluation reads the answer, not the trace. It stays green while the log tells a false story." },
+  ]}
+/>
+
+### Q5: You need to measure whether an answer's tone is appropriate. Code check or a model as judge?
+
+<Question
+  choices={[
+    { text: "A code check; deterministic beats probabilistic every time", explain: "Prefer code where code can express the property. Tone is not one a regex can express." },
+    { text: "A model as judge, spot-checked against human labels on a sample", explain: "Correct. Reach for a judge only where code cannot express the property, and measure the judge itself — an unchecked judge is an instrument with an error bar nobody reports.", correct: true },
+    { text: "A model as judge, and trust it — it is the same class of model that wrote the answer", explain: "That is the reason for suspicion, not for trust. A judge shares the generator's biases and will forgive its own failure modes." },
+  ]}
+/>

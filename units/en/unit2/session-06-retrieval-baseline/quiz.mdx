@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: A file in the corpus directory has no title header. What should `load_corpus` do?
+
+<Question
+  choices={[
+    { text: "Skip it and return the other five documents", explain: "A corpus that is quietly one document short produces retrieval scores that look completely normal. Nothing downstream can detect it." },
+    { text: "Load it with an empty title", explain: "A document with no title is not a document with a blank title. The empty string travels on and fails somewhere with no connection to the cause." },
+    { text: "Raise CorpusError naming the file and the missing header", explain: "Correct. The whole directory or nothing, and the message names the file so the fix takes seconds.", correct: true },
+  ]}
+/>
+
+### Q2: `retrieve("vector embeddings cosine similarity", documents)` returns `[]`. What is the fix?
+
+<Question
+  choices={[
+    { text: "Lower the score threshold until three chunks come back", explain: "That converts a visible failure into an invisible one: the same nothing, now dressed as an answer with a score above it." },
+    { text: "Nothing to fix here — record it as a miss and let the agent refuse", explain: "Correct. No query token appears in any chunk, so the empty list is honest, and the agent refuses before spending a model call.", correct: true },
+    { text: "Rewrite the prompt so the model handles the missing context", explain: "The model was never shown the passage. No instruction recovers a passage that never reached the prompt." },
+  ]}
+/>
+
+### Q3: A document sits on disk, loads fine by hand, and no query ever returns it. What happened?
+
+<Question
+  choices={[
+    { text: "The index is stale — it was built before that file existed", explain: "Correct. The index is a value computed once, and it is right about the world it was built from. Nothing raises, which is what makes it the dangerous failure.", correct: true },
+    { text: "Its score is below the cutoff", explain: "A low score still appears when you print the scored chunks. This document appears nowhere, at any k." },
+    { text: "The loader rejected it", explain: "Then the load would have raised CorpusError and named the file. A rejection is loud; this failure is silent." },
+  ]}
+/>
+
+### Q4: `what is a good chunk size` returns one hit, `structured-outputs#2`, scoring 3.18. Why?
+
+<Question
+  choices={[
+    { text: "That chunk is the closest thing the corpus has to an answer", explain: "It is about parsing failures and retries. Closeness in meaning is exactly what this retriever cannot measure." },
+    { text: "chunk and size appear nowhere in the corpus, so the only shared token is good", explain: "Correct. rag-basics writes chunking and chunks, never chunk, and there is no stemming. One shared everyday word carries the whole score.", correct: true },
+    { text: "The score is low, so the result is already flagged", explain: "3.18 sits in the same range as scores from queries that work. The number cannot tell you it is wrong." },
+  ]}
+/>
+
+### Q5: The answer is wrong. Which question do you ask before changing anything?
+
+<Question
+  choices={[
+    { text: "Did the right passage reach the prompt?", explain: "Correct. No means retrieval — chunking, index, query. Yes means generation — instructions, schema, model. One print answers it.", correct: true },
+    { text: "Is the system prompt strict enough?", explain: "That assumes generation before checking retrieval. Never prompt-engineer a retrieval failure; a better instruction cannot recover a passage the model never saw." },
+    { text: "Would a bigger model get this right?", explain: "It would answer the same question from the same context. If the passage was missing, the bigger model invents more fluently." },
+  ]}
+/>

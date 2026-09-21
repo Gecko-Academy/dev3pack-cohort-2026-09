@@ -67,11 +67,11 @@ Mon 21 Sep to Fri 25 Sep
 
 | Day | # | Session | Checks | Runs unattended |
 |---|---|---|---|---|
-| Mon 21 Sep | 6 | A retrieval baseline — not yet | 3 | yes |
-| Tue 22 Sep | 7 | Retrieval and grounding metrics — not yet | 3 | yes |
-| Wed 23 Sep | 8 | Loops and graphs — not yet | 3 | yes |
-| Thu 24 Sep | 9 | Trace and evaluate an agent — not yet | 2 | yes |
-| Fri 25 Sep | 10 | Skills and an architecture decision record — not yet | 2 | no: assistant-driven: skill authoring plus before/after runs in your assistant |
+| Mon 21 Sep | 6 | [A retrieval baseline](../units/en/unit2/session-06-retrieval-baseline/) | 3 | yes |
+| Tue 22 Sep | 7 | [Retrieval and grounding metrics](../units/en/unit2/session-07-grounding-metrics/) | 3 | yes |
+| Wed 23 Sep | 8 | [Loops and graphs](../units/en/unit2/session-08-loops-and-graphs/) | 3 | yes |
+| Thu 24 Sep | 9 | [Trace and evaluate an agent](../units/en/unit2/session-09-trace-and-evaluate/) | 2 | yes |
+| Fri 25 Sep | 10 | [Skills and an architecture decision record](../units/en/unit2/session-10-skills-and-adr/) | 2 | no: assistant-driven: skill authoring plus before/after runs in your assistant |
 
 ## Week 3: State, MCP, deployment, defense
 
@@ -87,7 +87,7 @@ Mon 28 Sep to Fri 02 Oct
 
 ## Capstone
 
-Capstone: the source-grounded research assistant — opens with week 2 opens with week
+[Capstone: the source-grounded research assistant](../units/en/unit2/capstone/) opens with week
 2 and is built between sessions. 5 checks, scored.
 
 ## Totals

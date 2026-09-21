@@ -1,0 +1,39 @@
+# Conclusion
+
+You built a labeled set — five queries, five expected doc ids — and turned
+"retrieval feels fine" into a number: hit rate @3, baseline 80%.
+
+## What you did
+
+- You found the one MISS by reading words rather than guessing, and you wrote
+  your own breaking paraphrase, which the check re-ran through retrieval so the
+  finding had to be real.
+- You fixed the MISS with query expansion: one rule, one dict, no dependency and
+  no index rebuild, and hit rate went to 100%.
+- Then you measured the same rule on four queries it was never tuned on, and
+  probe hit rate @1 went from 75% to 0%.
+- That pair is the artifact: an improvement with its number and a regression with
+  its number, in a report the check refuses to accept without both.
+
+## The failure you handled
+
+A metric that flatters the change that produced it. Measure on the set you tuned,
+and you are measuring your own homework.
+
+Then the same discipline on grounding — the golden set at 38%, one targeted fix,
+100% — and the moment to get suspicious rather than satisfied.
+
+So you attacked it. A fake that answers every question with one sentence and
+cites one document scored 50%: three passes free because retrieval refused before
+the model was asked, and one genuine false positive where the citation was right
+and the claim it sat beside was supported by nothing.
+
+## What to carry forward
+
+That is what the capstone grader's `citation_precision` and `claim_support` gates
+exist to close, and why the graded question set is one you cannot tune to.
+
+## Into session 8
+
+Session 8 assumes you write the set before the fix, report both numbers, and
+treat an evaluator you have not attacked as a guess.

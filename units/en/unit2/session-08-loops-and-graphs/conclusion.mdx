@@ -1,0 +1,40 @@
+# Conclusion
+
+You ran one task three ways and filled the comparison table from counted calls:
+the chain spends one, the loop one plus a corrective retry, reflection three with
+the revision capped at one.
+
+## What you did
+
+- Two of those columns are facts the code answers, and `ch08-e1` re-read the code
+  rather than taking your word for the numbers.
+- You either ran the graph appendix and named what its trace showed, or you said
+  why you did not — `ch08-e2` takes both and refuses a blank.
+- Then you wrote the workflow as a graph without a framework: five states, six
+  edges in a dict, and `step(state, event)` as the only thing that moves between
+  them.
+- `ch08-e3` drove your machine over every state and every event, legal and not,
+  with no model anywhere in it.
+
+## The failure you handled
+
+An invalid transition. An event that is not declared from the current state
+leaves the state exactly where it was, raises nothing, and comes back with
+`rejected` naming the event and the state it was refused from.
+
+You injected the other two failures and read the difference. A retry storm is an
+edge with nothing counting on it, and `visited`, which only grows, is the counter
+that caps it. A partial tool failure is a decision about which event to emit,
+made in the open, with the failed source named and the flag travelling with the
+answer.
+
+## What to carry forward
+
+`done` is terminal for one reason only — no row in the table starts there — so
+terminality is a fact about the data and not a guard somebody can delete.
+
+## Into session 9
+
+Session 9 assumes you can draw the graph your agent walks, and it starts
+measuring whether that graph is the right one — structure was today; quality is
+the golden set and the pass rate.

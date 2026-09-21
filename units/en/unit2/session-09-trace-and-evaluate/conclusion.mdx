@@ -1,0 +1,39 @@
+# Conclusion
+
+You replaced "it seemed to work" with a number anybody can reproduce: eight
+golden cases, a code pass condition, one command.
+
+## What you did
+
+- The baseline scored 3/8 and the report said why, which is a failing eval doing
+  its job.
+- The report alone could not separate two buckets, so you read a trace: retrieval
+  returned the right document, the model was called, the answer cited nothing —
+  `instruction_following`, and the fix now has an address.
+- One targeted change, rerun, compare. Two changes between measurements and you
+  would have learned nothing about either.
+- Then you wrote `redact(event)` and the trace became something you are allowed
+  to keep: an API key, a bearer token and an email address replaced, every other
+  byte untouched, the same secret always the same placeholder.
+
+## The failure you handled
+
+A secret reaching a log. Replaced, never deleted — a field that vanishes reads as
+a field that never existed, and the placeholder is the record that something was
+removed.
+
+You also saw the quieter one. Drop a single `llm_call` event and nothing raises;
+the trace simply describes a run that never happened, and it reads as evidence
+rather than absence.
+
+## What to carry forward
+
+The limit is written down: a redactor removes what you declared and nothing else,
+and a green eval means the cases you wrote pass, not that the answers are right.
+
+## Into session 10
+
+Session 10 assumes you can read a trace unaided, name a bucket from it, and treat
+a log as data with a retention policy attached. It writes instructions an
+assistant executes, and measures the before and after — which is this session's
+discipline pointed at a prompt.

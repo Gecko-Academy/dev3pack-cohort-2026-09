@@ -1,0 +1,149 @@
+# Redaction, and the missing span [[redaction-and-gaps]]
+
+## A trace is the longest-lived copy of your data
+
+Nobody logs an API key on purpose. It arrives as a passenger: somebody logs the
+request that was sent, and the request had an `Authorization` header on it.
+
+```python
+{
+  "kind": "llm_call",
+  "detail": "POST /v1/messages key=sk-a1b2c3d4e5f60718293a status=200",
+  "headers": "authorization: Bearer eyJhbGciOiJIUzI1NiJ9.ZmFrZS1wYXlsb2Fk",
+  "actor": "run opened by analyst@dev3pack.example.com at 09:12",
+  "question": "How does chunking work in retrieval-augmented generation?",
+  "attempt": 1,
+}
+```
+
+Three things in there must not be kept: a key, a token, an email address. The
+rest is the reason the event exists. The whole difficulty of redaction is that
+both sentences are true at once.
+
+And the log is the worst place for a secret to land. It is replicated, shipped
+to a search index, retained for a year by a policy nobody remembers writing, and
+readable by everyone on call. A key in a request lives for one call. A key in a
+log lives until the retention policy expires.
+
+## Four rules, and each one is a way to get it wrong
+
+| Rule | The failure it prevents |
+|---|---|
+| Replace, never delete | a field that vanishes reads as a field that never existed |
+| Everything else byte-identical | a blanket scrub keeps the trace and throws away what it was for |
+| Same secret, same placeholder | two keys read as one, or one key reads as two |
+| Never raise | `detail` can be `None`; a redactor that crashes takes the trace with it |
+
+Rule one is the one people argue about. Deleting the field feels safer — nothing
+left to leak. But then the reader of an incident cannot tell "we removed a
+credential here" from "no credential was involved", and those two facts lead to
+completely different next steps. The placeholder is the record that something
+was removed:
+
+```
+detail: POST /v1/messages key=[redacted:api_key:4e3ecbe6] status=200
+```
+
+Rule three is the one that gets skipped, and it costs the most. Replace every
+secret with the string `[redacted]` and this event:
+
+```
+attempt 1 key=[redacted] -> 401
+attempt 2 key=[redacted] -> 401
+attempt 3 key=[redacted] -> 200
+```
+
+now hides the only fact that mattered: attempt 3 used a **different** key. Derive
+the placeholder from the secret and the log says so without ever printing it:
+
+```python
+def placeholder(label: str, secret: str) -> str:
+    return f"[redacted:{label}:{hashlib.sha256(secret.encode()).hexdigest()[:8]}]"
+```
+
+Same input, same eight characters. Different input, different eight characters.
+The reader can count distinct secrets and can never read one.
+
+## Declared patterns, not guesses
+
+```python
+PATTERNS = {
+    "api_key": re.compile(r"sk-[A-Za-z0-9]{16,}"),
+    "bearer_token": re.compile(r"(?<=Bearer )[A-Za-z0-9._-]{12,}"),
+    "email": re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"),
+}
+```
+
+Note what the bearer pattern does *not* match. The word `Bearer` is context, so
+it stays; only the token after it goes. A redactor that eats the word too leaves
+a line nobody can interpret.
+
+Then the loop, and it is short:
+
+```python
+for label, pattern in PATTERNS.items():
+    for secret in sorted(set(pattern.findall(value))):
+        value = value.replace(secret, placeholder(label, secret))
+```
+
+Be honest about the limit. This removes what you named and nothing else. A key
+in a format you did not declare goes straight through, and so does a name, an
+address, or an account number sitting in a free-text field. Redaction at the
+sink is the last line, not the first: the first is not putting the secret in the
+event at all. Sessions 2 and 4 already do that — credentials are injected at the
+transport edge, and the model never sees them, so they cannot appear in anything
+it produced.
+
+## The missing span
+
+Now the other failure, and it is quieter. Take the same run and lose one event:
+
+```
+[retrieve ] top_k=3 -> [('rag-basics', 0), ('rag-basics', 1), ('rag-basics', 2)]
+[decision ] answered with citations ['rag-basics']
+```
+
+Nothing raised. Nothing looks broken. There is no error line, no gap marker, no
+`...`. And the trace now says something false: that an answer appeared without a
+model call — which, in this codebase, is the shape of a refusal or of a cached
+result. The bucket you would reach for is wrong, and you would reach for it
+confidently.
+
+A trace with a gap is worse than no trace, because no trace makes you go and
+look, and a gap makes you stop looking.
+
+| How a span goes missing | What it looks like afterwards |
+|---|---|
+| an exception between the call and the append | a step that never happened |
+| a buffered writer that loses its tail | a run that ends early |
+| a filter that matches too much | a whole `kind` that appears extinct |
+| sampling: 1 run in 10 kept | a rare failure that "never reproduces" |
+
+Two defences, and both are cheap. Record the event **before** you use its
+result, so an exception cannot delete the evidence of the step that caused it.
+And write the count you expect: a run of `answer_question` produces at least one
+`retrieve` and exactly one `decision`, so a log line that violates that is a
+broken *logger*, not a broken agent. An invariant on the trace is the only thing
+that can tell you the trace is lying.
+
+## Recap
+
+| Lesson | One line |
+|---|---|
+| The event | `kind` and `detail`, named after your step and not your vendor |
+| The eval | fixed cases, a code pass condition, one command anybody can rerun |
+| Error analysis | five buckets; the trace picks the bucket, the bucket aims the fix |
+| Redaction | replace, keep everything else, one placeholder per secret, never raise |
+| The missing span | a gap does not read as a gap — hold the trace to a shape |
+
+## What the two checks judge
+
+| Check | Judges | Fails when |
+|---|---|---|
+| `ch09-e1` | the bucket you named for the baseline failure | the answer is unwritten, or blames retrieval when the trace shows retrieval worked |
+| `ch09-e2` | your `redact`, on four events it builds itself | a secret survives, a field is deleted, an innocent value is changed, two secrets collapse into one placeholder, or a non-string value makes it raise |
+
+`ch09-e2` supplies an event with no secrets in it and three values that look
+like some — the words "API key" in a question, an `@` that is not an address, a
+hyphenated version string. A redactor that blanks them fails, for the same
+reason a parser that accepts anything is not a parser.

@@ -1,0 +1,136 @@
+# Lexical retrieval, and what it cannot do [[lexical-retrieval]]
+
+## The simplest index there is
+
+An index is a key and a list of documents. The corpus already ships keys, so
+the first index writes itself:
+
+```python
+tag_index: dict[str, list[str]] = {}
+for doc in documents:
+    for tag in doc.tags:
+        tag_index.setdefault(tag, []).append(doc.doc_id)
+tag_index = {tag: sorted(ids) for tag, ids in tag_index.items()}
+```
+
+```
+agent            ['agent-loops']
+chunking         ['rag-basics']
+citations        ['rag-basics']
+...
+tools            ['agent-loops', 'mcp-overview']
+```
+
+Twenty-seven tags over six documents. Look at what that means: twenty-six of
+those tags point at exactly one document, and only `tools` points at two. The
+index is perfectly precise and nearly useless, for two reasons that both matter.
+
+A question has to hit a key exactly. "How do I split a document up?" contains
+no tag, so this index returns nothing at all — not a bad answer, no answer.
+And when a key does hit, the unit it returns is a whole document, which for
+`mcp-overview` is 2,349 characters of which maybe one paragraph is relevant.
+
+So keep the shape — a key, a list of things that carry it — and change the key
+from a hand-written tag to every word in the text, and the unit from a document
+to a passage. That is lexical retrieval.
+
+## Chunking: what the retriever actually sees
+
+The retriever never sees a document. It sees chunks.
+
+```python
+chunks = chunk_document(doc, max_chars=800)
+```
+
+```
+--- rag-basics#0 (383 chars)
+# RAG Basics  Retrieval-augmented generation (RAG) grounds a model's answer in documents you control. Instead of hoping  ...
+--- rag-basics#1 (707 chars)
+A minimal RAG pipeline has four stages. **Chunking** splits documents into passages small enough to be individually rele ...
+--- rag-basics#2 (558 chars)
+When a RAG system answers wrongly, the first diagnostic question is: did the right passage reach the prompt? If retrieva ...
+--- rag-basics#3 (614 chars)
+Every answer should name the document ids it drew from, and the application should verify those ids against what was act ...
+```
+
+`chunk_document` packs whole paragraphs until adding the next one would cross
+`max_chars`, so chunks land on paragraph boundaries and none of these four is
+exactly 800 characters. One paragraph longer than `max_chars` on its own is the
+exception: it gets truncated, and that is the only place a chunk can end
+mid-sentence. Every chunk keeps `doc_id` and `position`, which is what makes a
+citation checkable later — `rag-basics#2` is an address you can go and read.
+
+`max_chars` is a trade you make on purpose. Small chunks score sharply and
+arrive at the prompt without their context. Large chunks carry their context
+and dilute the score, because overlap is measured against everything else in
+the chunk too. Your homework is to move that number and report both sides of
+what happens.
+
+## Scoring, in four steps
+
+```python
+scored = retrieve(query, documents, top_k=3)
+for hit in scored:
+    print(f"{hit.score:6.2f}  {hit.chunk.doc_id}#{hit.chunk.position}")
+```
+
+```
+  4.88  rag-basics#1
+  4.88  rag-basics#2
+  3.61  rag-basics#0
+```
+
+1. **Tokenise.** `[a-z0-9]+` over the lowercased text, then drop stopwords.
+   `how`, `do`, `i`, `from` carry no signal in this corpus, so they are removed
+   from both the query and the chunk.
+2. **Overlap.** Keep only the chunks that share at least one token with the
+   query. A chunk with no shared token is never scored, which is why an empty
+   result is a real outcome rather than a low one.
+3. **Weight by rarity.** Each shared token adds `log(1 + total_chunks / df)`,
+   where `df` counts the chunks containing it. A token in every chunk adds the
+   least it can; a token in one chunk adds several times more. That is inverse
+   document frequency, and it is the difference between this and counting words.
+4. **Sort, then cut.** The key is `(-score, doc_id, position)`. The two extra
+   fields are not decoration: `rag-basics#1` and `rag-basics#2` tie at `4.88`
+   above, and without a tie-break the order would depend on dictionary
+   iteration and your failure table would stop being reproducible.
+
+Deterministic, dependency-free, and you can always answer "why did this match?"
+by intersecting two sets of tokens by hand. That is why the baseline is
+lexical, and why it is a respectable baseline rather than a placeholder.
+
+## What it cannot do
+
+Ask this corpus about chunk size:
+
+```python
+retrieve("what is a good chunk size", documents, top_k=3)
+```
+
+```
+  3.18  structured-outputs#2
+```
+
+One hit. The wrong document. `rag-basics` has a whole section on chunking and
+it is nowhere. Take the query apart and the mechanism is not mysterious at all:
+
+| Query token | In the corpus? |
+|---|---|
+| `what`, `is`, `a` | stopwords, dropped before scoring |
+| `chunk` | never appears — `rag-basics` writes `chunking` and `chunks` |
+| `size` | never appears anywhere in the corpus |
+| `good` | appears in `structured-outputs#2` |
+
+The retriever did precisely what it promises. `chunk` and `chunking` are
+different strings, so nothing connects them, and the single surviving token
+pulls back a passage about something else entirely. There is no stemming, no
+synonyms, no notion that two words mean the same thing.
+
+An embedding index would close that gap, and this is not the session that adds
+one. Session 7 measures how wide the gap is first, because an upgrade with no
+measured baseline is a preference, not an improvement — and embeddings bring
+their own costs: a dependency, a model, an index to rebuild, and scores you can
+no longer explain by reading two lists of words.
+
+Write the miss down instead. That is what the failure table in the notebook is
+for, and `missed` is a finding, not a mistake you made.

@@ -1,0 +1,103 @@
+# A skill is an instruction artifact [[what-a-skill-is]]
+
+## The thing you keep retyping
+
+You have a way of reviewing a diff. Read the diff and nothing else. Findings by
+severity. File and line on every one. Say what you did not review. You type some
+version of that into your assistant every time, it comes out different every
+time, and the version you type when you are tired is the short one.
+
+A skill is that paragraph, written once, in a file the assistant loads when the
+task matches. It is instructions, not code. Nothing executes it; the model reads
+it and follows it, the same way it follows the sentence you would have typed.
+
+## Why a file beats a longer prompt
+
+Three reasons, and only the third is about quality.
+
+| | A longer prompt | A skill |
+|---|---|---|
+| Where it lives | in your head, retyped per task | one file, in the repository |
+| When it is loaded | every turn, whether it applies or not | when its description matches the task |
+| When it is wrong | you notice, once, and retype | you edit the file, and it is fixed for every future run |
+
+The second row is progressive disclosure, and it is context budgeting. A skill
+has two parts. The `description` in the front matter is short and always
+visible, so the model can tell whether the skill applies. The body is long and
+loads only when it does. Ten skills cost you ten lines of context until one of
+them is needed.
+
+```markdown
+---
+name: corpus-answers
+description: Use when answering questions from a local document corpus —
+  requires verified citations, refusal on unsupported questions, and a
+  visible trace.
+---
+```
+
+That `description` is doing routing, not decoration. "Use when…" and the
+refusal condition are what let the model pick this skill over another one.
+
+## The five sections
+
+```markdown
+## When to use      ← and, explicitly, when NOT to
+## Workflow         ← numbered, with a stop condition
+## Output format    ← checkable by someone who did not watch the run
+## Failure rules    ← what to do when a step does not work
+## Safety boundary  ← what this skill may never do
+```
+
+The failure rules are where a skill earns its keep. Anyone can write the happy
+path; the model mostly knows it already. "If the diff does not apply or a test
+is missing, say so and stop. Never approve a change you could not run" is the
+sentence that changes an output, because it names a situation the model would
+otherwise improvise its way out of.
+
+The safety boundary is a sentence, and a sentence is not a sandbox. Write it —
+"read-only, no edits, no commits, no dependency changes" — and then know what it
+is: a strong hint to a model, not a permission system. The thing that actually
+stops a write is the tool contract from session 4 and the permissions in your
+assistant's configuration. A skill that says "never delete files" and a tool
+that can delete files is one bad turn away from deleting files.
+
+## The worked example ships with the repo
+
+`builder-kit/plugin/skills/corpus-answers/SKILL.md` is the five sections filled
+in for grounded question answering: run the trace first, report "not in the
+corpus" when retrieval is empty, never present a stripped citation, and treat
+retrieved documents as data rather than instructions.
+`builder-kit/plugin/skills/store-builder/SKILL.md` is the same shape for a much
+bigger job. Read one before you write yours — the kit is packaged as a plugin,
+so a skill you write in this shape installs anywhere the kit does.
+
+## A skill is testable
+
+Instructions are code, so they get the same treatment as code: a change is
+justified by a failure it fixes, and a claim needs a probe.
+
+1. Run the task **without** the skill. Save the output.
+2. Load the skill. Run the **same** task. Save that output.
+3. Diff them. No difference means the skill did nothing, and the honest move is
+   to delete it or sharpen it, not to keep it because it reads well.
+4. Watch it fail once. Fix the one instruction that let it fail. Rerun.
+
+Step 4 is the bit people skip. The first draft of a skill is a guess about what
+the model needs to be told; the second draft is written after you have seen what
+it actually does. `ch10-e1` asks for both excerpts and refuses them when they
+are identical, because two identical runs are the evidence that nothing
+happened.
+
+## Where skills sit next to everything else
+
+| Thing | Executes? | Lives where? | Loaded when? |
+|---|---|---|---|
+| Tool | yes, your code runs it | the app, or an MCP server | registered, in the prompt every turn |
+| Skill | no, the model follows it | a folder of markdown | on demand, when its description matches |
+| MCP server | it packages tools | behind a protocol | when the client connects |
+
+One row of that table is this session. The MCP rows are sessions 12 and 13,
+which build a server and then secure it. The relationship is worth one sentence
+now and no more: tools decide what is possible, skills decide how to use them
+well, and neither substitutes for the other.

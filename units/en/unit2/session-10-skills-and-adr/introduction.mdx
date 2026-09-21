@@ -1,0 +1,76 @@
+# Skills and an architecture decision record
+
+**Friday, September 25, 2026 · 2h · Thread: harness engineering**
+
+## Outcome
+
+You leave with two artifacts and one habit. The artifacts: a `SKILL.md` your
+assistant loads on demand, with a before-and-after pair of runs that shows what
+it changed, and a decision record for one architecture choice you already made
+in the capstone. The habit is the reversal test — a decision that does not name
+the measurement which would overturn it is an opinion, and week 2 ends by
+writing one that is not.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | One repeatable job you already do by hand in your assistant — code review or test generation on this repository — and one architecture decision you made while building the capstone. |
+| Output | A skill with five sections (when to use, workflow, output format, failure rules, safety boundary), excerpts from the same task run without it and with it, and a four-field decision record whose last field is a trigger somebody else could check. |
+| Budget | One skill. One decision. Markdown only: no new dependency, no code in the skill, and two runs of one task rather than five runs of five. |
+| Failures this session must handle | **A skill that changes nothing.** The two runs come back the same, so the file is decoration. `ch10-e1` refuses two identical excerpts. **A framework used where a fixed workflow was better.** Run the same question through the framework-free loop and through the graph version, count the model calls in each, and say what the second one bought. |
+
+The threat is not a bad instruction. It is an instruction nobody can check. A
+skill that says "be careful with credentials" and a decision record that says
+"we will revisit this if it becomes a problem" both read well, and neither can
+ever be shown to have failed. Both artifacts here are written so they can be.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. Run
+   your chosen task in your assistant with no skill loaded and save the output.
+   That run is the "before", and you only get one chance at it.
+2. **Contract and threat boundary (15m).** What a skill is and is not: text the
+   model may follow, not code the app runs. Its safety boundary is a sentence,
+   so the permission that actually stops a write still lives in the tool. The
+   contract table above, read aloud.
+3. **Concept and live implementation (30m).** The five sections written live
+   from `builder-kit/plugin/skills/corpus-answers/SKILL.md`, with progressive
+   disclosure explained on the `description` line. Then the same question
+   through `answer_question` and through
+   `units/en/unit2/session-08-loops-and-graphs/langgraph_capstone.py`, counting the
+   model calls in both.
+4. **Guided lab (35m).** In your assistant, with the notebook as the logbook:
+   author your second skill, run the same task with it loaded, record two
+   concrete differences and the one instruction you fixed (`ch10-e1`). Then
+   write the decision record (`ch10-e2`).
+5. **Failure injection (15m).** Take a task whose steps are known in advance and
+   ask for it as a multi-step agent instead. Count the model calls, the new
+   failure modes, and the dependencies. Then delete one line from your skill's
+   failure rules and rerun the task; if nothing changes, that line was never
+   doing any work.
+6. **Evaluation and artifact receipt (10m).** `check("ch10-e1", skill)`,
+   `check("ch10-e2", adr)`, then `review("ch10")`. Read two reversal triggers
+   out loud. The best one is the one you could tell had fired this week.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: swap both artifacts with another learner and review
+   theirs for ambiguity, hidden assumptions, and unbounded permissions.
+
+## Evidence
+
+This session is assistant-driven. The notebook's first cell carries
+`# manual-run:`, so CI does not execute it and the CLI reports it as manual:
+
+```bash
+uv run bootcamp check ch10                    # prints the manual reason; run the notebook in Jupyter
+uv run bootcamp submit ch10 --github <you>    # hands in the notebook as it stands, no re-run, no marks
+```
+
+The scorecard is the `review("ch10")` cell in Jupyter. `ch10-e1` reads the five
+sections of your skill plus the two run excerpts, and refuses two runs that are
+identical. `ch10-e2` reads the decision record and refuses a reversal trigger
+with no number and no unit.
+
+<!-- navigation:start -->
+[Previous: Trace and evaluate an agent](../session-09-trace-and-evaluate/introduction.mdx) · [Next: Capstone: the source-grounded research assistant](../capstone/introduction.mdx)
+<!-- navigation:end -->

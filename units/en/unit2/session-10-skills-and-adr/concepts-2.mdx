@@ -1,0 +1,85 @@
+# The same task twice: your code, or a framework [[framework-or-not]]
+
+## Two implementations of one assistant
+
+`src/bootcamp_agent/agent.py` answers a grounded question in plain Python:
+retrieve, call the model, parse, retry once on a broken output contract, strip
+fabricated citations, return. You can read it top to bottom in a few minutes,
+and every exit it has is a line you can point at.
+
+`units/en/unit2/session-08-loops-and-graphs/langgraph_capstone.py` is the same
+assistant as a declared graph. Same corpus, same `LLMClient` seam, same refusal
+rule. Four nodes — retrieve, answer, critique, revise — and one conditional edge
+that caps revision at exactly one:
+
+```python
+builder.add_edge("retrieve", "answer")
+builder.add_edge("answer", "critique")
+builder.add_conditional_edges("critique", route, {"revise": "revise", END: END})
+builder.add_edge("revise", END)
+```
+
+Run it and it prints the node path and the number of model calls. Run the
+notebook's version and read its trace. Then compare the two, which is the point
+of having both.
+
+```bash
+uv add langgraph                                                        # optional, not a course dependency
+uv run python units/en/unit2/session-08-loops-and-graphs/langgraph_capstone.py
+```
+
+Without `langgraph` installed the script says so, prints the path it would have
+walked, and exits cleanly.
+
+## What each one buys
+
+| | The framework-free loop | The graph |
+|---|---|---|
+| Control flow | branches in a function; you find them by reading | nodes and edges, declared in one place |
+| "What happens after a parse failure?" | read the `except` block | point at an edge |
+| Model calls per answer | one, or two when the first reply breaks the contract | one per node that calls the model, so answer plus critique, plus revise when the critique is not an approval |
+| Dependencies | none | one, and its transitive tree |
+| New vocabulary | none | state, node, edge, conditional edge, compile, invoke |
+| Where a new person gets lost | a long function | a graph they cannot see without running it |
+| Retries, persistence, concurrency | you write them | it has them |
+
+Count the model calls before you decide. A critique node is not free: it is a
+second call, on every question, whether or not the first answer needed
+improving. Sometimes that is exactly the trade you want. Sometimes you have paid
+double for a critique that says APPROVE every time, and nobody measured it.
+
+## The failure this session handles
+
+**A framework used where a fixed workflow would have been better.** It looks
+like this: the steps were known in advance, the sequence never varied, and it
+was still built as an agent with a planner, three nodes, and a state object.
+Every hop is a place to fail, and none of them was buying a decision the code
+did not already know how to make.
+
+Session 5 made the same point from the other side. When the steps are known,
+write them down; a fixed chain has fewer failure modes, no model spend on
+deciding what to do next, and a trace you can predict. The professional question
+is never "how autonomous can I make this" but "what is the least autonomy that
+passes the eval". The framework version of that question: **what does the
+framework do that my code would otherwise have to do, and do I need it today?**
+
+Three honest answers to that question, each of which justifies the dependency:
+
+- **Persistence.** A run has to survive a process restart and resume where it
+  stopped. Writing that yourself is a project, not an afternoon.
+- **Concurrency.** Independent nodes should run at the same time and rejoin.
+- **Legibility at size.** Past roughly a dozen nodes, a declared graph is easier
+  to read than the function that would replace it, and the edge you forgot shows
+  up as a missing arrow rather than as a branch nobody wrote.
+
+Three that do not: it is what everyone uses, it makes the system feel more
+agentic, and it might be useful later. "Later" is what the reversal trigger in
+the next page is for.
+
+## Neither answer is permanent
+
+This is why the two pages sit in one session. "Framework or no framework" is the
+architecture decision most teams make by accident, defend by taste, and never
+revisit. The way out is not to be right today. It is to write down what you
+chose, what you turned down, why, and the number that would make you change your
+mind — and then to be able to notice when that number arrives.

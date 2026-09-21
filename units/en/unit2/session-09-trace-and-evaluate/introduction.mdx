@@ -1,0 +1,76 @@
+# Trace and evaluate an agent
+
+**Thursday, September 24, 2026 · 2h · Thread: harness engineering**
+
+## Outcome
+
+You leave with two artifacts and one habit. The artifacts: a provider-neutral
+event log — `kind`, `detail`, and the fields a reader needs, with nothing in it
+you are not allowed to keep — and a regression dataset, the eight-case golden
+set run by one command anybody can rerun. The habit is error analysis: read the
+trace, put the failure in a named bucket, fix the bucket. You also write
+`redact(event)`, the function that decides what a trace is allowed to carry, and
+you see what a trace looks like when one event goes missing.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | The six-document corpus, the eight golden cases in `data/evals/golden.jsonl`, and two fakes: the plain `FakeLLM`, and one seeded to read its context. Plus one trace event, logged the way a service logs it. |
+| Output | A pass rate from `run_evals`, a named failure bucket with the trace line that decided it, and `redact(event) -> dict` — the same event, secrets replaced, everything else byte-identical. |
+| Budget | No model call outside the two fakes. Both checks are deterministic and model-free, so the same notebook gives the same verdict on every machine. No new dependency: `re` and `hashlib` ship with Python. |
+| Failures this session must handle | **A secret or a personal detail reaching a log.** An API key, a bearer token and an email address arrive inside a logged request. They get replaced — not deleted, and not scrubbed along with everything around them. **A missing span.** One event never reaches the log, nothing raises, and the trace now describes a run that did not happen. |
+
+The threat here is not an attacker. It is the two most useful properties of a
+trace turning on you. A trace is durable, so a key in one is a key kept for a
+year in a file nobody guards. A trace is trusted, so a gap in one does not read
+as a gap — it reads as evidence that nothing happened there.
+
+One thing this session cannot do: an evaluation says a run met its pass
+condition, never that the answer is right. Session 7 already attacked this
+evaluator and found what its pass condition ignores. Carry that finding in.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. One
+   sentence each: the last time "it seemed to work" turned out to be false, and
+   what would have caught it.
+2. **Contract and threat boundary (15m).** What an event has to carry to be
+   worth keeping, and what it must never carry. The contract table above, read
+   aloud. Name one field your own logs have that would fail it.
+3. **Concept and live implementation (30m).** `evals.py` line by line: cases,
+   pass condition, report. Then the baseline on the plain `FakeLLM` — 3/8, and
+   the report says why. One targeted fix, rerun, compare. One change per
+   measurement.
+4. **Guided lab (35m).** `notebook.ipynb`. Bucket the baseline failure from a
+   trace (`ch09-e1`), then write `redact` and run it on a logged event
+   (`ch09-e2`).
+5. **Failure injection (15m).** Section 7: drop the `llm_call` event and read
+   what is left. Say out loud which bucket you would have reached for, and how
+   long it would have taken to notice the log was lying.
+6. **Evaluation and artifact receipt (10m).** `check("ch09-e1", ...)`,
+   `check("ch09-e2", redact)`, then `review("ch09")`. Read one redacted event
+   out loud; the placeholders are the receipt.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: a regression test for the failure you classified, and
+   one sentence on why it would catch a future regression.
+
+## Evidence
+
+This session runs unattended. Both checks are deterministic and model-free:
+
+```bash
+uv run bootcamp check ch09                    # runs your notebook, prints its scorecard
+uv run bootcamp submit ch09 --github <you>    # hands in the notebook as it stands
+```
+
+`ch09-e1` reads the bucket you named for the baseline failure: it has to be the
+one the trace supports, and it has to say why. `ch09-e2` drives your `redact`
+with events of its own — one full of secrets, one that repeats a secret and adds
+a second, one with no secrets and three values that look like some, and two
+sparse ones with a missing field and no strings at all — and names the rule you
+broke.
+
+<!-- navigation:start -->
+[Previous: Loops and graphs](../session-08-loops-and-graphs/introduction.mdx) · [Next: Skills and an architecture decision record](../session-10-skills-and-adr/introduction.mdx)
+<!-- navigation:end -->

@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: Why does `cap01-e2` want `len(probe.calls)` next to the refusal, instead of the refusal on its own?
+
+<Question
+  choices={[
+    { text: "To confirm the model was warm before the question arrived", explain: "Nothing in the capstone needs a warm model, and `FakeLLM` has no warm-up." },
+    { text: "Because the refusal alone says nothing about when it happened; an empty `calls` list is the evidence retrieval decided it", explain: "Correct. A refusal after a model call is still a refusal, but it paid for something retrieval already knew for free.", correct: true },
+    { text: "Because a refusal is only valid if the model agreed with it", explain: "The deterministic door is the reliable one. Asking the model to confirm an empty retrieval adds a cost and a way to be talked out of it." },
+  ]}
+/>
+
+### Q2: The model returns a good sentence and cites a document retrieval never returned. What does the capstone do with it?
+
+<Question
+  choices={[
+    { text: "Keeps the citation; the model presumably had a reason", explain: "The model's reason is unavailable and the claim is unsupported by anything the program can point at. That is the failure the check exists for." },
+    { text: "Raises, so the caller sees that something went wrong", explain: "The caller gets a traceback instead of a result, and the part of the answer that was usable is lost." },
+    { text: "Strips the citation, drops confidence, flags for human review, and records all of it in the trace", explain: "Correct. The sentence may still help a person; the source claim beside it may not. Both facts survive.", correct: true },
+  ]}
+/>
+
+### Q3: A capped reflection loop costs three model calls and scores the same on the golden set as the one-call chain. What ships?
+
+<Question
+  choices={[
+    { text: "The chain, and the measured comparison goes in the decision record", explain: "Correct. Pick the least autonomy that passes the eval, and write down the number that would reverse the choice.", correct: true },
+    { text: "The reflection loop; it is the more capable architecture", explain: "Capability you cannot measure is a claim. Three times the spend for no measured gain is a decision you cannot defend in minute 4." },
+    { text: "Both, behind a flag, decided per question at runtime", explain: "That adds a branch nobody has evaluated, and the demo now has two systems to explain and one measurement covering neither." },
+  ]}
+/>
+
+### Q4: In minute 6 you draw "the retrieval returns nothing" and cannot recover inside the minute. What is the passing answer?
+
+<Question
+  choices={[
+    { text: "Show the refusal, point at the trace line where it stopped, and say what you would fix", explain: "Correct. Failing safely is a pass. A refusal the caller can read plus an accurate next step is the demonstration.", correct: true },
+    { text: "Switch to the recorded run from last night, which worked", explain: "That answers a question nobody asked. The room already believes the happy path exists." },
+    { text: "Say it works locally and move on", explain: "Claiming it worked when the trace says otherwise is the one answer that fails." },
+  ]}
+/>
+
+### Q5: `cap01-e5` rejects an issue list whose first two rows are both ranked 1. Why is that worth failing?
+
+<Question
+  choices={[
+    { text: "The check needs unique keys to store the rows", explain: "Nothing is stored. The list is read once and judged." },
+    { text: "Two issues at rank 1 is an inventory, not a prioritisation, and the ordering is the whole exercise", explain: "Correct. The impact is what orders the list, which is why every row has to carry one.", correct: true },
+    { text: "Ties mean the two issues have the same cause and should be merged", explain: "They may be unrelated and equally annoying. You still have to say which one you would fix first." },
+  ]}
+/>

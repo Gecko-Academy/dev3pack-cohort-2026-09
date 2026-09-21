@@ -1,0 +1,98 @@
+# When a chain is enough, and when it is not [[chain-or-graph]]
+
+## The autonomy ladder
+
+Four rungs, and each one buys a decision you no longer have to make in advance.
+
+| Rung | What decides | What it costs |
+|---|---|---|
+| Fixed chain | nothing decides; the steps are written down | cannot adapt at all |
+| Tool loop | the model picks the tool, inside your budget | budgets, a repetition guard, an exit table |
+| Reflection | the model critiques its own draft | a whole extra call per critique, and self-approval |
+| Multi-agent | models delegating to models | every cost above, once per role |
+
+Each rung adds latency, spend and failure modes. So the professional question is
+never "how autonomous can I make this". It is: **what is the least autonomy that
+passes the eval.** Climb a rung when a measured failure justifies it, and not
+before.
+
+## The same task, three ways
+
+The notebook runs one question — *what stopping conditions should an agent loop
+have?* — through three implementations over the same corpus and the same
+`LLMClient` seam.
+
+**Way 1: the chain.** Retrieve, prompt, parse. Every time, in that order.
+
+```python
+def chain(question: str):
+    scored = retrieve(question, documents, top_k=3)  # step 1, always
+    context = "\n\n".join(f"[{s.chunk.doc_id}]\n{s.chunk.text}" for s in scored)
+    raw = llm.complete(system=ANSWER_JSON_INSTRUCTIONS, user=f"{context}\n\nQ: {question}")
+    return parse_research_answer(raw)  # step 3, always
+```
+
+Nothing in there decides anything. That is the feature. One call, one path, a
+trace you can predict before you run it.
+
+**Way 2: the tool loop.** `answer_question`, the assistant you have been using
+since session 3. Retrieve, and if retrieval came back empty, refuse *before*
+spending a call. Then one call, one corrective retry, citations verified.
+
+**Way 3: reflection, capped.** Draft, critique, and revise at most once.
+
+```python
+critique = llm.complete(
+    system="You are a strict reviewer. Reply APPROVE or one concrete fix.",
+    user=f"Q: {question}\nDraft: {draft.answer}",
+)
+if critique.strip().upper().startswith("APPROVE"):
+    return draft, len(llm.calls) - calls_before
+revised = chain(question + f" (address: {critique[:80]})")
+```
+
+The cap is the whole design. A critique loop with no cap is a model arguing with
+itself on your budget, and it stops when the money does.
+
+## The comparison table decides
+
+| | model calls | can refuse early? | failure modes |
+|---|---|---|---|
+| chain | 1 | no | bad retrieval flows straight into the answer |
+| tool loop | 1–2 (+retry) | **yes** | wrong tool choice; needs budgets and a repetition guard |
+| reflection | 2–3 | yes | the critique costs a full call; self-approval; must be capped |
+
+Two of those columns are facts. `len(llm.calls)` counts the first one; the code
+answers the second. Only `failure modes` is judgement, and it is the column you
+have to write yourself.
+
+**Why the chain cannot refuse early.** It has no branch between retrieval and
+the prompt. Whatever retrieval returned — three good passages, one bad one,
+nothing at all — goes into the model. The loop has that branch, and refusing
+there costs nothing at all, because a call you did not make is free and cannot
+hallucinate.
+
+That is what `ch08-e1` judges. It re-reads how the three implementations behave
+and compares that with your table. A guessed call count fails, and it fails
+naming the cell you could have counted it in.
+
+## Notice which rung you are on
+
+By this session you have been running rung 2 all week. That is worth saying out
+loud, because "agent" gets used for all four rungs and the differences are
+exactly the ones that matter operationally: how many calls, which exits, what
+happens when a step fails.
+
+When the steps are known in advance, the chain is the correct design. It is not
+the less impressive option. It is the one with fewer failure modes, no model
+spend on decisions nobody needed, and a trace you can predict.
+
+## What the table cannot tell you
+
+Nothing in it says which way answers *better*. Call counts and refusal points
+are structure, and structure is measurable today. Quality needs the golden set
+and the pass rate from session 9, run against all three.
+
+Take that seriously in the other direction too. A reflection pass that spends
+three calls and changes nothing is a 3× bill for a diff of zero, and you cannot
+find that out from this table. You find it out by measuring.

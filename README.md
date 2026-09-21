@@ -134,7 +134,7 @@ Three threads recur: [loop](docs/guides/loop-engineering.md), [graph](docs/guide
 |---|---|---|
 | **Week 0 units** (`w01`–`w12`) | [units/en/](units/en/) | Self-paced, ungraded, available now. The fast lane is the floor Session 1 assumes. |
 | **Sessions** (`session-01`–`15`) | same tree | Live, weekday, two hours. Introduction, concepts, quiz, exercise notebook, and a demo. Solutions for sessions 1–3 only. Session 15 has no notebook. |
-| **Capstone** | units/en/unit2/capstone/ — opens with week 2 | Built between sessions from week 2. `src/bootcamp_agent/` is the finished shape. |
+| **Capstone** | [units/en/unit2/capstone/](units/en/unit2/capstone/) | Built between sessions from week 2. `src/bootcamp_agent/` is the finished shape. |
 | **Bonus / depth / cookbook / workspaces** | linked below | Optional. Never counted. |
 
 Two sessions are assistant-driven (1 and 10) and show as `in Jupyter` in `bootcamp progress`.
@@ -270,11 +270,11 @@ Each live session is one directory under `units/en/unit1/`, `unit2/` or `unit3/`
 | 3 | Wed 16 Sep | [Structured outputs](units/en/unit1/session-03-structured-outputs/) | A typed answer; retry once, then refuse | [notebook](units/en/unit1/session-03-structured-outputs/notebook.ipynb) | [demo](units/en/unit1/session-03-structured-outputs/demo.ipynb) |
 | 4 | Thu 17 Sep | [Bounded tools](units/en/unit1/session-04-bounded-tools/) | Read-only tools whose boundaries you can prove | [notebook](units/en/unit1/session-04-bounded-tools/notebook.ipynb) | [demo](units/en/unit1/session-04-bounded-tools/demo.ipynb) |
 | 5 | Fri 18 Sep | [A deterministic mini-agent](units/en/unit1/session-05-deterministic-mini-agent/) | A loop that stops, notices repeats, and exits safely | [notebook](units/en/unit1/session-05-deterministic-mini-agent/notebook.ipynb) | — |
-| 6 | Mon 21 Sep | A retrieval baseline — not yet | A corpus loader and lexical retrieval — plus the ways it fails | notebook — not yet | — |
-| 7 | Tue 22 Sep | Retrieval and grounding metrics — not yet | Hit rate, grounding rate, and the cost of one fix | notebook — not yet | — |
-| 8 | Wed 23 Sep | Loops and graphs — not yet | Chain vs loop vs graph; illegal edges do not move | notebook — not yet | — |
-| 9 | Thu 24 Sep | Trace and evaluate — not yet | A redacted event log and named error buckets | notebook — not yet | — |
-| 10 | Fri 25 Sep | Skills and an ADR — not yet | A `SKILL.md` and a decision that names its reversal | notebook — not yet | — |
+| 6 | Mon 21 Sep | [A retrieval baseline](units/en/unit2/session-06-retrieval-baseline/) | A corpus loader and lexical retrieval — plus the ways it fails | [notebook](units/en/unit2/session-06-retrieval-baseline/notebook.ipynb) | — |
+| 7 | Tue 22 Sep | [Retrieval and grounding metrics](units/en/unit2/session-07-grounding-metrics/) | Hit rate, grounding rate, and the cost of one fix | [notebook](units/en/unit2/session-07-grounding-metrics/notebook.ipynb) | — |
+| 8 | Wed 23 Sep | [Loops and graphs](units/en/unit2/session-08-loops-and-graphs/) | Chain vs loop vs graph; illegal edges do not move | [notebook](units/en/unit2/session-08-loops-and-graphs/notebook.ipynb) | — |
+| 9 | Thu 24 Sep | [Trace and evaluate](units/en/unit2/session-09-trace-and-evaluate/) | A redacted event log and named error buckets | [notebook](units/en/unit2/session-09-trace-and-evaluate/notebook.ipynb) | — |
+| 10 | Fri 25 Sep | [Skills and an ADR](units/en/unit2/session-10-skills-and-adr/) | A `SKILL.md` and a decision that names its reversal | [notebook](units/en/unit2/session-10-skills-and-adr/notebook.ipynb) | — |
 | 11 | Mon 28 Sep | State and memory — not yet | Session state, a retention policy, cross-user isolation | notebook — not yet | — |
 | 12 | Tue 29 Sep | MCP architecture — not yet | Host / client / server; a surface read as claims | notebook — not yet | — |
 | 13 | Wed 30 Sep | Build and secure an MCP server — not yet | A fetch guard that refuses *before* it fetches | notebook — not yet | — |
@@ -285,7 +285,7 @@ Session 13 uses an instructor-hosted Gecko MCP surface; the URL is handed out in
 
 ## Capstone and certificate
 
-A **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. You rebuild `src/bootcamp_agent/` in the session notebooks, then compare against the shipped package. Brief: units/en/unit2/capstone/ — opens with week 2.
+A **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. You rebuild `src/bootcamp_agent/` in the session notebooks, then compare against the shipped package. Brief: [units/en/unit2/capstone/](units/en/unit2/capstone/).
 
 [`final_assignment/`](final_assignment/) is a template that scores 30% as shipped — it refuses correctly and answers nothing. Pass both gates (aggregate bar and every **critical** question) and the course issues an Ed25519-signed certificate anyone can verify. Details: [`final_assignment/README.md`](final_assignment/README.md).
 

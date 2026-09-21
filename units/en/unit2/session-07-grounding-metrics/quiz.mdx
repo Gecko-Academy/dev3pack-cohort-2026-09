@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: Why does this session measure hit rate rather than recall and precision?
+
+<Question
+  choices={[
+    { text: "Hit rate is the more accurate metric", explain: "It is the coarser one. Hit rate @3 says the document was somewhere in the top three, not that it ranked first or that the other two were useful." },
+    { text: "It needs one labeled doc id per query, so the set exists by lunchtime", explain: "Correct. Recall and precision need every relevant passage judged for every query; hit rate needs one pair, and five cases beat zero cases by infinity.", correct: true },
+    { text: "Recall and precision do not apply to retrieval", explain: "They are the standard retrieval pair. They are just expensive to label, which is the whole reason hit rate is the day-one metric." },
+  ]}
+/>
+
+### Q2: The expansion rule takes the labeled set from 80% to 100%. What do you report?
+
+<Question
+  choices={[
+    { text: "100%, because that is the measured number", explain: "It is measured on the five cases the rule was written to fix. On four probe queries it never saw, hit rate @1 fell from 75% to 0%." },
+    { text: "Both: 80% to 100% on the tuning set, and 75% to 0% at k=1 on queries it never saw", explain: "Correct. One change, measured twice — once where it was designed to help and once where it was not.", correct: true },
+    { text: "100% with a note that results may vary", explain: "That is a mood, not a regression. A regression sentence names what fires, on what, and the number it moved." },
+  ]}
+/>
+
+### Q3: A fake that answers every question with the same sentence and cites `rag-basics` every time scores 50% on the golden set. Which passes were free?
+
+<Question
+  choices={[
+    { text: "None; it earned all four", explain: "Three of the eight cases retrieve nothing, so the agent refuses before any model call. The fake's answer never ran on them." },
+    { text: "The three refusal cases — retrieval was empty, so the model was never asked", explain: "Correct. Those cases measure the retriever and the refusal path. Split refusal from grounded and the fake scores 1/5 on the half that is about grounding.", correct: true },
+    { text: "The four grounded failures", explain: "Those are failures, not passes. They fail because the expected doc id is missing from the citations." },
+  ]}
+/>
+
+### Q4: Case 1 passed with the answer "Everything is in rag-basics, trust me." and the citation `rag-basics`. What is wrong with the pass condition?
+
+<Question
+  choices={[
+    { text: "Nothing; the citation is genuinely correct", explain: "The citation is correct and the sentence is supported by nothing. A correct doc id next to an empty claim is exactly the false positive to hunt." },
+    { text: "It asks which document was cited, never whether the answer follows from it", explain: "Correct. That is claim support, and it is missing. The capstone grader adds it as the `claim_support` gate.", correct: true },
+    { text: "It should have rejected the citation as fabricated", explain: "It is not fabricated. Retrieval did return rag-basics for that question, so the agent's fabricated-citation strip has nothing to remove." },
+  ]}
+/>
+
+### Q5: Your golden set scores 100%. What is the next thing you do?
+
+<Question
+  choices={[
+    { text: "Record the result and move on", explain: "A perfect score is evidence about the system and about the evaluator at the same time, and you cannot yet tell which." },
+    { text: "Add more cases until something fails", explain: "Useful later, and it does not answer the question. More cases graded by the same weak pass condition inherit the same blind spot." },
+    { text: "Build something that deserves zero, run it, and see what it scores", explain: "Correct. Until you have attacked the evaluator on purpose, the pass rate is a guess about what your pass rate means.", correct: true },
+  ]}
+/>

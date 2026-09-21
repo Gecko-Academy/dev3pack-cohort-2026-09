@@ -1,0 +1,83 @@
+# Retrieval and grounding metrics
+
+**Tuesday, September 22, 2026 · 2h**
+
+## Outcome
+
+You leave with three numbers you produced yourself and can defend: a retrieval
+baseline (hit rate at k on a labeled set), a grounding baseline (the golden set's
+pass rate), and the cost of the one change you made between them. You write the
+labeled set, find a query that breaks lexical retrieval, fix it with query
+expansion, and measure the fix twice — on the cases it was written for and on
+four it never saw. Then you turn on the evaluator itself: a fake that answers
+every question with the same sentence and cites the same document scores **50%**
+on the golden set, and you write down why.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | Five labeled retrieval cases against the six-document corpus in `data/corpus/`, the eight golden cases in `data/evals/golden.jsonl`, and the session-3 agent behind `FakeLLM`. Measuring retrieval needs no model at all; the golden set spends one call per answerable case. |
+| Output | A measured baseline, one documented change carrying both its improvement and its regression, and a written weakness of the evaluator that produced the pass rate. Every number is printed by code you ran, never estimated. |
+| Budget | No new dependency and no index rebuild. Retrieval stays lexical, the models stay fakes, and the whole session runs offline. |
+| Failures this session must handle | **Irrelevant over-citation.** A model cites one document for every question and collects the passes where it happens to match. **An unsupported claim.** The citation is right, the sentence beside it is supported by nothing, and the pass condition never looks. **A metric measured on the set it was tuned on.** The fix takes hit rate to 100% on the five cases it was written for, and wrecks four it was not. |
+
+The threat here is not a hostile model. It is your own number. A pass rate is
+produced by a program you wrote, on cases you chose, with a pass condition you
+defined, and every one of those three is a place to fool yourself. The cheap
+version of the mistake is measuring a fix on the queries that motivated it. The
+expensive version is shipping a grading harness a system can satisfy without
+ever being right.
+
+So the boundary is this: a metric is a claim about the thing measured **and**
+about the thing measuring. You attack both today. An evaluator you have not
+attacked is a guess.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. One
+   improvement-plus-regression pair from session 6's homework, read out. Whoever
+   wrote "no regression" defends it.
+2. **Contract and threat boundary (15m).** Hit rate, precision, recall, latency,
+   context size — what each one answers, and why hit rate is the one you can
+   afford on day one. Why five labeled cases beat zero cases by infinity, and why
+   the set gets written before the fix.
+3. **Concept and live implementation (30m).** The labeled set, live: five queries,
+   five expected doc ids, baseline **80%**. Diagnose the one MISS by reading the
+   words. Write the expansion rule. Re-measure: **100%**. Then run it on four
+   probe queries it never saw and watch hit rate at 1 go **75% to 0%**.
+4. **Guided lab (35m).** `notebook.ipynb`, sections 1 to 5: your own breaking
+   paraphrase and why it misses, then the honest report — improvement with its
+   number, regression with its number.
+5. **Failure injection (15m).** Sections 6 to 8. The golden set on the plain fake
+   (**38%**), then on a context-reading fake (**100%**), then on the
+   cite-everything fake that should score zero and scores **50%**. Say which of
+   its four passes were free.
+6. **Evaluation and artifact receipt (10m).** `review("ch07")` in Jupyter, or
+   `uv run bootcamp check ch07` in the terminal. Then share the best breaking
+   paraphrase in the room.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: three more labeled cases, one of them a question whose
+   correct answer is "not found" — a hit there means retrieval returns nothing.
+
+## Evidence
+
+This session runs unattended. Every cell works offline on `FakeLLM`, so the
+notebook is its own arbiter:
+
+```bash
+uv run bootcamp check ch07                    # runs the notebook, prints the scorecard
+uv run bootcamp submit ch07 --github <you>    # re-runs it and writes the bundle you hand in
+```
+
+Three checks decide it. `ch07-e1`: your breaking paraphrase, re-run through
+retrieval — a query that actually hits its expected doc is rejected, so the
+finding has to be real. `ch07-e2`: the report carries an improvement **and** a
+regression or risk, and "none" does not pass. `ch07-e3`: the pass rate you report
+for the cite-everything fake is compared against the rate the check measures by
+building the same fake itself, and your weakness sentence has to name what the
+pass condition does not check.
+
+<!-- navigation:start -->
+[Previous: A retrieval baseline](../session-06-retrieval-baseline/introduction.mdx) · [Next: Loops and graphs](../session-08-loops-and-graphs/introduction.mdx)
+<!-- navigation:end -->

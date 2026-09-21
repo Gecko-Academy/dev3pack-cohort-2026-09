@@ -1,0 +1,101 @@
+# A retrieval baseline
+
+**Monday, September 21, 2026 · 2h · week 2 opens**
+
+## Outcome
+
+You leave with both halves of a retrieval baseline, and with the failures that
+come with it. The first half is the corpus: a typed loader that turns a
+directory of markdown into `Document` values or refuses out loud, and the
+smallest index there is, a tag mapped to the documents that carry it. The
+second half is retrieval over what that loader produced: chunk each document,
+score the chunks by token overlap weighted by inverse document frequency,
+return the top k with their scores. Then you classify what came back for three
+queries, and you watch the baseline fail in the three ways it fails: nothing
+comes back, the index is older than the corpus, and one confident hit points at
+the wrong document.
+
+The loader comes first for a reason. Retrieval scores whatever it was handed.
+A corpus that loaded half a document, or loaded five files out of six because
+one header was malformed, produces retrieval results that look completely
+normal and are wrong. The corpus is not preamble to the baseline. It is the
+first half of it.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | A fixed, versioned corpus: the six markdown files in `data/corpus/`, each opening with `title` and `tags` HTML-comment headers. Plus a query string. The corpus is an input under version control, and nothing this session runs writes to it. |
+| Output | A list of `ScoredChunk`, each carrying `doc_id`, `position` and a score, ordered deterministically. Plus a tag index: tag to sorted doc ids. Both are derived values you can rebuild from the corpus at any moment, and neither is persisted. |
+| Budget | Zero model calls in the retrieval path, zero network, no new dependency. `retrieval.py` is a regex, a stopword set and `math.log`. The whole baseline runs offline in milliseconds. |
+| Failures this session must handle | **An empty result.** The query shares no token with any chunk, so `retrieve` returns `[]` and there is nothing to put in a prompt. **A stale index.** The index was built from a snapshot, the corpus moved on, and the index answers from the old world without raising anything. **The wrong document returned.** One hit, a healthy score, the wrong document, because the score measures word overlap and never relevance. |
+
+The threat boundary has two sides. Outward: every corpus document is **data,
+not instructions**. Retrieval pastes passages into a prompt, so a document that
+says "ignore your instructions" arrives inside the model's context with the
+same standing as everything else. `agent.py` says so in its system prompt;
+session 13 attacks that line.
+
+Inward: a retrieval score is not a truth claim. `3.18` means the query and the
+chunk share tokens the corpus treats as rare. It does not mean the chunk
+answers the question, and one of today's failures is exactly that gap: a
+single, confident, wrong hit. The habit this session installs is reading the
+retrieved chunk before believing the number above it.
+
+One thing this baseline cannot do: recognise a paraphrase. Ask about "chunk
+size" and the document that explains "chunking" never appears, because `chunk`
+and `chunking` are different strings and lexical matching has no idea they are
+related. That is not a bug to fix today. It is the measurement session 7 takes
+before anyone earns the right to add embeddings.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. One
+   question out loud: your assistant answered wrongly from your own docs, so
+   was that retrieval or generation? Nobody can tell yet, and that is the
+   diagnostic.
+2. **Contract and threat boundary (15m).** The table above, read aloud. Why the
+   corpus is versioned input rather than something a session edits, and why the
+   index is derived and therefore always suspect.
+3. **Concept and live implementation (30m).** `documents.py` line by line: the
+   header format, `CorpusError`, the sorted glob that makes load order
+   deterministic. Then `retrieval.py`: paragraph packing into `max_chars`,
+   tokens minus stopwords, the IDF sum, and the three-part sort key.
+4. **Guided lab (35m).** `notebook.ipynb`. Write `load_mini` with both failure
+   modes, build the tag index over the real corpus, then chunk `rag-basics`,
+   retrieve for three queries, and fill the failure table.
+5. **Failure injection (15m).** Two cells you run and read. A stale index
+   missing a document nobody deleted, and the query `what is a good chunk size`
+   returning one confident hit from `structured-outputs`. Say which line of
+   output tells you which failure happened.
+6. **Evaluation and artifact receipt (10m).** `review("ch06")` in Jupyter, or
+   `uv run bootcamp check ch06` in the terminal. Then share the worst
+   wrong-document hit anybody found.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: change `max_chars` or `top_k`, rerun the failure
+   table, and write down ONE improvement and ONE regression. There is always
+   both.
+
+## Evidence
+
+This session runs unattended. Every cell works offline, with no key and no
+network, so the notebook is its own arbiter:
+
+```bash
+uv run bootcamp check ch06                    # runs the notebook, prints the scorecard
+uv run bootcamp submit ch06 --github <you>    # re-runs it and writes the bundle you hand in
+```
+
+Three checks decide it. `ch06-e2`: your `load_mini` builds the right
+`MiniDocument` from a good file, and raises `ValueError` with a message for
+both a missing file and a file whose first line is not a title, judged on files
+the check writes itself in a temp directory. `ch06-e3`: your tag index matches
+the one built from the real corpus, tag for tag, each list sorted. `ch06-e1`:
+the failure table, where every verdict starts with one of `good`, `missed`,
+`irrelevant` or `duplicated`, carries a reason, and agrees with what retrieval
+actually returned when the check re-runs it. The scorecard reads what your
+notebook produced, never a summary of it.
+
+<!-- navigation:start -->
+[Previous: A deterministic mini-agent](../../unit1/session-05-deterministic-mini-agent/introduction.mdx) · [Next: Retrieval and grounding metrics](../session-07-grounding-metrics/introduction.mdx)
+<!-- navigation:end -->

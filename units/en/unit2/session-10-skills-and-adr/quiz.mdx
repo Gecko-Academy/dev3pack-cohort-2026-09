@@ -1,0 +1,61 @@
+# Quick quiz (ungraded)
+
+### Q1: Why does a skill's `description` line sit in the front matter, separate from the body?
+
+<Question
+  choices={[
+    { text: "So the file is easier for a human to skim", explain: "A side effect. The reason is about what the model loads, not about reading." },
+    { text: "The description is always in context and the body loads only when the task matches, so ten skills cost ten lines until one is needed", explain: "Correct. That is progressive disclosure, and it is context budgeting.", correct: true },
+    { text: "Because the assistant executes the description and ignores the body", explain: "Nothing in a skill executes. The model reads both; the difference is when." },
+  ]}
+/>
+
+### Q2: Your skill says "read-only: no edits, no commits". The assistant edits a file anyway. What went wrong?
+
+<Question
+  choices={[
+    { text: "The skill needs stronger wording", explain: "Stronger wording is still wording. The next model, or the next long context, ignores it again." },
+    { text: "Nothing enforced it — a safety boundary in a skill is a hint, and the tool that could edit was still available", explain: "Correct. Permissions live in the tool contract and the assistant's configuration; the skill says what should happen, not what can.", correct: true },
+    { text: "Skills cannot express safety boundaries, so the section should be dropped", explain: "Write it — it changes behaviour often. Just do not confuse it with a permission system." },
+  ]}
+/>
+
+### Q3: `ch10-e1` refuses when `without_skill` and `with_skill` are identical. Why is that a failure rather than a strong result?
+
+<Question
+  choices={[
+    { text: "Identical runs prove the skill is stable", explain: "They prove the skill changed nothing. Stability of an output you did not influence is not evidence about your file." },
+    { text: "The skill made no difference, so there is nothing yet to keep or improve", explain: "Correct. A skill is justified by the difference it makes; no difference means delete it or sharpen it.", correct: true },
+    { text: "The check cannot compare two different strings", explain: "It compares them fine. The refusal is a judgement about the evidence, not a limitation." },
+  ]}
+/>
+
+### Q4: A task has the same five steps every time, in the same order. It is built as a three-node agent with a planner. What is the cost?
+
+<Question
+  choices={[
+    { text: "None, as long as the output is correct", explain: "The output is correct until the day one hop fails. You added failure modes to buy a decision that was never in doubt." },
+    { text: "Model calls and failure modes bought a decision the code already knew how to make", explain: "Correct. When the steps are known in advance, a fixed chain is the design: fewer failure modes, no spend on deciding, a predictable trace.", correct: true },
+    { text: "Only the extra dependency", explain: "The dependency is the cheapest part. The hops, the spend, and the unpredictable trace are the rest." },
+  ]}
+/>
+
+### Q5: Which `reverses_it` passes `ch10-e2`, and why is the rule worth having?
+
+<Question
+  choices={[
+    { text: "\"When the retriever starts to feel slow for users\"", explain: "No number. Two people can hold this belief and disagree about whether it has happened, forever." },
+    { text: "\"When we go past 2000 and it hurts\"", explain: "A number with no unit. 2000 what? Nothing can be compared against it." },
+    { text: "\"When p95 for one answer stays over 2000 ms for 15 minutes\"", explain: "Correct. A number and a unit means somebody can check on a Tuesday and get one answer.", correct: true },
+  ]}
+/>
+
+### Q6: Why does the record require two `options_considered` rather than one?
+
+<Question
+  choices={[
+    { text: "So the reader has an alternative to try if the decision fails", explain: "Useful, but the check is not about a fallback plan." },
+    { text: "One option is a justification written after the fact; two is the smallest record of an actual choice", explain: "Correct. A record that never mentions anything you did not do is defending the only thing you tried.", correct: true },
+    { text: "Because every architecture question has exactly two answers", explain: "Most have several. Two is the minimum the check can insist on, not the true number." },
+  ]}
+/>
