@@ -1,0 +1,173 @@
+# Follow along: today's class
+
+Keep this page open during the session. Every step says what to open and what to
+run, in the order we run it in class.
+
+| Part | What | Time |
+|---|---|---|
+| [0](#0-before-we-start) | Before we start: pull week 2 | 5 min |
+| [1](#1-live-demo-one-question-two-retrievers) | Live demo: one question, two retrievers | 15 min |
+| [2](#2-how-the-baseline-scores-a-passage) | How the baseline scores a passage | 15 min |
+| [3](#3-your-exercise) | Your exercise: a loader, a tag index, a failure table | 50 min |
+| [4](#4-break-it-on-purpose) | Break it on purpose: two failures that raise nothing | 15 min |
+| [5](#5-hand-it-in) | Hand it in | 10 min |
+
+## 0. Before we start
+
+**Week 2 opened this morning.** From your course folder:
+
+```bash
+git pull
+uv run jupyter lab
+```
+
+Check that the pull worked: the folder `units/en/unit2/` must exist. If it does
+not, today's notebook is not on your machine yet.
+
+Nothing new to install. **No model and no key:** the whole session runs offline,
+in milliseconds.
+
+Open two files:
+
+- `units/en/unit2/session-06-retrieval-baseline/notebook.ipynb` — today's exercise
+- [`demos/05_the_coach_up_close.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/05_the_coach_up_close.ipynb) — the demo we run together
+
+**No setup on your laptop?** Open the notebook in Colab. Its first cell fetches
+the course for you, in about 20 seconds.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/session-06-retrieval-baseline/notebook.ipynb)
+
+## 1. Live demo: one question, two retrievers
+
+You have used a retriever all week without building one: the coach. Today you
+build its core. First, watch it fail.
+
+Two retrievers read **the same course pages**:
+
+- **the coach in your notebooks** — `bootcamp_agent.coach`
+- **[@gecko_coach_bot](https://t.me/gecko_coach_bot)** on Telegram — the same
+  coach, with two fixes it got this week
+
+In demo 5, run sections 1 and 2, then **section 6: Two retrievers, the same
+pages**. It asks your notebook two questions. Send the same two to the bot,
+from your phone, and compare.
+
+**What to look for:**
+
+- **A word and its other forms are different words.** To a word counter, two
+  forms of one word never match. A contributor fixed one of these this weekend
+  and [measured it before and after](https://github.com/Gecko-Academy/gecko-ai-coach/pull/21):
+  **76% → 80%** on 25 course questions, and nothing got worse.
+- **A score is not an answer.** The coach in your notebook always returns its
+  top three, even when the best page shares one common word with your
+  question. The bot refuses when its best page covers too few of your words.
+
+**The point of the demo:** same pages, same question, different rules,
+different answers. The number above a passage counts shared words. It never
+says whether the passage answers you.
+
+**Why the questions are in the notebook, not on this page.** If this page
+quoted them, it would contain every word of both. It would rank first for both,
+and the bot would stop refusing. That is today's third failure, one confident
+hit on the wrong document, and it is the easiest one to cause by accident.
+
+Now go back to demo 5, section 2, and run the cell that switches all three
+adjustments off:
+
+```python
+show("where do I submit my work", bm25=False, title_weight=0, one_per_page=False)
+```
+
+**That plain word count is what you write today.**
+
+## 2. How the baseline scores a passage
+
+`retrieval.py` runs four steps, in this order:
+
+| Step | What happens |
+|---|---|
+| **Chunk** | Cut each document into passages of at most 800 characters, at paragraph breaks. |
+| **Tokens** | Lowercase the words and drop the stopwords: `how`, `do`, `I`, `in`, `a`. |
+| **Score** | Add up the words the question and the passage share. A rare word counts more than a common one: `log(1 + chunks / chunks-with-this-word)`. |
+| **Sort** | By score, then by document id, then by position. A tie always breaks the same way. |
+
+**The one habit this session installs:** read the passage before you believe
+the number above it.
+
+The concepts pages go deeper:
+[1 — the corpus](concepts-1.mdx) · [2 — scoring](concepts-2.mdx) · [3 — the failures](concepts-3.mdx).
+
+## 3. Your exercise
+
+In the session notebook. **300 marks, three exercises, in notebook order:**
+
+| Challenge | What you write | Marks |
+|---|---|---|
+| `ch06-e2` | `load_mini`: the second failure mode, then return a `MiniDocument` | 100 |
+| `ch06-e3` | `tag_index`: each tag, and the sorted ids of the documents that carry it | 100 |
+| `ch06-e1` | the failure table: a verdict for two queries, and why | 100 |
+
+Each one has `TODO(you)` lines in the cell. Fill them in, then run the check
+cell under it.
+
+```bash
+uv run bootcamp check ch06
+```
+
+As shipped, it prints `0/3` and says what is wrong in each one. That is where
+you start.
+
+**The failure table uses four words.** Every verdict starts with one of them:
+
+| Verdict | Meaning |
+|---|---|
+| `good` | the right document, ranked where it should be |
+| `missed` | the right document is absent — sometimes because nothing came back at all |
+| `irrelevant` | a wrong document is present |
+| `duplicated` | one document fills several slots and crowds the rest out |
+
+**The three that catch people:**
+
+- **A refusal needs a message.** `load_mini` raises `ValueError` for a bad file,
+  and the message names the file. An empty error message fails the check.
+- **Sort each list.** The tag index holds the right ids in the wrong order until
+  you sort them.
+- **A verdict needs a reason.** `missed` alone fails. `missed — ...` with the
+  reason passes. Read what retrieval printed before you pick the word.
+
+## 4. Break it on purpose
+
+Two cells in the notebook, sections 5 and 9. You run them and read the output.
+Nothing raises.
+
+| Section | The failure |
+|---|---|
+| **5. A stale index** | The index was built before the corpus changed. It answers from the old world, and nothing warns you. |
+| **9. The wrong document** | `what is a good chunk size` returns one confident hit, from `structured-outputs`. |
+
+**The question for the room:** which line of the output tells you which failure
+happened?
+
+With the empty result from your failure table, that makes three ways a
+retriever fails. **None of them raises an error.** That is why you read the
+output.
+
+## 5. Hand it in
+
+When the check is green:
+
+```bash
+uv run bootcamp submit ch06 --github <your-github-name> --push
+```
+
+**Save the notebook first.** `submit` reads the file on disk.
+
+It goes to **dev3pack-submissions**, never to the course repository. No `gh` on
+your machine? The command prints the browser route. Type the path exactly as it
+shows: `submissions/<your-github-name>/ch06/`, **with no spaces**.
+
+## Tomorrow
+
+Today's baseline cannot match `chunk` to `chunking`: two strings, no relation.
+Session 7 measures what that costs, before anyone earns the right to add
+embeddings.
