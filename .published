@@ -105,9 +105,11 @@ integrations/sendai-txs/index.ts
 integrations/sendai-txs/package.json
 llms.txt
 modules/README.md
+projects/01-clothing-reviews/AGENTS.md
 projects/01-clothing-reviews/data/LICENSE.md
 projects/01-clothing-reviews/data/reviews.csv
 projects/01-clothing-reviews/notebook.ipynb
+projects/02-sec-filings/AGENTS.md
 projects/02-sec-filings/data/LICENSE.md
 projects/02-sec-filings/data/questions.json
 projects/02-sec-filings/data/raw/aapl-10k-item1a.html
@@ -126,6 +128,14 @@ projects/02-sec-filings/fetch.py
 projects/02-sec-filings/img/architecture.png
 projects/02-sec-filings/notebook.ipynb
 projects/README.md
+projects/_template/AGENTS.md
+projects/_template/README.md
+projects/_template/data/LICENSE.md
+projects/_template/notebook.ipynb
+projects/tutorials/01-calling-a-model.ipynb
+projects/tutorials/02-tools-with-limits.ipynb
+projects/tutorials/fixtures/01-calling-a-model.json
+projects/tutorials/fixtures/02-tools-with-limits.json
 pyproject.toml
 scripts/check_notebooks.py
 scripts/check_setup.py

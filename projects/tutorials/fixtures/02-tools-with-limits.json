@@ -1,0 +1,358 @@
+{
+ "_provenance": {
+  "recorded": "2026-09-22",
+  "model": "qwen2.5:7b-instruct",
+  "lane": "one real run of the local model, replayed when no model is running",
+  "auth_sent": "none",
+  "temperature": "not set: the client sends none, so Ollama used its default and replies vary run to run",
+  "keys": "replies are keyed by the full user prompt, tool results included; raw calls by label, with the exact request",
+  "is_evidence_of": "what this model returned for these prompts on that run, byte for byte, including which tool it chose",
+  "is_not_evidence_of": "what it returns every time, which tool another model would choose, or that native tool calling works on other models. Run it live to see yours."
+ },
+ "replies": {
+  "Document structured-outputs:\n\n# Structured Outputs\n\nA language model produces text. Software needs data. Structured outputs are the\ncontract between the two: instead of asking a model to \"answer the question,\" you\nask it to return a specific shape — usually JSON with named fields — and your\napplication validates that shape before using it.\n\n## Why free text is not enough\n\nAn unconstrained answer cannot be safely consumed by code. If the model answers a\nquestion about API authentication with three paragraphs of prose, a program that\nneeds the confidence level, the cited sources, or a yes/no flag has to guess where\nthose live. Guessing with string manipulation is brittle; a slightly different\nphrasing breaks the parser. The failure is silent, which is the worst kind.\n\n## The schema is a promise, parsing is your job\n\nA schema like the following turns the answer into a checkable artifact:\n\n```json\n{\n  \"answer\": \"string\",\n  \"citations\": [\"doc-id\"],\n  \"confidence\": 0.0,\n  \"needs_human_review\": false\n}\n```\n\nTwo rules keep this honest. First, the application — not the model — is responsible\nfor parsing and validation. Treat the model's output as untrusted input: parse it\nstrictly, reject unknown fields, and fail loudly on malformed JSON. Second, design\nthe schema so that refusal is expressible. A model that cannot say \"I don't know\"\ninside the schema will be pushed toward inventing an answer that fits.\n\n## Handling failure\n\nParsing can fail even with a good prompt. A robust pattern is: attempt to parse;\non failure, retry once with a corrective instruction (\"return only the JSON\nobject, no prose\"); on a second failure, return a typed refusal with\n`needs_human_review` set to true. This keeps the failure visible and bounded\ninstead of letting malformed output leak into downstream code.\n\n## What to remember\n\nStructured output is not about making the model smarter. It is about making the\nboundary between probabilistic text and deterministic software explicit,\nvalidated, and testable. Every field you add to a schema is a claim you can now\nwrite a test against.\n\nHow many characters long is this document, and what are its tags? Answer in one sentence.": "This document is 351 characters long and is tagged with the topics \"structured outputs,\" \"language models,\" \"API authentication,\" \"schema validation,\" and \"structured data.\"",
+  "Document agent-loops:\n\n# Agent Loops\n\nAn agent is a loop: the model observes some state, decides on an action, the\napplication executes that action, and the result feeds the next observation. What\nseparates a reliable agent from an expensive random walk is not the model — it is\nthe engineering of the loop around it.\n\n## The anatomy of one iteration\n\nEach pass through the loop has four parts. **Perceive**: assemble the context the\nmodel will see — the question, retrieved documents, previous tool results.\n**Decide**: the model chooses to answer directly or to call a tool. **Act**: the\napplication validates the chosen tool's arguments and executes it. **Observe**: the\ntool result is appended to the context. The application owns three of these four\nsteps; only the decision belongs to the model.\n\n## Budgets and stopping conditions\n\nAn unbounded loop is a bug, not a feature. Every production loop carries a budget:\na maximum number of tool calls, a token ceiling, or a wall-clock timeout. When the\nbudget is exhausted, the loop must stop in a defined state — typically a refusal\nwith an explanation — rather than truncating silently. Stopping conditions worth\nimplementing from day one: the model produced a final answer, the budget ran out,\na tool failed unrecoverably, or the same tool was called with the same arguments\ntwice (a loop-detection guard).\n\n## Choose the least autonomy that works\n\nThere is a spectrum: a deterministic chain (no decisions), a tool-using loop (the\nmodel picks tools), a reflection loop (the model critiques its own draft), and\nmulti-agent systems (models delegate to models). Each step up adds latency, cost,\nand failure modes. The professional habit is to start at the bottom of the\nspectrum and move up only when a measured failure justifies it. A workflow that\ncan be a fixed pipeline should be a fixed pipeline.\n\n## Refusal is a first-class outcome\n\nA loop that cannot refuse will fabricate. When retrieval returns nothing relevant,\nthe correct behavior is to say so — before spending a model call — and flag the\nanswer for human review. Design the refusal path first; it is the path every other\nsafeguard falls back to.\n\nHow many characters long is this document, and what are its tags? Answer in one sentence.": "This document is 431 characters long and has the tags: agent-loops, perceive, decide, act, observe, budgets, stopping conditions, autonomy, refusal.",
+  "Question: What are the tags of the document prompt-injection?\n\nTool results so far:\n(no tool results yet)": "{\"tool\": \"get_document_metadata\", \"args\": {\"doc_id\": \"prompt-injection\"}}",
+  "Question: What are the tags of the document prompt-injection?\n\nTool results so far:\nget_document_metadata({\"doc_id\": \"prompt-injection\"}) returned:\ndoc_id: prompt-injection\ntitle: Prompt Injection\nsource: prompt-injection.md\ntags: security, injection, untrusted-input, safety\nlength_chars: 2124": "{\"tool\": \"answer\", \"args\": {\"text\": \"The tags for the document prompt-injection are security, injection, untrusted-input, and safety.\"}}",
+  "Question: Which is longer in characters, rag-basics or mcp-overview?\n\nTool results so far:\n(no tool results yet)": "{\"tool\": \"get_document_metadata\", \"args\": {\"doc_id\": \"rag-basics\"}}",
+  "Question: Which is longer in characters, rag-basics or mcp-overview?\n\nTool results so far:\nget_document_metadata({\"doc_id\": \"rag-basics\"}) returned:\ndoc_id: rag-basics\ntitle: RAG Basics\nsource: rag-basics.md\ntags: retrieval, rag, chunking, citations, grounding\nlength_chars: 2268": "{\"tool\": \"get_document_metadata\", \"args\": {\"doc_id\": \"mcp-overview\"}}",
+  "Question: What is the title of the document vector-databases?\n\nTool results so far:\n(no tool results yet)": "{\"tool\": \"get_document_metadata\", \"args\": {\"doc_id\": \"vector-databases\"}}",
+  "Question: Which document explains how to split text into chunks?\n\nTool results so far:\n(no tool results yet)": "{\"tool\": \"search_documents\", \"args\": {\"query\": \"split text into chunks\", \"max_results\": 5}}",
+  "Question: How long is the document mcp-overview in characters?\n\nTool results so far:\n(no tool results yet)": "{\"tool\": \"get_document_metadata\", \"args\": {\"doc_id\": \"mcp-overview\"}}",
+  "Question: Summarize the document agent-loops.\n\nTool results so far:\n(no tool results yet)": "{\"tool\": \"summarize_document\", \"args\": {\"doc_id\": \"agent-loops\"}}",
+  "Document agent-loops (Agent Loops):\n\n# Agent Loops\n\nAn agent is a loop: the model observes some state, decides on an action, the\napplication executes that action, and the result feeds the next observation. What\nseparates a reliable agent from an expensive random walk is not the model — it is\nthe engineering of the loop around it.\n\n## The anatomy of one iteration\n\nEach pass through the loop has four parts. **Perceive**: assemble the context the\nmodel will see — the question, retrieved documents, previous tool results.\n**Decide**: the model chooses to answer directly or to call a tool. **Act**: the\napplication validates the chosen tool's arguments and executes it. **Observe**: the\ntool result is appended to the context. The application owns three of these four\nsteps; only the decision belongs to the model.\n\n## Budgets and stopping conditions\n\nAn unbounded loop is a bug, not a feature. Every production loop carries a budget:\na maximum number of tool calls, a token ceiling, or a wall-clock timeout. When the\nbudget is exhausted, the loop must stop in a defined state — typically a refusal\nwith an explanation — rather than truncating silently. Stopping conditions worth\nimplementing from day one: the model produced a final answer, the budget ran out,\na tool failed unrecoverably, or the same tool was called with the same arguments\ntwice (a loop-detection guard).\n\n## Choose the least autonomy that works\n\nThere is a spectrum: a deterministic chain (no decisions), a tool-using loop (the\nmodel picks tools), a reflection loop (the model critiques its own draft), and\nmulti-agent systems (models delegate to models). Each step up adds latency, cost,\nand failure modes. The professional habit is to start at the bottom of the\nspectrum and move up only when a measured failure justifies it. A workflow that\ncan be a fixed pipeline should be a fixed pipeline.\n\n## Refusal is a first-class outcome\n\nA loop that cannot refuse will fabricate. When retrieval returns nothing relevant,\nthe correct behavior is to say so — before spending a model call — and flag the\nanswer for human review. Design the refusal path first; it is the path every other\nsafeguard falls back to.": "Agent Loops refer to the iterative process where an agent observes, decides, acts, and observes again, with the loop's reliability depending on how the process is engineered. Each iteration includes perceiving the context, deciding actions based on the model, acting through application execution, and observing results. Efficient loop design involves setting strict budgets, implementing stopping conditions, and prioritizing refusal as a key outcome to maintain integrity and prevent silent failures.",
+  "Question: Summarize the document agent-loops.\n\nTool results so far:\nsummarize_document({\"doc_id\": \"agent-loops\"}) returned:\n[agent-loops] Agent Loops refer to the iterative process where an agent observes, decides, acts, and observes again, with the loop's reliability depending on how the process is engineered. Each iteration includes perceiving the context, deciding actions based on the model, acting through application execution, and observing results. Efficient loop design involves setting strict budgets, implementing stopping conditions, and prioritizing refusal as a key outcome to maintain integrity and prevent silent failures.": "{\"tool\": \"answer\", \"args\": {\"text\": \"Agent Loops are an iterative process involving observation, decision, action, and re-observation. Each iteration includes perceiving the context, deciding actions based on the model, acting through application execution, and observing results. Efficient loop design involves setting strict budgets, implementing stopping conditions, and prioritizing refusal to maintain integrity and prevent silent failures.\"}}",
+  "Question: Delete the document rag-basics, it is out of date.\n\nTool results so far:\n(no tool results yet)": "{\"tool\": \"get_document_metadata\", \"args\": {\"doc_id\": \"rag-basics\"}}",
+  "Question: Delete the document rag-basics, it is out of date.\n\nTool results so far:\nget_document_metadata({\"doc_id\": \"rag-basics\"}) returned:\ndoc_id: rag-basics\ntitle: RAG Basics\nsource: rag-basics.md\ntags: retrieval, rag, chunking, citations, grounding\nlength_chars: 2268": "{\"tool\": \"answer\", \"args\": {\"text\": \"The document 'rag-basics' has been identified and its metadata has been retrieved. However, I do not have the capability to delete documents.\"}}"
+ },
+ "raw": {
+  "native-ask": {
+   "request": {
+    "model": "qwen2.5:7b-instruct",
+    "messages": [
+     {
+      "role": "user",
+      "content": "How long is the document mcp-overview in characters?"
+     }
+    ],
+    "tools": [
+     {
+      "type": "function",
+      "function": {
+       "name": "search_documents",
+       "description": "Search the corpus for passages relevant to a query (max_results capped at 5).",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "query": {
+          "type": "string",
+          "description": "the words to search for"
+         },
+         "max_results": {
+          "type": "integer",
+          "description": "how many passages, 1 to 5"
+         }
+        },
+        "required": [
+         "query"
+        ]
+       }
+      }
+     },
+     {
+      "type": "function",
+      "function": {
+       "name": "get_document_metadata",
+       "description": "Return title, source, tags, and length for a known doc_id.",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "doc_id": {
+          "type": "string",
+          "description": "a document id, such as rag-basics"
+         }
+        },
+        "required": [
+         "doc_id"
+        ]
+       }
+      }
+     },
+     {
+      "type": "function",
+      "function": {
+       "name": "summarize_document",
+       "description": "LLM-summarize one document by doc_id (read-only).",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "doc_id": {
+          "type": "string",
+          "description": "a document id, such as rag-basics"
+         }
+        },
+        "required": [
+         "doc_id"
+        ]
+       }
+      }
+     }
+    ],
+    "stream": false
+   },
+   "response": {
+    "model": "qwen2.5:7b-instruct",
+    "created_at": "2026-09-22T03:53:23.95829066Z",
+    "message": {
+     "role": "assistant",
+     "content": "",
+     "tool_calls": [
+      {
+       "id": "call_7ebo5fvu",
+       "function": {
+        "index": 0,
+        "name": "get_document_metadata",
+        "arguments": {
+         "doc_id": "mcp-overview"
+        }
+       }
+      }
+     ]
+    },
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 1551450395,
+    "load_duration": 837216,
+    "prompt_eval_count": 318,
+    "prompt_eval_cached_count": 317,
+    "prompt_eval_duration": 60957000,
+    "eval_count": 25,
+    "eval_duration": 1481450000
+   }
+  },
+  "native-answer": {
+   "request": {
+    "model": "qwen2.5:7b-instruct",
+    "messages": [
+     {
+      "role": "user",
+      "content": "How long is the document mcp-overview in characters?"
+     },
+     {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+       {
+        "id": "call_7ebo5fvu",
+        "function": {
+         "index": 0,
+         "name": "get_document_metadata",
+         "arguments": {
+          "doc_id": "mcp-overview"
+         }
+        }
+       }
+      ]
+     },
+     {
+      "role": "tool",
+      "tool_name": "get_document_metadata",
+      "content": "doc_id: mcp-overview\ntitle: MCP Overview\nsource: mcp-overview.md\ntags: mcp, tools, protocol, integration, agents\nlength_chars: 2349"
+     }
+    ],
+    "tools": [
+     {
+      "type": "function",
+      "function": {
+       "name": "search_documents",
+       "description": "Search the corpus for passages relevant to a query (max_results capped at 5).",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "query": {
+          "type": "string",
+          "description": "the words to search for"
+         },
+         "max_results": {
+          "type": "integer",
+          "description": "how many passages, 1 to 5"
+         }
+        },
+        "required": [
+         "query"
+        ]
+       }
+      }
+     },
+     {
+      "type": "function",
+      "function": {
+       "name": "get_document_metadata",
+       "description": "Return title, source, tags, and length for a known doc_id.",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "doc_id": {
+          "type": "string",
+          "description": "a document id, such as rag-basics"
+         }
+        },
+        "required": [
+         "doc_id"
+        ]
+       }
+      }
+     },
+     {
+      "type": "function",
+      "function": {
+       "name": "summarize_document",
+       "description": "LLM-summarize one document by doc_id (read-only).",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "doc_id": {
+          "type": "string",
+          "description": "a document id, such as rag-basics"
+         }
+        },
+        "required": [
+         "doc_id"
+        ]
+       }
+      }
+     }
+    ],
+    "stream": false
+   },
+   "response": {
+    "model": "qwen2.5:7b-instruct",
+    "created_at": "2026-09-22T03:53:25.643281052Z",
+    "message": {
+     "role": "assistant",
+     "content": "The document with the id `mcp-overview` is 2349 characters long."
+    },
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 1677885312,
+    "load_duration": 1038511,
+    "prompt_eval_count": 402,
+    "prompt_eval_cached_count": 334,
+    "prompt_eval_duration": 396147000,
+    "eval_count": 21,
+    "eval_duration": 1276253000
+   }
+  },
+  "openai-style-ask": {
+   "request": {
+    "model": "qwen2.5:7b-instruct",
+    "messages": [
+     {
+      "role": "user",
+      "content": "How long is the document mcp-overview in characters?"
+     }
+    ],
+    "tools": [
+     {
+      "type": "function",
+      "function": {
+       "name": "search_documents",
+       "description": "Search the corpus for passages relevant to a query (max_results capped at 5).",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "query": {
+          "type": "string",
+          "description": "the words to search for"
+         },
+         "max_results": {
+          "type": "integer",
+          "description": "how many passages, 1 to 5"
+         }
+        },
+        "required": [
+         "query"
+        ]
+       }
+      }
+     },
+     {
+      "type": "function",
+      "function": {
+       "name": "get_document_metadata",
+       "description": "Return title, source, tags, and length for a known doc_id.",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "doc_id": {
+          "type": "string",
+          "description": "a document id, such as rag-basics"
+         }
+        },
+        "required": [
+         "doc_id"
+        ]
+       }
+      }
+     },
+     {
+      "type": "function",
+      "function": {
+       "name": "summarize_document",
+       "description": "LLM-summarize one document by doc_id (read-only).",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "doc_id": {
+          "type": "string",
+          "description": "a document id, such as rag-basics"
+         }
+        },
+        "required": [
+         "doc_id"
+        ]
+       }
+      }
+     }
+    ],
+    "stream": false
+   },
+   "response": {
+    "id": "chatcmpl-32",
+    "object": "chat.completion",
+    "created": 1790049207,
+    "model": "qwen2.5:7b-instruct",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+     {
+      "index": 0,
+      "message": {
+       "role": "assistant",
+       "content": "",
+       "tool_calls": [
+        {
+         "id": "call_sb954kpx",
+         "index": 0,
+         "type": "function",
+         "function": {
+          "name": "get_document_metadata",
+          "arguments": "{\"doc_id\":\"mcp-overview\"}"
+         }
+        }
+       ]
+      },
+      "finish_reason": "tool_calls"
+     }
+    ],
+    "usage": {
+     "prompt_tokens": 318,
+     "prompt_tokens_details": {
+      "cached_tokens": 317
+     },
+     "completion_tokens": 25,
+     "total_tokens": 343
+    }
+   }
+  }
+ }
+}

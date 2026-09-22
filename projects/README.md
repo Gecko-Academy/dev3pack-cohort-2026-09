@@ -10,6 +10,12 @@ Optional and never counted. Each task has a check so you know when you are done.
 | [01 — What are customers really saying?](01-clothing-reviews/notebook.ipynb) | Embeddings of 958 real clothing reviews, a 2-D map, topics, and "find reviews like this one" with ChromaDB |
 | [02 — What are these companies worried about?](02-sec-filings/notebook.ipynb) | A RAG pipeline on the risk sections of eight real annual reports: clean the HTML, chunk without losing a word, embed into ChromaDB, answer with the paragraph it came from, and measure keyword search against embeddings on 20 labelled questions |
 
+**Ask your assistant.** Each project folder has an `AGENTS.md`: what the project is for, how
+to run it, and the rules a coding assistant follows. It explains; it does not write the answers.
+
+**Start a new project** by copying [`_template/`](_template/README.md). Its README lists the steps
+and the checklist a project passes before it ships.
+
 ## Setup, once
 
 ```bash

@@ -5,7 +5,8 @@
   "chat_model": "qwen2.5:7b-instruct",
   "lane": "one real run, replayed when no local model is running",
   "is_evidence_of": "the vectors and replies these models produced for this text on that run",
-  "is_not_evidence_of": "what they return every time. A live run words answers differently. Run it live to see yours."
+  "is_not_evidence_of": "what they return every time. A live run words answers differently. Run it live to see yours.",
+  "prose_reply": "the reply keyed 'Write your answer as prose.' (step 8.3, fail first): one live run of qwen2.5:7b-instruct on 2026-09-22, same passages, JSON format left out of the rules"
  },
  "chunk_fingerprint": "eace5ac61cb58d6c3a02ec0ec36ed57a555f9258b36c50e45f0ae74dc5a1e701",
  "chunks": 1401,
@@ -38,6 +39,7 @@
   "who won the 1998 world cup final"
  ],
  "replies": {
+  "Write your answer as prose. Say which passage you used and how confident you are.": "MercadoLibre's latest annual report, as referenced in the context, mentions that Argentina's official exchange rate against the U.S. dollar increased by 41.0%, 27.7%, and 356.3% for the years ended December 31, 2025, 2024, and 2023, respectively. This indicates significant volatility and devaluation of the Argentine peso. Additionally, the context notes that certain subsidiaries might face restrictions in converting local currencies into U.S. dollars due to exchange control regulations. Based on the provided context, I am moderately confident in this answer as it is directly quoted from the text.",
   "Question: What does MercadoLibre's latest annual report say about Argentina's currency?": "{\"answer\": \"Argentina’s official exchange rate against the U.S. dollar increased 41.0%, 27.7% and 356.3% respectively for the years ended December 31, 2025, 2024 and 2023.\", \"citations\": [\"meli#213\"], \"confidence\": 1.0, \"needs_human_review\": false}",
   "Question: Which of these companies is exposed to taxes on sweet drinks, and how?": "{\"answer\": \"The company is exposed to taxes on sweet drinks through direct and indirect levies. Directly, increases in or the imposition of new indirect taxes on sweetened beverages would increase the cost of products. Indirectly, proposed or increased sales or similar taxes could also affect the affordability and net operating revenues of the products.\", \"citations\": [\"ko#83\", \"ko#82\", \"ko#40\"], \"confidence\": 1.0, \"needs_human_review\": false}",
   "Question: What is Nike's refund policy for online orders?": "{\"answer\": \"The context provided does not contain information about Nike's refund policy for online orders.\", \"citations\": [], \"confidence\": 0.0, \"needs_human_review\": true}",

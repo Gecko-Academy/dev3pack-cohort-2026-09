@@ -129,18 +129,29 @@ def describe(notebook: Path) -> dict[str, object]:
     }
 
 
+def _listed(path: Path, directory: Path) -> bool:
+    """Not a solution, not an editor checkpoint, and not a template.
+
+    A folder starting with `_` is scaffolding, not a lesson: `projects/_template`
+    is what a new project copies, full of placeholders. Listed, it would read as a
+    real project with no data and a title that says "write this".
+    """
+    parts = path.relative_to(directory).parts
+    return (
+        "solutions" not in parts
+        and ".ipynb_checkpoints" not in parts
+        and not any(part.startswith("_") for part in parts[:-1])
+    )
+
+
 def notebooks_under(directory: Path) -> list[Path]:
     """Exercise notebooks only. A `solutions/` copy is the same entry, answered."""
     return sorted(
-        path
-        for path in directory.rglob("notebook.ipynb")
-        if "solutions" not in path.parts and ".ipynb_checkpoints" not in path.parts
+        path for path in directory.rglob("notebook.ipynb") if _listed(path, directory)
     ) + sorted(
         path
         for path in directory.rglob("*.ipynb")
-        if path.name != "notebook.ipynb"
-        and "solutions" not in path.parts
-        and ".ipynb_checkpoints" not in path.parts
+        if path.name != "notebook.ipynb" and _listed(path, directory)
     )
 
 
