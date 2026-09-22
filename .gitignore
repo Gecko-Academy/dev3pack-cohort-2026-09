@@ -46,3 +46,5 @@ site/
 # LibreOffice writes a lock file beside any spreadsheet it has open, and it
 # carries the machine name and user of whoever opened it.
 .~lock.*#
+
+projects/02-sec-filings/data/clean/

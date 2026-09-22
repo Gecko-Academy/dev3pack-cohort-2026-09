@@ -109,6 +109,8 @@ projects/02-sec-filings/data/recorded/query_vectors.npy
 projects/02-sec-filings/data/recorded/recorded.json
 projects/02-sec-filings/data/sources.json
 projects/02-sec-filings/fetch.py
+projects/02-sec-filings/img/architecture.png
+projects/02-sec-filings/img/draw_architecture.py
 projects/02-sec-filings/notebook.ipynb
 projects/README.md
 pyproject.toml
