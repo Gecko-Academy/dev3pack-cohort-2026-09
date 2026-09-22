@@ -61,6 +61,29 @@ uv run bootcamp start
 - `git pull` in the course folder. A week that has not opened is not in the repository yet
 - Week 1 · 14 Sep — Week 2 · 21 Sep — Week 3 · 28 Sep
 
+## When `git pull` stops
+
+`error: Your local changes to the following files would be overwritten by merge`
+means the course updated a notebook you have edited. Nothing is lost. Put your
+changes aside, then pull:
+
+```bash
+git stash push -m "my work before the update"
+git pull
+```
+
+`git stash` puts your changes on a shelf and deletes nothing. Work you already
+handed in is safe in the submissions repository too.
+
+**Want one notebook back exactly as you left it?** Take back that one file:
+
+```bash
+git checkout stash@{0} -- units/en/unit1/session-05-deterministic-mini-agent/notebook.ipynb
+```
+
+Do not use `git stash pop`. It tries to merge your notebook with the updated one,
+and notebooks do not merge cleanly. `git stash list` shows what is on the shelf.
+
 ## Stuck more than fifteen minutes
 
 - Post the output of `uv run bootcamp doctor` in the group. Never your `.env`

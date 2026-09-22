@@ -17,10 +17,17 @@ run, in the order we run it in class.
 From your course folder:
 
 ```bash
+git stash push -m "my work before today's update"
 git pull
 uv sync --extra projects
 uv run jupyter lab
 ```
+
+**Why the stash first.** Today's update changes the notebooks of sessions 4 to 10.
+If you typed answers into one of them, `git pull` stops with "your local changes
+would be overwritten". `git stash` puts your changes on a shelf and deletes
+nothing; your handed-in work is safe in the submissions repository. To take one
+notebook back as you left it, see [when `git pull` stops](../../unit0/get-settled.mdx).
 
 Check that the pull worked: the folder `projects/02-sec-filings/` must exist.
 
