@@ -1,0 +1,177 @@
+# Follow along: today's class
+
+Keep this page open during the session. Every step says what to open and what to
+run, in the order we run it in class.
+
+| Part | What | Time |
+|---|---|---|
+| [0](#0-before-we-start) | Before we start: pull, and one extra to install | 5 min |
+| [1](#1-where-we-are-going) | Where we are going: the road to the capstone | 10 min |
+| [2](#2-project-02-together) | Project 02, together: a RAG on real filings, from the model alone to a measured result | 45 min |
+| [3](#3-your-exercise) | Your exercise: three numbers you can defend | 40 min |
+| [4](#4-break-it-on-purpose) | Break it on purpose: a fix that wrecks what it never saw, and a cheat that scores 50% | 10 min |
+| [5](#5-hand-it-in) | Hand it in | 10 min |
+
+## 0. Before we start
+
+From your course folder:
+
+```bash
+git pull
+uv sync --extra projects
+uv run jupyter lab
+```
+
+Check that the pull worked: the folder `projects/02-sec-filings/` must exist.
+
+**Start the `uv sync` now.** The `projects` extra brings ChromaDB, which is heavy,
+and classroom wifi is slow. The exercise itself needs nothing new: it runs
+offline, on fakes, in milliseconds.
+
+**Ollama is optional today.** If you have it, `ollama pull nomic-embed-text`
+(274 MB) is enough. Do not pull the 4.7 GB chat model in class: the project
+notebook plays a recording for the two steps that need it, and says so. No
+Ollama at all? The notebook still runs every step. Its setup cell prints
+`[recorded]` where it replays one real run.
+
+Open two files:
+
+- [`projects/02-sec-filings/notebook.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/02-sec-filings/notebook.ipynb), the project we run together
+- `units/en/unit2/session-07-grounding-metrics/notebook.ipynb`, today's exercise
+
+**No setup on your laptop?** Open them in Colab. The first cell of each fetches
+the course for you.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/02-sec-filings/notebook.ipynb) the project ·
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/session-07-grounding-metrics/notebook.ipynb) the exercise
+
+## 1. Where we are going
+
+Open [the road to the capstone](../capstone/road.mdx). Three things to find on it:
+
+| Find | Why |
+|---|---|
+| **Three weeks, three goals** | This week's goal is grounding and evidence: answers that point at the passage they came from, and numbers that say how often they do. |
+| **Session 7, in one line** | Measure retrieval and answers with numbers you can defend. That is today. |
+| **Every requirement, and where you learn it** | The rows for sessions 6 and 7. With what you have after today, capstone checks 1 and 2 can already go green. |
+
+Where the class is: sessions 1 to 6 done, six to go before the capstone week.
+
+**The projects are practice, not the capstone.** Project 02 runs on real, messy
+data with a real embedding model. The capstone stays on the six documents in
+`data/corpus/`, offline, on the fake model, with no database. Nothing you build
+today in the project is required for the capstone; everything you learn is.
+
+## 2. Project 02, together
+
+Open [`projects/02-sec-filings/notebook.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/02-sec-filings/notebook.ipynb)
+and run it from the top. The setup cell prints one line per part: `[live]` when
+Ollama answers, `[recorded]` when it replays the run made on 21 September.
+Either way, every cell runs.
+
+The data is Item 1A, *Risk Factors*, from the latest annual report of eight
+companies (Apple, Microsoft, NVIDIA, Tesla, Coca-Cola, Nike, MercadoLibre,
+Airbnb), exactly as the SEC publishes it. Nine steps, in the order a real project
+goes. Watch for these moments:
+
+| Step | What happens |
+|---|---|
+| **1. The model alone** | Asked about one company's risks with no filing in front of it, the model answers fluently, and makes it up. Same as demo 9, on data it has never seen. |
+| **2. The raw data** | Tags, inline styles, entities, "Table of Contents" on every page, page numbers. Nobody should trust this before cleaning it. |
+| **3. Clean** | A parser for the structure, regex for the page furniture. The check counts words: cleaning that loses more than 1% of them fails. |
+| **5. Chunk** | Session 6's chunker, on this data, drops **27%** of the words and never says so. The check names the number. The notebook's chunker keeps every word, in 1,401 chunks of at most 800 characters. |
+| **6. Embed and store** | 1,401 vectors of 768 numbers go into ChromaDB, each with its company. If Ollama is embedding live, this is the slow step. |
+| **7. Retrieve two ways** | The same question through session 6's word count and through embeddings. Read both top-3 before you look at the scores. |
+| **8. Answer** | With the paragraph it came from. A nonsense question stops below the similarity floor, before the model runs. |
+| **9. Measure** | 20 labelled questions: 10 that reuse the filing's own words, 10 paraphrases. Keyword search: **10/10** and **7/10**. Embeddings: **10/10** and **10/10**. |
+
+**The point of the project:** embeddings buy back the paraphrases keyword
+search cannot match. Step 9 is how you know they did, instead of believing
+they did. Writing a step 9 is today's exercise.
+
+**Why this page names no question from the notebook.** A page that quotes a
+question ranks first for it. Yesterday's third failure, one confident hit on
+the wrong document, is exactly that.
+
+## 3. Your exercise
+
+In the session notebook. **300 marks, three exercises, in notebook order:**
+
+| Challenge | What you write | Marks |
+|---|---|---|
+| `ch07-e1` | a paraphrase that misses, the document it should have found, and why, in terms of word overlap | 100 |
+| `ch07-e2` | the honest report: what got better, with its number, and what got worse or riskier, with its number | 100 |
+| `ch07-e3` | the pass rate the cite-everything fake really scored, and what the pass condition never checks | 100 |
+
+The notebook walks there in eight sections. The numbers it prints on the way:
+
+| Section | What it shows |
+|---|---|
+| 1 | Five labelled cases against the six documents. Baseline hit rate **80%**. |
+| 2 | **Exercise:** your paraphrase, and why it misses. |
+| 3 | Query expansion, the cheapest fix. Hit rate **100%**. |
+| 4 | The same rule on four queries it was never tuned on. Hit rate at 1: **75% to 0%**. |
+| 5 | **Exercise:** the report, improvement and regression side by side. |
+| 6 | The golden set on the plain fake: **38%**. |
+| 7 | One targeted fix, a fake that reads its context: **100%**. |
+| 8 | **Exercise:** a fake that cites the same document for every question scores **50%**. Say why. |
+
+Each exercise has `TODO(you)` lines in the cell. Fill them in, then run the check
+cell under it.
+
+```bash
+uv run bootcamp check ch07
+```
+
+As shipped, it prints `0/3` and says what is wrong in each one. That is where
+you start.
+
+**The three that catch people:**
+
+- **The check re-runs your paraphrase.** If it does retrieve the expected
+  document at `top_k=3`, the check prints what it retrieved and rejects it.
+  Replace the document's own words with everyday ones.
+- **"none" is almost never true.** The regression line needs a sentence. Section
+  4 already printed what happened to the four probe queries.
+- **`pass_rate` is the number your run printed, as a float.** The check builds the
+  same fake, runs it, and compares. `50` is not `0.5`. The weakness needs a full
+  sentence about what the pass condition does not check.
+
+## 4. Break it on purpose
+
+Two moments in the notebook, sections 4 and 8. Nothing raises.
+
+| Section | The failure |
+|---|---|
+| **4. The fix, on queries it never saw** | Hit rate at 1 falls from 75% to 0%. The fix took the tuned set to 100% first, so it looked finished. |
+| **8. The cheat** | A fake that answers every question with the same sentence and cites the same document scores 50%. |
+
+**The question for the room:** which of the cheat's four passes were free, and
+what would the pass condition have to look at to charge for them?
+
+That is the lesson of the session. A metric is a claim about the thing measured
+and about the thing measuring. You attacked both. An evaluator you have not
+attacked is a guess.
+
+## 5. Hand it in
+
+When the check is green:
+
+```bash
+uv run bootcamp submit ch07 --github <your-github-name> --push
+```
+
+**Save the notebook first.** `submit` reads the file on disk.
+
+It goes to **dev3pack-submissions**, never to the course repository. No `gh` on
+your machine? The command prints the browser route. Type the path exactly as it
+shows: `submissions/<your-github-name>/ch07/`, **with no spaces**.
+
+Homework, from the session page: three more labelled cases, one of them a
+question whose right answer is "not found".
+
+## Tomorrow
+
+Session 8 takes one task and builds it three ways: a chain, a loop and a graph,
+and counts what each one costs. Project 03 follows this week: a team of agents,
+in a graph, working over the index you built today.

@@ -167,6 +167,8 @@
       title: "The cheapest fix, and what it cost"
     - local: unit2/session-07-grounding-metrics/concepts-3
       title: "Attack your own evaluator"
+    - local: unit2/session-07-grounding-metrics/follow-along
+      title: "Follow along: today's class"
     - local: unit2/session-07-grounding-metrics/quiz
       title: "Quick quiz (ungraded)"
     - local: unit2/session-07-grounding-metrics/conclusion
