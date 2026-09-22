@@ -11,9 +11,11 @@ to the reader, the budget that recovers, and your own loop from `ch05-e2` behind
 it. A learner who stops at 100 has finished the week; the other 400 is where the
 bot becomes theirs.
 
-WHY IT IS STILL UNCOUNTED. It lives in `bonus.BONUS`, which no session total
-reads, so the 200 marks of session 5 stay the 200 marks of session 5. The score
-below is the challenge's own, reported to the learner and to whoever reviews it.
+WHERE THE SCORE GOES. It lives in `bonus.BONUS`, not `checks.CHECKS`, so session
+5's two exercises stay two exercises. The score it prints is added to the ch05
+row instead: the learner writes the bot at the end of the session notebook, and
+the track reads the `week 1 challenge: S/500` line below out of the saved outputs
+(see `bootcamp_agent.weekly`). That line is a contract; do not reword it.
 
 WHAT IT JUDGES. One function:
 
@@ -217,7 +219,7 @@ def _week1_bot(respond: Any) -> str | None:
     for (name, why), got in zip(TIERS, earned, strict=True):
         print(f"     {'✅' if got else '·  '} {name:24} {why}")
     if score < FULL_MARKS:
-        print("   the ones without a tick are what is left. None of them is marked.\n")
+        print("   the ones without a tick are what is left.\n")
     return None
 
 

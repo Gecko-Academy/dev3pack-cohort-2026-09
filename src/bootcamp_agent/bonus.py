@@ -33,6 +33,8 @@ BONUS: dict[str, Checker] = {}
 
 OK = "\N{WHITE HEAVY CHECK MARK}"
 NO = "\N{CROSS MARK}"
+#: Not a failure: the cell is still the one that was shipped.
+NOT_YET = "\N{MIDDLE DOT}"
 
 
 def register(exercise_id: str) -> Callable[[Checker], Checker]:
@@ -47,12 +49,25 @@ class UnknownBonus(Exception):
     """No bonus exercise is registered under that id."""
 
 
+class NotAttempted(Exception):
+    """The learner's cell is still as shipped: nothing to score, and nothing wrong.
+
+    A session notebook ships its weekly-challenge cell unwritten, and it runs in CI.
+    Reporting that as a failure (a red cross on every clean clone) would teach
+    people to ignore the cross. `NotImplementedError` from the learner's stub means
+    the same thing, so it is read the same way.
+    """
+
+
 def bonus(exercise_id: str, value: Any) -> bool:
     """Run the bonus checker, print the verdict, return whether it passed."""
     if exercise_id not in BONUS:
         raise UnknownBonus(f"no bonus registered for {exercise_id!r}; known: {sorted(BONUS)}")
     try:
         problem = BONUS[exercise_id](value)
+    except (NotAttempted, NotImplementedError) as error:
+        print(f"{NOT_YET} bonus {exercise_id}: not attempted yet. {error}")
+        return False
     except Exception as error:  # a bonus must never take the notebook down with it
         problem = f"it raised {type(error).__name__}: {error}"
     if problem:
@@ -127,4 +142,4 @@ def _ch02(answer_with_timeout: object) -> str | None:
     return None
 
 
-__all__ = ["BONUS", "UnknownBonus", "bonus", "register"]
+__all__ = ["BONUS", "NotAttempted", "UnknownBonus", "bonus", "register"]

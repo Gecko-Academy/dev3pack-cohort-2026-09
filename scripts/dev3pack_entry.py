@@ -52,6 +52,7 @@ from bootcamp_agent.curriculum import (  # noqa: E402
 )
 from bootcamp_agent.hints import FULL_MARKS  # noqa: E402
 from bootcamp_agent.submission import resolve  # noqa: E402
+from bootcamp_agent.weekly import challenge_points  # noqa: E402
 
 OUT_DIR = ROOT / "docs" / "dev3pack"
 SHEET = OUT_DIR / "curriculum-entry.md"
@@ -189,7 +190,12 @@ def _module_block(chapter, week: int) -> list[str]:
         f"## Week {week} · Module {chapter.number}: {chapter.title}",
         "",
         f"`{chapter.chapter_id}` · {chapter.on.strftime('%A %d %B %Y')} · "
-        + (f"{marks} marks" if marks else "handed in, not marked"),
+        + (f"{marks} marks" if marks else "handed in, not marked")
+        + (
+            f", plus up to {challenge_points(chapter.chapter_id)} from the weekly challenge"
+            if marks and challenge_points(chapter.chapter_id)
+            else ""
+        ),
         "",
         "**Lesson title**",
         "",

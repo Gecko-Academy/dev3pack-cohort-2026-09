@@ -52,6 +52,7 @@ from bootcamp_agent.curriculum import (  # noqa: E402
     unit_exercise_ids,
 )
 from bootcamp_agent.hints import FULL_MARKS  # noqa: E402
+from bootcamp_agent.weekly import challenge_points  # noqa: E402
 
 TOCTREE = UNITS_ROOT / "_toctree.yml"
 INDEX = ROOT / "docs" / "course-index.md"
@@ -907,6 +908,10 @@ def render_items() -> str:
         # in came back `score: null`, the leaderboard showed 0/0 for everybody,
         # and nothing here was failing.
         item = submission.resolve(chapter.chapter_id)
+        # A weekly challenge adds to its session's row rather than getting one of
+        # its own (founder ruling, 2026-09-22), so the row's ceiling carries it too:
+        # otherwise a full challenge reads as a score above its maximum.
+        row_max = None if item.max_score is None else item.max_score + challenge_points(item.id)
         items.append(
             {
                 "id": chapter.chapter_id,
@@ -917,7 +922,7 @@ def render_items() -> str:
                 "scored": item.scored,
                 "verifiable": item.verifiable,
                 "exercises": len(exercises),
-                "max_score": item.max_score,
+                "max_score": row_max,
             }
         )
     capstone = unit_exercise_ids(CAPSTONE.prefix)

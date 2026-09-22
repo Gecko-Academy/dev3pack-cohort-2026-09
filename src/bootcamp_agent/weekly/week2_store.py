@@ -15,8 +15,10 @@ parts working once: a store that could exist, and a buyer that buys from it and
 refuses one raw unit short with a sentence naming both amounts and the mint.
 Everything above it is a case a toy buyer gets wrong.
 
-WHY IT IS STILL UNCOUNTED. It lives in `bonus.BONUS`, which no session total
-reads, so session 10 keeps its 200 marks. The score is the challenge's own.
+WHERE THE SCORE GOES. It lives in `bonus.BONUS`, not `checks.CHECKS`, so session
+10's two exercises stay two exercises. The `week 2 challenge: S/500` line below is
+added to the ch10 row by the track, read from the saved session notebook (see
+`bootcamp_agent.weekly`). That line is a contract; do not reword it.
 
 NOTHING HERE REACHES A NETWORK, A KEY OR A WALLET. The listings below are data.
 """
@@ -27,7 +29,7 @@ import re
 from collections.abc import Callable
 from typing import Any
 
-from ..bonus import register
+from ..bonus import NotAttempted, register
 from ..shipit.borsh_store import StoreBytesError, decode_store, encode_store
 from ..shipit.storefront import StorefrontError, load, problems, to_store
 
@@ -283,6 +285,21 @@ def _earned(tier: Callable[..., bool], *args: Any) -> bool:
         return False
 
 
+def _untouched(github: Any, store: Any) -> bool:
+    """Both the handle and the store name are still the shipped placeholder.
+
+    Only both: a learner who has filled in one of them has started, and is owed
+    the floor's reason rather than "not attempted".
+    """
+    name = store.get("store") if isinstance(store, dict) else None
+    return (
+        isinstance(github, str)
+        and bool(PLACEHOLDER.search(github))
+        and isinstance(name, str)
+        and bool(PLACEHOLDER.search(name))
+    )
+
+
 @register("week2-store")
 def _week2_store(handin: Any) -> str | None:
     """Score the store and the buyer out of 500 and print the ladder. 100 is a pass."""
@@ -290,6 +307,12 @@ def _week2_store(handin: Any) -> str | None:
         return (
             "pass one dict: bonus('week2-store', "
             "{'github': 'you', 'store': MY_STORE, 'buyer': plan_purchase})"
+        )
+
+    if _untouched(handin["github"], handin["store"]):
+        raise NotAttempted(
+            "Replace REPLACE_ME in MY_GITHUB and MY_STORE, write plan_purchase, "
+            "then run this cell again. It adds nothing to the session until then"
         )
 
     floor = _store_problem(handin["github"], handin["store"])
@@ -313,7 +336,7 @@ def _week2_store(handin: Any) -> str | None:
     for (name, why), got in zip(TIERS, earned, strict=True):
         print(f"     {'✅' if got else '·  '} {name:24} {why}")
     if score < FULL_MARKS:
-        print("   the ones without a tick are what is left. None of them is marked.\n")
+        print("   the ones without a tick are what is left.\n")
     return None
 
 

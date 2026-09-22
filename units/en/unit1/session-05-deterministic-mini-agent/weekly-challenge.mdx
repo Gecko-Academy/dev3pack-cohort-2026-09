@@ -1,6 +1,6 @@
 # Weekly challenge — a bot that refuses well
 
-> **Scored out of 500, and separate from your marks.** Your week-1 marks come from the sessions; this is the challenge's own score. It runs offline, needs no key and no token, and the check is one you run yourself.
+> **Scored out of 500, and added to your session 5 score.** Up to 500 on top of `ch05-e1` and `ch05-e2`, so it moves you up the leaderboard. It runs offline, needs no key and no token, and the check is one you run yourself.
 
 **The brief:** build a bot whose four exits a stranger can see, without reading
 your code.
@@ -148,14 +148,17 @@ will read:
 
 ## Hand it in
 
+Write your bot in the challenge cell at the end of the session 5 notebook
+(section "Weekly challenge"), run the `bonus("week1-bot", respond)` cell under it,
+save the notebook, then:
+
 ```bash
 uv run bootcamp submit ch05 --github <your-github-name> --push
 ```
 
-Put your bot in the same notebook, under the session's exercises, with the
-`bonus("week1-bot", respond)` cell showing its score. It does not change your
-session marks — it is there so the person reviewing sees how far you took it, and
-so **you** can tell.
+The score it prints, up to 500, is added to your session 5 score. Already
+submitted ch05? Add the cell, run it, save, and submit again. You can submit as
+many times as you like; the last run of the check is the one that counts.
 
 **Share it in the group too.** A screenshot of your bot refusing well teaches the
 next person more than this page does.
