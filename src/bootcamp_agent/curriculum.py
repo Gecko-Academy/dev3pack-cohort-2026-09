@@ -297,6 +297,13 @@ CAPSTONE = Project()
 SUBMISSIONS_REPO = "Gecko-Academy/dev3pack-submissions"
 SUBMISSIONS_URL = f"https://github.com/{SUBMISSIONS_REPO}"
 
+#: The course as students receive it: public, read-only, published from the
+#: private source. A capstone repository installs the package from here, so it
+#: is spelled once and `tests/test_capstone_repo.py` holds it equal to the
+#: publisher's `STUDENT_REPO`.
+COURSE_REPO = "Gecko-Academy/dev3pack-cohort-2026-09"
+COURSE_URL = f"https://github.com/{COURSE_REPO}"
+
 
 BONUS_DIRS: tuple[str, ...] = (
     f"{BONUS_ROOT}/b01-graph-rag",

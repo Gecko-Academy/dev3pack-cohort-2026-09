@@ -13,6 +13,19 @@ not raise. It comes back with the state unchanged and a sentence naming what was
 refused. You leave able to say, about any workflow you ship, which transitions
 exist — and to show that the others cannot happen.
 
+## Where this sits
+
+![Model, RAG, agent, agents in a graph: what each one adds to the row above it](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit2/session-08-loops-and-graphs/img/model-rag-agent-team.png)
+
+| Row | What it adds | The new way it fails | Where you met it |
+|---|---|---|---|
+| A model call | nothing: the prompt and your context | it answers from memory, fluently | session 2 |
+| RAG | passages retrieved first, cited back | the wrong passages, cited with confidence | sessions 6, 7 |
+| An agent | a loop: decide, call a tool, read the result, go again | it never stops, unless you make it | sessions 4, 5 |
+| Agents in a graph | several narrow roles, one shared state, declared edges | more calls, and a transition nobody declared | today |
+
+Each row costs more model calls than the one above it. Today you count them.
+
 ## Contract and threat boundary
 
 | | |

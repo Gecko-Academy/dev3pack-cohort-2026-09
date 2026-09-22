@@ -1,0 +1,62 @@
+name: check
+
+# Every push: install, run the contract tests, grade the agent on the practice
+# set. No secret is needed or read anywhere: the model is the offline fake, and
+# the course package comes from a public repository.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Stated, not assumed: every number this job prints is the fake model's.
+      BOOTCAMP_PROVIDER: fake
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync
+      # The contract. Green on day one: the parts the starter lacks are xfail.
+      # A red here is real: a test you had earned stopped passing, or an xfail
+      # started passing and wants its marker removed.
+      - run: uv run pytest
+
+  practice-score:
+    # A report, not a gate. "NOT YET" is where every starter begins, and the
+    # grader exits 1 until it passes, so its step may fail without turning the
+    # push red. The certificate is graded on a private set, not this one.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BOOTCAMP_PROVIDER: fake
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync
+      - name: practice grader (fake model, no keys in CI)
+        continue-on-error: true
+        run: |
+          set +e
+          uv run bootcamp capstone grade | tee grade.txt
+          status=${PIPESTATUS[0]}
+          {
+            echo "### Practice grader: offline fake model (CI has no keys)"
+            echo
+            echo '```'
+            tail -n 5 grade.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"

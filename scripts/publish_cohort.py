@@ -124,6 +124,10 @@ ALWAYS = (
     "projects",
     "ship-it",
     "final_assignment",
+    # What `bootcamp capstone new` copies into a student's own public
+    # repository. It runs in the student's clone, so the template has to be
+    # there; it holds no answer, only skeletons and the contract tests.
+    "capstone-template",
     "README.md",
     "SETUP.md",
     # The agent-facing index. Re-derived against the student's own tree after

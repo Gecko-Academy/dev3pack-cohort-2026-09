@@ -1,0 +1,45 @@
+[project]
+name = "{{package_name}}"
+version = "0.1.0"
+description = "A source-grounded research assistant: cites its sources, refuses what they do not support."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  # The Dev3Pack course package, from the public cohort repository, pinned to
+  # the exact commit this repository was created from. A pin rather than
+  # `main`, so a course update never changes your results behind your back:
+  # the grader your CI runs is checked out at the same commit.
+  # To move to a newer course release, change the commit here AND in
+  # .github/workflows/check.yml, then `uv sync`.
+  "dev3pack-bootcamp-ai-engineering @ git+{{course_url}}@{{course_ref}}",
+]
+
+[project.optional-dependencies]
+# A real model behind the seam. `uv sync --extra anthropic`, then set
+# BOOTCAMP_PROVIDER and the key in .env (never in a committed file).
+anthropic = ["anthropic>=0.40"]
+openai = ["openai>=1.40"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+]
+
+[tool.uv]
+# An application, not a library: nothing here is built or published.
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# The course, checked out by CI (and by you, locally) to run the grader.
+extend-exclude = [".course"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

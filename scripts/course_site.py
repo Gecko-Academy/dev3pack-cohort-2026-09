@@ -141,6 +141,11 @@ REPO_MAP: tuple[tuple[str, str], ...] = (
         "here and never will be.",
     ),
     (
+        "capstone-template/",
+        "Your own public capstone repository, as `uv run bootcamp capstone new ../my-capstone` "
+        "writes it: the agent, the contract tests, the docs skeletons and a CI workflow.",
+    ),
+    (
         "modules/",
         "A pointer only. The tree lived here until 9 Sep 2026; the file says where it went.",
     ),

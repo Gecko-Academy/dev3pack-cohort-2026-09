@@ -1,0 +1,14 @@
+# Your keys. Only ever in .env, and .env is never committed.
+.env
+
+# The grader's output: evidence about one run, regenerated every time.
+score_report.json
+grade.txt
+
+# The course, checked out to run the grader (CI does this on every push).
+.course/
+
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

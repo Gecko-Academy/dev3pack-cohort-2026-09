@@ -165,6 +165,7 @@ Where everything lives, and what a student receives.
 | `integrations/` | Worked integrations the sessions link into rather than re-explain. | day one |
 | `builder-kit/` | Templates a learner copies from when starting their own surface. | day one |
 | `final_assignment/` | The final's harness and the offline practice grader. The private question set is not here and never will be. | day one |
+| `capstone-template/` | Your own public capstone repository, as `uv run bootcamp capstone new ../my-capstone` writes it: the agent, the contract tests, the docs skeletons and a CI workflow. | day one |
 | `modules/` | A pointer only. The tree lived here until 9 Sep 2026; the file says where it went. | in part |
 | `AGENTS.md` | The policy a coding assistant reads before it edits. `CLAUDE.md` and the Cursor rules point at it rather than forking it. | day one |
 | `README.md` | This file. | day one |
@@ -208,7 +209,7 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (50 paths). |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (51 paths). |
 | Week 1 | Mon 14 Sep | unit1 |
 | Week 2 | Mon 21 Sep | unit2 |
 | Week 3 | Mon 28 Sep | unit3 |

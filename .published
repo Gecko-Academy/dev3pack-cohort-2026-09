@@ -15,6 +15,19 @@ builder-kit/plugin/.claude-plugin/plugin.json
 builder-kit/plugin/commands/bootcamp-doctor.md
 builder-kit/plugin/skills/corpus-answers/SKILL.md
 builder-kit/plugin/skills/store-builder/SKILL.md
+capstone-template/.env.example
+capstone-template/.github/workflows/check.yml
+capstone-template/.gitignore
+capstone-template/.python-version
+capstone-template/README.md
+capstone-template/agent.py
+capstone-template/docs/EVAL_REPORT.md
+capstone-template/docs/ISSUES.md
+capstone-template/docs/RETENTION.md
+capstone-template/docs/SKILL.md
+capstone-template/docs/adr/0001-run-shape.md
+capstone-template/pyproject.toml
+capstone-template/tests/test_contract.py
 cookbook/README.md
 cookbook/advanced/08_anti_poisoning.ipynb
 cookbook/advanced/09_program_graph_find_start.ipynb
@@ -77,10 +90,11 @@ final_assignment/README.md
 final_assignment/agent.py
 final_assignment/app.py
 final_assignment/certificate.py
+final_assignment/fixtures/tutorial-recorded.json
 final_assignment/grade.py
-final_assignment/questions.jsonl
 final_assignment/receipt.py
 final_assignment/requirements.txt
+final_assignment/tutorial.ipynb
 integrations/README.md
 integrations/gecko-orquestra/README.md
 integrations/gecko-orquestra/probe_matrix.py
@@ -110,7 +124,6 @@ projects/02-sec-filings/data/recorded/recorded.json
 projects/02-sec-filings/data/sources.json
 projects/02-sec-filings/fetch.py
 projects/02-sec-filings/img/architecture.png
-projects/02-sec-filings/img/draw_architecture.py
 projects/02-sec-filings/notebook.ipynb
 projects/README.md
 pyproject.toml
@@ -120,6 +133,7 @@ scripts/collect_submissions.py
 scripts/course_html.py
 scripts/course_site.py
 scripts/dev3pack_entry.py
+scripts/diagrams.py
 scripts/fill_notebooks.py
 scripts/notebook_colab.py
 scripts/notebook_index.py
@@ -136,6 +150,7 @@ ship-it/seed/RUNBOOK.md
 src/bootcamp_agent/__init__.py
 src/bootcamp_agent/agent.py
 src/bootcamp_agent/bonus.py
+src/bootcamp_agent/capstone_repo.py
 src/bootcamp_agent/checks.py
 src/bootcamp_agent/cli.py
 src/bootcamp_agent/coach.py
@@ -146,6 +161,8 @@ src/bootcamp_agent/curriculum.py
 src/bootcamp_agent/depth_checks.py
 src/bootcamp_agent/documents.py
 src/bootcamp_agent/evals.py
+src/bootcamp_agent/final_grade.py
+src/bootcamp_agent/final_practice.jsonl
 src/bootcamp_agent/handin.py
 src/bootcamp_agent/hints.py
 src/bootcamp_agent/llm.py
@@ -317,6 +334,8 @@ units/en/unit2/capstone/concepts-1.mdx
 units/en/unit2/capstone/concepts-2.mdx
 units/en/unit2/capstone/concepts-3.mdx
 units/en/unit2/capstone/conclusion.mdx
+units/en/unit2/capstone/guide.mdx
+units/en/unit2/capstone/img/architecture.png
 units/en/unit2/capstone/introduction.mdx
 units/en/unit2/capstone/notebook.ipynb
 units/en/unit2/capstone/quiz.mdx
@@ -341,6 +360,7 @@ units/en/unit2/session-08-loops-and-graphs/concepts-1.mdx
 units/en/unit2/session-08-loops-and-graphs/concepts-2.mdx
 units/en/unit2/session-08-loops-and-graphs/concepts-3.mdx
 units/en/unit2/session-08-loops-and-graphs/conclusion.mdx
+units/en/unit2/session-08-loops-and-graphs/img/model-rag-agent-team.png
 units/en/unit2/session-08-loops-and-graphs/introduction.mdx
 units/en/unit2/session-08-loops-and-graphs/langgraph_capstone.py
 units/en/unit2/session-08-loops-and-graphs/langgraph_subagents.py

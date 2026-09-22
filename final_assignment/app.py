@@ -17,7 +17,7 @@ sys.path.insert(0, str(HERE))
 
 import gradio as gr  # noqa: E402
 from agent import YourAgent  # noqa: E402
-from grade import PASS_THRESHOLD, grade, load_questions  # noqa: E402
+from grade import DEFAULT_QUESTIONS, PASS_THRESHOLD, grade, load_questions  # noqa: E402
 
 
 def ask(question: str) -> str:
@@ -33,7 +33,7 @@ def ask(question: str) -> str:
 
 
 def run_practice_set() -> tuple[str, list[list[str]]]:
-    entries = load_questions(HERE / "questions.jsonl")
+    entries = load_questions(DEFAULT_QUESTIONS)
     results = grade(YourAgent(), entries)
     passed = sum(r.passed for r in results)
     score = passed / len(results) if results else 0.0

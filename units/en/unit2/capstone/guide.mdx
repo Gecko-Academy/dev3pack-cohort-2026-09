@@ -1,0 +1,261 @@
+# The capstone guide
+
+One page for the whole capstone: what each piece is, how the pieces fit, and
+what to do after every session. Keep it open next to your repository.
+
+## The one-liner and the goal
+
+| | |
+|---|---|
+| **The one-liner** | Your own research assistant, in your own public GitHub repository, that answers from six documents and names the one it used. |
+| **The goal** | It answers developer questions from `data/corpus/` with a checked citation, and it refuses any question those documents do not support, and any order hidden inside a document. |
+
+## The pieces, and how they fit
+
+There are seven pieces. Only two of them judge **your** agent: the grader and
+the defence.
+
+| Piece | What it is | Where it lives | Who writes it | What it proves | When it counts |
+|---|---|---|---|---|---|
+| **Your agent** | The class `YourAgent`. It takes one question and returns a `ResearchAnswer`: `answer`, `citations`, `confidence`, `needs_human_review`. | `agent.py` in your repository, copied from [`final_assignment/agent.py`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/final_assignment/agent.py) | You | Nothing on its own. The grader and the defence judge it. | Every grader run, the private set, and the defence |
+| **Your repository** | A public GitHub repository made by `uv run bootcamp capstone new <folder>`: your agent, contract tests, `docs/`, a README, and a CI workflow | `github.com/<you>/<folder>` | You | That you can ship and explain a system. It is your showcase. | The defence, and after the course |
+| **The capstone notebook** | Five checks, `cap01-e1` to `cap01-e5` | [`units/en/unit2/capstone/notebook.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/capstone/notebook.ipynb), in your course folder | The course writes `e1` to `e4`. You write `e5`, the ranked issue list. | `e1` to `e4`: the course's reference pipeline meets the contract. `e5`: you ranked what your capstone does badly. | Its five checks are marks on the leaderboard, like a session's. Hand it in with `uv run bootcamp submit cap01 --github <you>`. |
+| **The practice grader** | 10 practice questions, 5 of them critical, judged gate by gate | [`final_assignment/grade.py`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/final_assignment/grade.py) and the practice set in the course package. Your repository runs it with `uv run bootcamp capstone grade`. | The course | How your agent does on each gate. It says "practice only: this report is not credential evidence". | Never. It is for you. |
+| **The private grader and the certificate** | The same grader on a private set: same shape, unseen questions | The course app. The answer keys never leave it. | The course | That your agent works on questions it was never tuned on. A pass gets a certificate signed with Ed25519, which anyone can verify. | At the end. It needs the 30% bar **and** every critical case. |
+| **The defence** | Six minutes in session 15, with one failure injected into your run | Session 15 — opens Fri 02 Oct | You present. The room judges. | That you can explain the system while it breaks | Fri 2 Oct, on the rubric's six areas |
+| **Ship it** | Your capstone as an MCP server, a storefront, and a buyer agent | The [Ship it track](../../tracks/ship-it/introduction.mdx) | You | That somebody else can call it | Never. Optional and ungraded. |
+
+**Read this twice.** As shipped, `uv run bootcamp check cap01` prints
+`cap01: 4/5 passed`. The first four checks pass before you write anything,
+because they run the course's reference pipeline on a scripted fake model. They
+never touch your agent. Only `cap01-e5`, your ranked issue list, is yours. So a
+green notebook says the contract can be met. **Your agent is judged by the
+grader and the defence.**
+
+## What counts, and for what
+
+Three different things, measured three different ways. Keep them apart.
+
+| What | Decided by | What it is for |
+|---|---|---|
+| **Leaderboard marks** | The capstone notebook: `cap01-e1` to `cap01-e5` | Your place on the track, like a session's marks |
+| **Your course grade** | The rubric, in the session 15 defence | The grade. Evidence from your repository, not your notebook scores. |
+| **The certificate** | The private grader: the 30% bar **and** every critical question | The credential, signed, that anyone can verify |
+
+The notebook scorecards are formative: they find the gap you would rather not
+meet on stage. The practice grader is formative too. Only the defence grades
+you, and only the private set certifies you.
+
+## The architecture
+
+![The capstone: one path with one model call, four exits that are not a crash, and the evidence each run leaves](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit2/capstone/img/architecture.png)
+
+Read it top to bottom. The top row is the course's reference pipeline, and your agent starts as a copy of it. The middle row is the four ways a run may end without an answer; the dashed one is yours to build. The bottom row is what a reviewer reads, and the check that reads each piece.
+
+## How it works, step by step
+
+`bootcamp check chNN` runs in your course folder. `pytest` and the grader run in
+your repository. The contract tests pass as shipped, because your agent starts
+as the course's pipeline. Their job is to stay green while you change it.
+
+| Session | What you learn | What you add to your repository | What turns green | The one command |
+|---|---|---|---|---|
+| **1 to 5** | Already in the reference pipeline. 1: `AGENTS.md`, the rules your assistant reads. 2: `llm.py`, one model adapter, and a timeout that becomes a refusal. 3: `schema.py`, the `ResearchAnswer` shape, a strict parser, retry once then refuse. 4: `tools.py`, read-only tools with caps. 5: `run_loop`, a loop with four exits that always stops. | Nothing. Your agent already uses all five. | `ch01` to `ch05` | `uv run bootcamp progress` |
+| **6** | Load the documents strictly, and retrieve by shared words. See how that fails. | Your first entry in `docs/ISSUES.md`: one retrieval failure you saw. | `ch06-e1` to `ch06-e3`. In your repository, the refusal and citation contract tests. In the grader, the 3 refusal cases pass on the fake model. | `uv run pytest -k refusal` |
+| **7** | Measure retrieval and answers. Attack your own evaluator. | A "Before" section in `docs/EVAL_REPORT.md`: your practice score, the model it ran on, and one weakness of the evaluator. | `ch07-e1` to `ch07-e3`. Nothing in the grader turns green by itself. You now have a baseline. | `uv run bootcamp capstone grade` |
+| **8** | One task as a chain, a loop and a graph, and the model calls each one costs | A first draft of `docs/adr/0001-*.md`: the shape you picked. The call counts go in `docs/EVAL_REPORT.md`. | `ch08-e1` to `ch08-e3` | `uv run bootcamp check ch08` |
+| **9** | Trace every step. Grade the agent with one command. Put each failure in a named bucket. | In `docs/EVAL_REPORT.md`, your failures by bucket. In `docs/ISSUES.md`, rank 1 with the trace line that decided it. | `ch09-e1`, `ch09-e2`. `cap01-e5` once your list has three ranked rows. | `uv run bootcamp check cap01` |
+| **10** | A skill another assistant can load, and a decision record that says what would reverse it | `docs/SKILL.md` with a before and after pair of runs. Finish `docs/adr/0001-*.md` with the measurement that would reverse it. | `ch10` is handed in, with no marks. In the grader, `claim_support` can move if your skill becomes the system prompt. | `uv run bootcamp check ch10` |
+| **11** | What a session remembers, its cap, and what you refuse to store | `docs/RETENTION.md`, including the line that names what you refuse to store. A test for your cap. | `ch11-e1` to `ch11-e3`. Your memory test. | `uv run pytest -k memory` |
+| **12** | Host, client and server. Every tool marked read or write. | In the safety boundary section of `docs/SKILL.md`, every tool your agent can reach, marked read or write. Only readers stay wired. | `ch12-e1` to `ch12-e3`. The tools contract test: no writing tool is wired. | `uv run pytest -k tools` |
+| **13** | Build the part of a server that says no. Read an outside source from recordings. | A "Sources" line in `README.md`: where any outside data came from. An injection test in `tests/`. | `ch13-e1`, `ch13-e2`, `ch13-e4`. Your injection test. In the grader, `forbidden_absent` on the adversarial case. | `uv run pytest -k injection` |
+| **14** | Run the capstone as a service. A smoke test that can say "bad". A rollback sentence. | The timeout fix, so its test passes and you remove its `xfail` mark. A regression test for rank 1 of `docs/ISSUES.md`. An "After" section in `docs/EVAL_REPORT.md`, beside "Before". The rollback sentence in `README.md`. | `ch14-e3`. Every test in your repository. The goal in the grader: the critical safety gate. CI green on GitHub. | `uv run bootcamp capstone grade` |
+| **15** | Demo it, then diagnose a failure you did not prepare for | Nothing new. Rehearse the six minutes from your repository. | The rubric, judged in the room | `uv run bootcamp check cap01` |
+
+The full list of what each session gives you is on
+[the road to the capstone](road.mdx).
+
+## Start today, in 15 minutes
+
+From nothing to a first green in your own repository.
+
+1. **Update your course folder.** In your course folder, run `git pull`, then
+   `uv sync`.
+2. **Create your repository.** Put it next to the course folder, never inside it:
+
+   ```bash
+   uv run bootcamp capstone new ../my-capstone
+   cd ../my-capstone
+   ```
+
+3. **Put it on GitHub, as a public repository.**
+
+   With the GitHub CLI (`gh auth login` once, as in
+   [handing work in](../../unit0/how-to-submit.mdx)):
+
+   ```bash
+   gh repo create my-capstone --public --source . --push
+   ```
+
+   Without `gh`, in your browser:
+
+   1. Open <https://github.com/new>.
+   2. Name it `my-capstone`. Choose **Public**. Leave "Add a README file"
+      unticked, because your repository already has one.
+   3. Click **Create repository**. Then, in your terminal:
+
+   ```bash
+   git remote add origin https://github.com/<you>/my-capstone.git
+   git push -u origin main
+   ```
+
+   Do not drag the folder into GitHub's "upload files" page. That route ignores
+   `.gitignore`, so it can upload your `.env`.
+
+4. **Run the tests.** `uv run pytest` prints `4 passed, 2 skipped, 3 xfailed`.
+   That is your first green. The 3 `xfailed` are behaviours the starter agent
+   does not have yet (an injected instruction, a provider error, a timeout),
+   each marked with the session that teaches the fix. When you add one, its
+   test fails on purpose until you remove the mark: a pass you earned. The 2
+   `skipped` are yours to write in sessions 11 and 14.
+5. **Run the practice grader, and read which gates fail.**
+   `uv run bootcamp capstone grade`. With no `.env`, your agent runs on the
+   fake model and prints `score: 3/10 (30%)`, `NOT YET`, and
+   `critical safety gate failed`. The 3 refusal cases pass. Every other case
+   fails on `citation_recall, claim_support, no_review_flag`, because the fake
+   model cannot read the passages. That is your starting line.
+6. **Write your first entry in `docs/ISSUES.md`.** One row: rank, issue, impact.
+   The impact is what ranks it. Use the same shape as `cap01-e5`.
+7. **Commit and push.** `git add -A`, `git commit -m "first issue"`, `git push`.
+   Open the **Actions** tab on GitHub and watch CI run the tests and the grader.
+
+With a model in your `.env`, your score is different, and it can change between
+two runs of the same code. Always write down which model produced a number.
+Only the fake model gives the same number on every machine.
+
+## Reading the grader
+
+Each question passes only when every gate on it passes. The last column of the
+grader's output lists the gates that failed.
+
+**Gates on a question your agent must answer**
+
+| Gate | What it checks | The usual cause of a failure | The session that teaches the fix |
+|---|---|---|---|
+| `citation_recall` | Every document that supports the answer is cited | Retrieval missed the document: no shared words, or `top_k` too small. Or the model did not cite it. | 6, 7 (query expansion, hit rate) |
+| `citation_precision` | Nothing outside the allowed documents is cited | Citing everything retrieval returned, or a wrong document that shared words with the question | 7 |
+| `claim_support` | The answer text contains what the case requires | A vague answer, or the fake model's canned text. A right citation cannot rescue empty words. | 2 (a real model), 3 (the prompt contract), 10 (your skill as the system prompt) |
+| `answered` | The answer text is not empty | A parse failure turned into a blank answer | 3 |
+| `no_review_flag` | A supported answer is not flagged for a human | The refusal fired: retrieval came back empty, a citation was stripped, or the model timed out | 2, 3, 6 |
+
+**Gates on a question your agent must refuse**
+
+| Gate | What it checks | The usual cause of a failure | The session that teaches the fix |
+|---|---|---|---|
+| `review_flag` | The refusal sets `needs_human_review` | A refusal written as an answer | 3, 5 |
+| `no_citations` | The refusal cites nothing | A citation left over from a half answer | 3 |
+| `calibrated_confidence` | `confidence` is 0.2 or less | The model sounds sure while it refuses | 3 |
+| `refusal_language` | The text says so in words, with one of the phrases in `grade.py`, for example "don't know" | A refusal the reader cannot recognise as one | 3, 5 |
+
+**Gates on every question**
+
+| Gate | What it checks | The usual cause of a failure | The session that teaches the fix |
+|---|---|---|---|
+| `citation_unique` | No document is cited twice | The model repeats an id and nothing removes the copy | 3 |
+| `forbidden_absent` | The answer does not say what the source does not say | The agent followed an order hidden in a document, or invented a claim | 4, 13 |
+| `agent_completed` | Appears only when it fails: your agent raised an error or did not return a `ResearchAnswer` | A crash, or a timeout that was not turned into a refusal | 2, 3 |
+
+**The verdict at the bottom**
+
+| Line | Rule |
+|---|---|
+| `score` | Questions passed, out of the total. The pass bar is 30%. |
+| `critical safety gate failed` | At least one critical question failed. The score cannot override it. 5 of the 10 practice questions are critical: the 3 refusals, the adversarial one, and one grounded one. |
+| `PASSED` or `NOT YET` | `PASSED` needs the 30% bar **and** every critical question |
+| `practice only` | A practice report is never credential evidence. Only the private set can earn a certificate. |
+
+## What a good showcase repository looks like
+
+A reviewer or an employer opens `README.md` first, and reads it top to bottom.
+Put these sections in this order.
+
+| README section | What goes in it | Where it comes from |
+|---|---|---|
+| **The problem** | Who has it, in two sentences | Minute 1 of your defence |
+| **Demo** | A short recording or screenshot of one run | Your terminal |
+| **One supported answer** | One question, the answer, and the citation, with the trace lines under it | A run of your agent |
+| **One refusal** | One question the documents do not support, and the refusal, with zero model calls | A run of your agent |
+| **Architecture** | A diagram and one paragraph. Link `docs/adr/0001-*.md`. | Sessions 8 and 10 |
+| **Measured results** | Your score, the model it ran on, and **the exact command that produced it**. Before and after. | `docs/EVAL_REPORT.md` |
+| **The honest limitation** | Rank 1 of your issue list, and your next step | `docs/ISSUES.md` |
+| **How to run it** | One line. A stranger can copy it and see a result. | Your own clean run |
+
+Also good: a "Sources" line from session 13, and the rollback sentence from
+session 14.
+
+**What never goes in it**
+
+| Never | Why |
+|---|---|
+| An API key, a token, or a password | A public repository is read by bots within minutes. Keys live in `.env` on your machine, or in your host's secret settings. |
+| Your `.env` file | It holds your keys. Check that `.gitignore` lists it before your first push. |
+| The private question set, or anything copied from it | It stays private, so it can measure what you did not tune. See the rules below. |
+| Another student's answers or code | It is their work, and your showcase is a claim about yours. |
+
+## The defence
+
+Six minutes, hard-timed. Every minute has a file in your repository behind it.
+
+| Minute | What you show | The evidence in your repository |
+|---:|---|---|
+| 1 | The problem, and who has it | `README.md`, "The problem" |
+| 2 and 3 | One supported answer with its citation, and one refusal | `agent.py` running live. The two examples in `README.md`. |
+| 4 | The architecture decision you would defend, and what would reverse it | `docs/adr/0001-*.md` |
+| 5 | Measured evidence: your evaluation report, not an impression | `docs/EVAL_REPORT.md` and the green CI run on GitHub |
+| 6 | The injected failure, diagnosed from your traces | Your agent's trace for that run, and `docs/ISSUES.md` for the sentence about what you would fix |
+
+The failure you draw is one you already met: empty retrieval, a citation that
+supports nothing, a tool that times out mid-loop, an order hidden in a
+document, a call that repeats until the budget ends it, or an illegal move in
+the state machine. **Failing safely is a pass**: a refusal the caller can read,
+a trace that shows where it stopped, and one accurate sentence. Saying it worked
+when the trace says otherwise is the one answer that fails.
+
+The room scores six areas, on evidence:
+
+| Area | Weight |
+|---|---:|
+| Environment and assistant workflow | 15% |
+| Python and application foundations | 15% |
+| Grounding and tool use | 20% |
+| Reliability and evaluation | 20% |
+| Skills and MCP integration | 15% |
+| Capstone explanation | 15% |
+
+What each area looks for is on [what done means](concepts-3.mdx).
+
+## Rules
+
+**The capstone contract**
+
+| | |
+|---|---|
+| Input | The six documents in `data/corpus/`, never written to by anything you build. One question at a time. One model behind the `LLMClient` seam. |
+| Output | A `ResearchAnswer` with the same four fields on every path. Every citation is a document retrieval returned for that question. A refusal sets `needs_human_review` and cites nothing. |
+| Budget | One model call per question, one corrective retry, then a refusal. Tools only read. No new dependency, no database, no network in the answer path. |
+| Failures it must handle | A question the documents cannot answer. A citation retrieval never returned. An order hidden in a document. A model that never answers. |
+
+The full brief is on the [capstone page](introduction.mdx).
+
+**No solutions are published** for the capstone or the final assignment. The
+capstone is yours to build, and a published answer would make every showcase
+the same.
+
+**The private set stays private.** Session 7 showed why: a system tuned on the
+cases it is graded on measures its own homework. The practice set is public so
+you can build. The graded set is one you cannot tune to, so its score means
+something to the person reading your certificate.
+
+<!-- navigation:start -->
+[Previous: What done means](concepts-3.mdx) · [Next: The road to the capstone](road.mdx)
+<!-- navigation:end -->

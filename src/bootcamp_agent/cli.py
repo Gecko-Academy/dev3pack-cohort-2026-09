@@ -556,6 +556,60 @@ def _read(port: int, build_only: bool) -> int:
         return 0
 
 
+def _capstone_new(folder: str, github: str | None, course_ref: str | None) -> int:
+    """Create the student's own capstone repository beside the course clone."""
+    from bootcamp_agent.capstone_repo import CapstoneError, create, next_steps
+
+    try:
+        made = create(Path(folder), course_root=ROOT, github=github, course_ref=course_ref)
+    except CapstoneError as error:
+        print(f"{FAIL} {error}", file=sys.stderr)
+        return 2
+    print(next_steps(made))
+    return 0 if made.committed else 1
+
+
+def _capstone_grade(agent: str, name: str, report: str, count: int, seed: int | None) -> int:
+    """The practice grader, run inside a capstone repository on its own agent."""
+    from bootcamp_agent.capstone_repo import CapstoneError, grade_repo
+    from bootcamp_agent.final_grade import write_report
+
+    repo = Path.cwd()
+    try:
+        provider = load_settings().provider
+    except ConfigError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
+    print(f"grading {agent} on the practice set, model lane: {provider}\n")
+    try:
+        outcome, lines = grade_repo(
+            repo, agent_spec=agent, name=name, random_count=count, seed=seed
+        )
+    except CapstoneError as error:
+        print(f"{FAIL} {error}", file=sys.stderr)
+        return 2
+    for line in lines:
+        print(line)
+    destination = repo / report
+    write_report(outcome, destination)
+    print(f"report written: {report}")
+    return 0 if outcome["passed"] else 1
+
+
+def _capstone_trace(question: str, agent: str) -> int:
+    """One question through the capstone's agent, with every step it took."""
+    from bootcamp_agent.capstone_repo import CapstoneError, trace_lines
+
+    try:
+        lines = trace_lines(Path.cwd(), question, agent_spec=agent)
+    except (CapstoneError, ConfigError, CorpusError) as error:
+        print(f"{FAIL} {error}", file=sys.stderr)
+        return 2
+    for line in lines:
+        print(line)
+    return 0
+
+
 def bootcamp(argv: list[str] | None = None) -> int:
     """The participant's own command: check the setup, a chapter, or everything."""
     parser = argparse.ArgumentParser(
@@ -592,6 +646,32 @@ def bootcamp(argv: list[str] | None = None) -> int:
         action="store_true",
         help="fork, commit and open the pull request for you (needs the gh CLI)",
     )
+    capstone = sub.add_parser("capstone", help="your own capstone repository: new, grade, trace")
+    capstone_sub = capstone.add_subparsers(dest="capstone_command")
+    creator = capstone_sub.add_parser(
+        "new", help="create your capstone repository beside the course (never pushes)"
+    )
+    creator.add_argument("folder", help="where to create it, outside the course: ../my-capstone")
+    creator.add_argument(
+        "--github", help="the GitHub repository name to publish as (NAME or OWNER/NAME)"
+    )
+    creator.add_argument(
+        "--course-ref",
+        help="the course commit to pin (default: the published commit this clone holds)",
+    )
+    grader = capstone_sub.add_parser(
+        "grade", help="inside your capstone: grade its agent on the practice set"
+    )
+    grader.add_argument("--agent", default="agent.py", help="FILE[:CLASS] (default agent.py)")
+    grader.add_argument("--name", default="", help="your display name, for the report")
+    grader.add_argument("--report", default="score_report.json", help="where to write the report")
+    grader.add_argument("--random", type=int, default=0, metavar="N", help="a sample of N")
+    grader.add_argument("--seed", type=int, default=None, help="make --random repeatable")
+    tracer = capstone_sub.add_parser(
+        "trace", help="inside your capstone: answer one question and print every step"
+    )
+    tracer.add_argument("question", help="the question, in quotes")
+    tracer.add_argument("--agent", default="agent.py", help="FILE[:CLASS] (default agent.py)")
     args = parser.parse_args(argv)
 
     if args.command == "start":
@@ -608,6 +688,15 @@ def bootcamp(argv: list[str] | None = None) -> int:
         return _read(args.port, args.build_only)
     if args.command == "submit":
         return _submit(args.chapter, args.github, args.cohort, args.into, args.push)
+    if args.command == "capstone":
+        if args.capstone_command == "new":
+            return _capstone_new(args.folder, args.github, args.course_ref)
+        if args.capstone_command == "grade":
+            return _capstone_grade(args.agent, args.name, args.report, args.random, args.seed)
+        if args.capstone_command == "trace":
+            return _capstone_trace(args.question, args.agent)
+        capstone.print_help()
+        return 2
     parser.print_help()
     return 2
 

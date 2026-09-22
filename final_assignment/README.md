@@ -33,7 +33,8 @@ certificate when you pass.
 
    `--random` samples within each category, so a practice score predicts the
    real one instead of depending on which questions came up. Nothing is sent
-   anywhere: the practice set and its answers are in this folder.
+   anywhere: the practice set and its answers are in this repository
+   (`src/bootcamp_agent/final_practice.jsonl`).
 
 3. **The real run** uses a private set with the same shape and unseen
    questions. Your practice score is for you; the private score is what counts.
@@ -113,8 +114,7 @@ for provider keys; locally they live only in `.env`.
 | File | What it is |
 |---|---|
 | `agent.py` | **Yours.** The agent the grader runs — edit this. |
-| `questions.jsonl` | The public practice set (10 questions). |
-| `grade.py` | The grader — same pass logic as the course evals. |
+| `grade.py` | The grader — same pass logic as the course evals. The scoring and the public practice set (10 questions) ship in the package: `src/bootcamp_agent/final_grade.py` and `final_practice.jsonl`, so a capstone repository grades with the same code (`uv run bootcamp capstone grade`). |
 | `certificate.py` | Renders and verifies a certificate from a signed receipt. |
 | `receipt.py` | The issuer's Ed25519 keygen, sign and verify. |
 | `app.py` | Gradio UI for the Space version. |

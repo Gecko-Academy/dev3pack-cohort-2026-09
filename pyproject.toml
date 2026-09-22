@@ -65,6 +65,12 @@ bootcamp = "bootcamp_agent.cli:bootcamp"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# The final assignment's practice set travels with the package, so a capstone
+# repository outside the course (`bootcamp capstone grade`) grades on the same
+# ten questions. Public by design; the private set is not in this repository.
+[tool.setuptools.package-data]
+bootcamp_agent = ["final_practice.jsonl"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
