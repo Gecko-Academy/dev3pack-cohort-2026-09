@@ -401,9 +401,16 @@ def _no_evidence(item: object) -> str:
 
 
 def _manual_route(github: str, item_id: str, where: Path) -> str:
-    """How to hand in without `gh`. The text lives beside `push`, in `handin`."""
+    """How to hand in without `gh`. The text lives beside `push`, in `handin`.
+
+    The file list is read off the bundle, so a carried `challenge.ipynb` is named
+    in the upload steps exactly like the notebook is.
+    """
     from bootcamp_agent.handin import manual_route
 
+    files = tuple(sorted(p.name for p in where.iterdir() if p.is_file())) if where.is_dir() else ()
+    if files:
+        return manual_route(github, item_id, where, files=files)
     return manual_route(github, item_id, where)
 
 
@@ -457,14 +464,22 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None, push: b
             print(f"could not run it: {error}")
             return 1
 
+    # ch05/ch10 only: the week's challenge, if it was done (and saved) in its demo.
+    from bootcamp_agent.weekly.carry import carry
+
+    carried = carry(item.id, ROOT, item.notebook)
+    challenge = carried.carried.raw if carried.carried else None
+
     try:
-        payload = submission.build(item, card, item.notebook, github, cohort)
+        payload = submission.build(item, card, item.notebook, github, cohort, challenge=challenge)
     except submission.SubmissionError as error:
         print(str(error))
         return 2
 
     root = Path(into) if into else Path.cwd() / "submissions"
-    where = submission.write(payload, item.notebook, root / github / item.id)
+    where = submission.write(payload, item.notebook, root / github / item.id, challenge=challenge)
+    if carried.message:
+        print(carried.message)
 
     result = payload["result"]
     if item.scored:

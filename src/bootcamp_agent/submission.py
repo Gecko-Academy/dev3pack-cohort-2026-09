@@ -63,6 +63,8 @@ SCHEMA = "dev3pack.submission.v2"
 #: submissions root, in folders named after nobody, and nothing can be graded.
 SUBMISSION_FILE = "submission.json"
 NOTEBOOK_FILE = "notebook.ipynb"
+#: The third file, only in a ch05/ch10 bundle that carries its challenge demo.
+CHALLENGE_FILE = "challenge.ipynb"
 
 
 @dataclass(frozen=True)
@@ -241,7 +243,12 @@ def submission_id_for(payload: dict) -> str:
 
 
 def sha256_of(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return sha256_bytes(path.read_bytes())
+
+
+def sha256_bytes(raw: bytes) -> str:
+    """The one digest both evidence files are recorded under."""
+    return hashlib.sha256(raw).hexdigest()
 
 
 def score_for(passed: tuple[str, ...], help: Help) -> int:
@@ -261,12 +268,17 @@ def build(
     cohort: str,
     help: Help | None = None,
     now: datetime | None = None,
+    challenge: bytes | None = None,
 ) -> dict:
     """The submission payload for one chapter or week-0 unit.
 
     `card` is None for an item that was never run, which is the honest state for
     an assistant-driven chapter: it cannot be re-run unattended, so there are no
     verdicts to report and inventing zeroes would read as failure.
+
+    `challenge` is the raw weekly-challenge demo carried beside the notebook
+    (`weekly.carry`), recorded exactly as the notebook is so the checker can bind
+    it to this claim. None means the bundle has no third file.
     """
     if isinstance(item, Chapter):  # callers that still hand us a Chapter
         item = resolve(item.chapter_id)
@@ -302,12 +314,16 @@ def build(
         "evidence": {"notebook": NOTEBOOK_FILE, "notebook_sha256": sha256_of(notebook)},
         "verified": None,
     }
+    # ONLY when the file is attached: the checker fails a claim that names a
+    # challenge digest with no `challenge.ipynb` beside it.
+    if challenge is not None:
+        payload["evidence"]["challenge_sha256"] = sha256_bytes(challenge)
     # Last, because it is taken over everything above it.
     payload["submission_id"] = submission_id_for(payload)
     return payload
 
 
-def write(payload: dict, notebook: Path, into: Path) -> Path:
+def write(payload: dict, notebook: Path, into: Path, challenge: bytes | None = None) -> Path:
     """Write the bundle a learner commits: the claim and the evidence beside it.
 
     STAGED, THEN SWAPPED. A submission is a claim and the exact notebook it is
@@ -342,6 +358,8 @@ def write(payload: dict, notebook: Path, into: Path) -> Path:
     try:
         (stage / SUBMISSION_FILE).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         (stage / NOTEBOOK_FILE).write_bytes(notebook.read_bytes())
+        if challenge is not None:
+            (stage / CHALLENGE_FILE).write_bytes(challenge)
         if into.exists():
             if backup.exists():
                 shutil.rmtree(backup)
