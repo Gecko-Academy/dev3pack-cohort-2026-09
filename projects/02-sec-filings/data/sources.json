@@ -1,0 +1,109 @@
+{
+ "fetched": "2026-09-21",
+ "filings": [
+  {
+   "ticker": "AAPL",
+   "company": "Apple Inc.",
+   "cik": 320193,
+   "form": "10-K",
+   "accession": "0000320193-25-000079",
+   "period_of_report": "2025-09-27",
+   "filed": "2025-10-31",
+   "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+   "section": "Item 1A. Risk Factors",
+   "file": "raw/aapl-10k-item1a.html",
+   "bytes": 94456
+  },
+  {
+   "ticker": "MSFT",
+   "company": "MICROSOFT CORP",
+   "cik": 789019,
+   "form": "10-K",
+   "accession": "0001193125-26-323660",
+   "period_of_report": "2026-06-30",
+   "filed": "2026-07-29",
+   "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm",
+   "section": "Item 1A. Risk Factors",
+   "file": "raw/msft-10k-item1a.html",
+   "bytes": 148175
+  },
+  {
+   "ticker": "NVDA",
+   "company": "NVIDIA CORP",
+   "cik": 1045810,
+   "form": "10-K",
+   "accession": "0001045810-26-000021",
+   "period_of_report": "2026-01-25",
+   "filed": "2026-02-25",
+   "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+   "section": "Item 1A. Risk Factors",
+   "file": "raw/nvda-10k-item1a.html",
+   "bytes": 188816
+  },
+  {
+   "ticker": "TSLA",
+   "company": "Tesla, Inc.",
+   "cik": 1318605,
+   "form": "10-K",
+   "accession": "0001628280-26-003952",
+   "period_of_report": "2025-12-31",
+   "filed": "2026-01-29",
+   "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/tsla-20251231.htm",
+   "section": "Item 1A. Risk Factors",
+   "file": "raw/tsla-10k-item1a.html",
+   "bytes": 120460
+  },
+  {
+   "ticker": "KO",
+   "company": "COCA COLA CO",
+   "cik": 21344,
+   "form": "10-K",
+   "accession": "0001628280-26-010047",
+   "period_of_report": "2025-12-31",
+   "filed": "2026-02-20",
+   "url": "https://www.sec.gov/Archives/edgar/data/21344/000162828026010047/ko-20251231.htm",
+   "section": "Item 1A. Risk Factors",
+   "file": "raw/ko-10k-item1a.html",
+   "bytes": 121678
+  },
+  {
+   "ticker": "NKE",
+   "company": "NIKE, Inc.",
+   "cik": 320187,
+   "form": "10-K",
+   "accession": "0000320187-26-000088",
+   "period_of_report": "2026-05-31",
+   "filed": "2026-07-15",
+   "url": "https://www.sec.gov/Archives/edgar/data/320187/000032018726000088/nke-20260531.htm",
+   "section": "Item 1A. Risk Factors",
+   "file": "raw/nke-10k-item1a.html",
+   "bytes": 139654
+  },
+  {
+   "ticker": "MELI",
+   "company": "MERCADOLIBRE INC",
+   "cik": 1099590,
+   "form": "10-K",
+   "accession": "0001099590-26-000006",
+   "period_of_report": "2025-12-31",
+   "filed": "2026-02-25",
+   "url": "https://www.sec.gov/Archives/edgar/data/1099590/000109959026000006/meli-20251231.htm",
+   "section": "Item 1A. Risk Factors",
+   "file": "raw/meli-10k-item1a.html",
+   "bytes": 205219
+  },
+  {
+   "ticker": "ABNB",
+   "company": "Airbnb, Inc.",
+   "cik": 1559720,
+   "form": "10-K",
+   "accession": "0001559720-26-000004",
+   "period_of_report": "2025-12-31",
+   "filed": "2026-02-12",
+   "url": "https://www.sec.gov/Archives/edgar/data/1559720/000155972026000004/abnb-20251231.htm",
+   "section": "Item 1A. Risk Factors",
+   "file": "raw/abnb-10k-item1a.html",
+   "bytes": 249071
+  }
+ ]
+}

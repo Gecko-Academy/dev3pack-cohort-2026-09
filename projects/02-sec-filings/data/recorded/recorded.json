@@ -1,0 +1,47 @@
+{
+ "_provenance": {
+  "recorded": "2026-09-21",
+  "embedding_model": "nomic-embed-text",
+  "chat_model": "qwen2.5:7b-instruct",
+  "lane": "one real run, replayed when no local model is running",
+  "is_evidence_of": "the vectors and replies these models produced for this text on that run",
+  "is_not_evidence_of": "what they return every time. A live run words answers differently. Run it live to see yours."
+ },
+ "chunk_fingerprint": "eace5ac61cb58d6c3a02ec0ec36ed57a555f9258b36c50e45f0ae74dc5a1e701",
+ "chunks": 1401,
+ "dimensions": 768,
+ "queries": [
+  "Which company says its bottling partners could hurt its business?",
+  "Who warns about the devaluation of the Argentine peso?",
+  "Which company depends on Elon Musk?",
+  "Who worries about export controls on its GPUs to China?",
+  "Which company depends on hosts listing their homes?",
+  "Who relies on athletes and endorsers for its brand?",
+  "Which company is exposed to risks in its Azure datacenters?",
+  "Who outsources manufacturing to partners in Vietnam and India?",
+  "Who runs a lending business through Mercado Pago?",
+  "Who depends on suppliers of lithium-ion battery cells?",
+  "Which drinks maker relies on outside companies to package and deliver its products?",
+  "Who is hurt when a South American country's money loses value?",
+  "Which carmaker would suffer if its chief executive left?",
+  "Which chip designer could lose sales if governments limit what it can ship abroad?",
+  "Who depends on people renting out their spare rooms?",
+  "Which shoe brand worries about the celebrities it sponsors?",
+  "Who worries about attacks from foreign governments on its online services?",
+  "Which phone maker depends on factories it does not own in Asia?",
+  "Who is exposed to taxes on sweet drinks?",
+  "Which online marketplace also lends money to its sellers?",
+  "What does MercadoLibre's latest annual report say about Argentina's currency?",
+  "Which of these companies is exposed to taxes on sweet drinks, and how?",
+  "What is Nike's refund policy for online orders?",
+  "xylophone recital giraffe",
+  "who won the 1998 world cup final"
+ ],
+ "replies": {
+  "Question: What does MercadoLibre's latest annual report say about Argentina's currency?": "{\"answer\": \"Argentina’s official exchange rate against the U.S. dollar increased 41.0%, 27.7% and 356.3% respectively for the years ended December 31, 2025, 2024 and 2023.\", \"citations\": [\"meli#213\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Question: Which of these companies is exposed to taxes on sweet drinks, and how?": "{\"answer\": \"The company is exposed to taxes on sweet drinks through direct and indirect levies. Directly, increases in or the imposition of new indirect taxes on sweetened beverages would increase the cost of products. Indirectly, proposed or increased sales or similar taxes could also affect the affordability and net operating revenues of the products.\", \"citations\": [\"ko#83\", \"ko#82\", \"ko#40\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Question: What is Nike's refund policy for online orders?": "{\"answer\": \"The context provided does not contain information about Nike's refund policy for online orders.\", \"citations\": [], \"confidence\": 0.0, \"needs_human_review\": true}",
+  "What does MercadoLibre's latest annual report say about Argentina's currency?": "MercadoLibre's latest annual report mentions the continued volatility of Argentina's currency, highlighting the impact on the company's financial results and operations. The report notes strategies and measures taken to mitigate the risks associated with currency fluctuations.",
+  "Which of these companies is exposed to taxes on sweet drinks, and how?": "Coca-Cola is exposed to taxes on sweet drinks as it produces and sells sugary beverages, which are often targeted by governments implementing sugar-sweetened beverage (SSB) taxes to promote public health. Similarly, PepsiCo is also exposed to such taxes due to its production and distribution of sweet drinks."
+ }
+}

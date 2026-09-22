@@ -1,0 +1,105 @@
+{
+ "about": "Each question names the one company whose Risk Factors answer it. 'keyword' questions use that company's own words; 'paraphrase' questions avoid them. Checked by searching the cleaned text on 2026-09-21.",
+ "questions": [
+  {
+   "question": "Which company says its bottling partners could hurt its business?",
+   "company": "ko",
+   "kind": "keyword"
+  },
+  {
+   "question": "Who warns about the devaluation of the Argentine peso?",
+   "company": "meli",
+   "kind": "keyword"
+  },
+  {
+   "question": "Which company depends on Elon Musk?",
+   "company": "tsla",
+   "kind": "keyword"
+  },
+  {
+   "question": "Who worries about export controls on its GPUs to China?",
+   "company": "nvda",
+   "kind": "keyword"
+  },
+  {
+   "question": "Which company depends on hosts listing their homes?",
+   "company": "abnb",
+   "kind": "keyword"
+  },
+  {
+   "question": "Who relies on athletes and endorsers for its brand?",
+   "company": "nke",
+   "kind": "keyword"
+  },
+  {
+   "question": "Which company is exposed to risks in its Azure datacenters?",
+   "company": "msft",
+   "kind": "keyword"
+  },
+  {
+   "question": "Who outsources manufacturing to partners in Vietnam and India?",
+   "company": "aapl",
+   "kind": "keyword"
+  },
+  {
+   "question": "Who runs a lending business through Mercado Pago?",
+   "company": "meli",
+   "kind": "keyword"
+  },
+  {
+   "question": "Who depends on suppliers of lithium-ion battery cells?",
+   "company": "tsla",
+   "kind": "keyword"
+  },
+  {
+   "question": "Which drinks maker relies on outside companies to package and deliver its products?",
+   "company": "ko",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Who is hurt when a South American country's money loses value?",
+   "company": "meli",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Which carmaker would suffer if its chief executive left?",
+   "company": "tsla",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Which chip designer could lose sales if governments limit what it can ship abroad?",
+   "company": "nvda",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Who depends on people renting out their spare rooms?",
+   "company": "abnb",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Which shoe brand worries about the celebrities it sponsors?",
+   "company": "nke",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Who worries about attacks from foreign governments on its online services?",
+   "company": "msft",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Which phone maker depends on factories it does not own in Asia?",
+   "company": "aapl",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Who is exposed to taxes on sweet drinks?",
+   "company": "ko",
+   "kind": "paraphrase"
+  },
+  {
+   "question": "Which online marketplace also lends money to its sellers?",
+   "company": "meli",
+   "kind": "paraphrase"
+  }
+ ]
+}
