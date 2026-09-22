@@ -46,6 +46,22 @@ def _refusal() -> ResearchAnswer:
     )
 
 
+def _as_ids(citations: tuple[str, ...]) -> tuple[str, ...]:
+    """Citations as bare doc ids, each once.
+
+    The prompt labels every passage `[doc-id]`, and models copy the label whole.
+    Compared verbatim, a correct "[rag-basics]" looked invented and was stripped.
+    """
+    ids: list[str] = []
+    for citation in citations:
+        cited = citation.strip()
+        if len(cited) > 2 and cited.startswith("[") and cited.endswith("]"):
+            cited = cited[1:-1].strip()
+        if cited not in ids:
+            ids.append(cited)
+    return tuple(ids)
+
+
 def answer_question(
     question: str,
     documents: Sequence[Document],
@@ -96,6 +112,12 @@ def answer_question(
             )
             return AgentResult(answer=_refusal(), trace=tuple(trace))
 
+    answer = ResearchAnswer(
+        answer=answer.answer,
+        citations=_as_ids(answer.citations),
+        confidence=answer.confidence,
+        needs_human_review=answer.needs_human_review,
+    )
     fabricated = [c for c in answer.citations if c not in retrieved_ids]
     if fabricated:
         trace.append(

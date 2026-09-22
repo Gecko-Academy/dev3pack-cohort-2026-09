@@ -401,41 +401,10 @@ def _no_evidence(item: object) -> str:
 
 
 def _manual_route(github: str, item_id: str, where: Path) -> str:
-    """How to hand in without `gh`: which repository, which path, in a browser.
+    """How to hand in without `gh`. The text lives beside `push`, in `handin`."""
+    from bootcamp_agent.handin import manual_route
 
-    WHY IT NAMES THE REPOSITORY. The old line was "commit that folder to your fork
-    and open a pull request", and it named neither. A learner reads it standing in
-    their clone of the COURSE, so "your fork" meant the course repository: three
-    pull requests with submissions and edited lessons landed there, where nothing
-    is ever marked. Another copied the folder to the root of the submissions fork,
-    one level too high, where no check runs and the pull request waits for ever.
-    """
-    from bootcamp_agent.curriculum import SUBMISSIONS_REPO, SUBMISSIONS_URL
-
-    target = f"submissions/{github}/{item_id}"
-    return "\n".join(
-        [
-            "",
-            f"Hand it in to {SUBMISSIONS_REPO} — the SUBMISSIONS repository.",
-            "Never open the pull request on the course repository (dev3pack-cohort-2026-09).",
-            "",
-            "Easiest, if you have the GitHub CLI (https://cli.github.com, then: gh auth login):",
-            f"    uv run bootcamp submit {item_id} --github {github} --push",
-            "",
-            "Without it, in your browser. No git needed:",
-            f"  1. Open {SUBMISSIONS_URL} and click Fork.",
-            "  2. In YOUR fork, open the `submissions` folder.",
-            "  3. Click Add file, then Upload files. Drag in this folder from your computer:",
-            f"         {where.parent}",
-            "     The files must end up at:",
-            f"         {target}/notebook.ipynb",
-            f"         {target}/submission.json",
-            '  4. Choose "Create a new branch", click Propose changes,',
-            f"     then Create pull request. The base must be {SUBMISSIONS_REPO}.",
-            "",
-            "A green check on the pull request means it is accepted. Merging is automatic.",
-        ]
-    )
+    return manual_route(github, item_id, where)
 
 
 def _submit(chapter_id: str, github: str, cohort: str, into: str | None, push: bool = False) -> int:
@@ -610,6 +579,42 @@ def _capstone_trace(question: str, agent: str) -> int:
     return 0
 
 
+def _capstone_submit(args: argparse.Namespace) -> int:
+    """The final assignment: practise locally, answer the final set, open the pull request."""
+    from bootcamp_agent.capstone_submit import SubmitError, submit
+    from bootcamp_agent.questions_api import API_ENV, FinalNotOpen, NotPublished, QuestionsError
+
+    repo = Path.cwd()
+    try:
+        settings = load_settings(dotenv_path=repo / ".env")
+    except ConfigError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
+    try:
+        done = submit(
+            repo,
+            github=args.github,
+            api_base=args.api or os.environ.get(API_ENV),
+            settings=settings,
+            agent_spec=args.agent,
+            dry_run=args.dry_run,
+            into=Path(args.into) if args.into else None,
+            question_timeout_s=args.timeout,
+            budget_s=args.budget,
+        )
+    except FinalNotOpen as error:
+        print(f"\nThe final questions are not open yet. They open at {error.opens_at}.")
+        print("Nothing was handed in. Run this again after that.")
+        return 1
+    except NotPublished:
+        print("\nThe final questions are not published yet. Nothing was handed in.")
+        return 1
+    except (SubmitError, QuestionsError) as error:
+        print(f"{FAIL} {error}", file=sys.stderr)
+        return 2
+    return 0 if args.dry_run or done.pr_url else 1
+
+
 def bootcamp(argv: list[str] | None = None) -> int:
     """The participant's own command: check the setup, a chapter, or everything."""
     parser = argparse.ArgumentParser(
@@ -646,7 +651,9 @@ def bootcamp(argv: list[str] | None = None) -> int:
         action="store_true",
         help="fork, commit and open the pull request for you (needs the gh CLI)",
     )
-    capstone = sub.add_parser("capstone", help="your own capstone repository: new, grade, trace")
+    capstone = sub.add_parser(
+        "capstone", help="your own capstone repository: new, grade, trace, submit"
+    )
     capstone_sub = capstone.add_subparsers(dest="capstone_command")
     creator = capstone_sub.add_parser(
         "new", help="create your capstone repository beside the course (never pushes)"
@@ -672,6 +679,26 @@ def bootcamp(argv: list[str] | None = None) -> int:
     )
     tracer.add_argument("question", help="the question, in quotes")
     tracer.add_argument("--agent", default="agent.py", help="FILE[:CLASS] (default agent.py)")
+    final = capstone_sub.add_parser(
+        "submit", help="inside your capstone: answer the final questions and open the pull request"
+    )
+    final.add_argument("--github", required=True, help="your GitHub username")
+    final.add_argument(
+        "--api", help="the course app's address (default: the DEV3PACK_API_BASE variable)"
+    )
+    final.add_argument("--agent", default="agent.py", help="FILE[:CLASS] (default agent.py)")
+    final.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="write the bundle to a temporary folder and print it; open no pull request",
+    )
+    final.add_argument("--into", help="where to write the bundle (default ~/.bootcamp/final)")
+    final.add_argument(
+        "--timeout", type=float, default=120.0, help="seconds per question (default 120)"
+    )
+    final.add_argument(
+        "--budget", type=float, default=1800.0, help="seconds for the whole run (default 1800)"
+    )
     args = parser.parse_args(argv)
 
     if args.command == "start":
@@ -695,6 +722,8 @@ def bootcamp(argv: list[str] | None = None) -> int:
             return _capstone_grade(args.agent, args.name, args.report, args.random, args.seed)
         if args.capstone_command == "trace":
             return _capstone_trace(args.question, args.agent)
+        if args.capstone_command == "submit":
+            return _capstone_submit(args)
         capstone.print_help()
         return 2
     parser.print_help()

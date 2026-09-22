@@ -76,10 +76,22 @@ No key needed: without a `.env` it runs on the offline fake model. For a real
 model, copy `.env.example` to `.env`, fill in your provider, and
 `uv sync --extra anthropic` (or `--extra openai`).
 
+To hand in the final assignment, commit and push, then run
+`uv run bootcamp capstone submit --github <you>`. It runs the practice set
+first, then answers the final questions and opens the pull request.
+`--dry-run` shows the bundle without handing anything in.
+
 ## Sources
 
 <!-- optional. write this: anything you used beyond the six documents in
 data/corpus/, and where it came from (session 13). Delete the section if none. -->
+
+## Credits
+
+<!-- optional. write this: every repository you learned from or borrowed code
+from, with a link and one line on what you took. Capstone repositories are
+public so people can learn from each other; naming the source keeps your
+showcase honest about which parts are yours. Delete the section if none. -->
 
 ## Rollback
 

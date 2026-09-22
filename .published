@@ -161,6 +161,7 @@ src/bootcamp_agent/__init__.py
 src/bootcamp_agent/agent.py
 src/bootcamp_agent/bonus.py
 src/bootcamp_agent/capstone_repo.py
+src/bootcamp_agent/capstone_submit.py
 src/bootcamp_agent/checks.py
 src/bootcamp_agent/cli.py
 src/bootcamp_agent/coach.py
@@ -173,6 +174,7 @@ src/bootcamp_agent/documents.py
 src/bootcamp_agent/evals.py
 src/bootcamp_agent/final_grade.py
 src/bootcamp_agent/final_practice.jsonl
+src/bootcamp_agent/final_run.py
 src/bootcamp_agent/handin.py
 src/bootcamp_agent/hints.py
 src/bootcamp_agent/llm.py
@@ -182,6 +184,7 @@ src/bootcamp_agent/preflight.py
 src/bootcamp_agent/projects/__init__.py
 src/bootcamp_agent/projects/clothing_reviews.py
 src/bootcamp_agent/projects/sec_filings.py
+src/bootcamp_agent/questions_api.py
 src/bootcamp_agent/read.py
 src/bootcamp_agent/retrieval.py
 src/bootcamp_agent/schema.py
@@ -201,6 +204,7 @@ src/bootcamp_agent/shipit/borsh_store.py
 src/bootcamp_agent/shipit/server.py
 src/bootcamp_agent/shipit/storefront.py
 src/bootcamp_agent/submission.py
+src/bootcamp_agent/submit_checks.py
 src/bootcamp_agent/tools.py
 src/bootcamp_agent/track.py
 src/bootcamp_agent/week0_checks/__init__.py

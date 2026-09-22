@@ -21,7 +21,7 @@ the defence.
 | **Your repository** | A public GitHub repository made by `uv run bootcamp capstone new <folder>`: your agent, contract tests, `docs/`, a README, and a CI workflow | `github.com/<you>/<folder>` | You | That you can ship and explain a system. It is your showcase. | The defence, and after the course |
 | **The capstone notebook** | Five checks, `cap01-e1` to `cap01-e5` | [`units/en/unit2/capstone/notebook.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/capstone/notebook.ipynb), in your course folder | The course writes `e1` to `e4`. You write `e5`, the ranked issue list. | `e1` to `e4`: the course's reference pipeline meets the contract. `e5`: you ranked what your capstone does badly. | Its five checks are marks on the leaderboard, like a session's. Hand it in with `uv run bootcamp submit cap01 --github <you>`. |
 | **The practice grader** | 10 practice questions, 5 of them critical, judged gate by gate | [`final_assignment/grade.py`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/final_assignment/grade.py) and the practice set in the course package. Your repository runs it with `uv run bootcamp capstone grade`. | The course | How your agent does on each gate. It says "practice only: this report is not credential evidence". | Never. It is for you. |
-| **The private grader and the certificate** | The same grader on a private set: same shape, unseen questions | The course app. The answer keys never leave it. | The course | That your agent works on questions it was never tuned on. A pass gets a certificate signed with Ed25519, which anyone can verify. | At the end. It needs the 30% bar **and** every critical case. |
+| **The private grader and the certificate** | The same grader on a private set: same shape, unseen questions | The course app. The answer keys never leave it. Your repository answers the set with `uv run bootcamp capstone submit`. | The course | That your agent works on questions it was never tuned on. A pass gets a certificate signed with Ed25519, which anyone can verify. | At the end. It needs the 30% bar **and** every critical case. |
 | **The defence** | Six minutes in session 15, with one failure injected into your run | Session 15 — opens Fri 02 Oct | You present. The room judges. | That you can explain the system while it breaks | Fri 2 Oct, on the rubric's six areas |
 | **Ship it** | Your capstone as an MCP server, a storefront, and a buyer agent | The [Ship it track](../../tracks/ship-it/introduction.mdx) | You | That somebody else can call it | Never. Optional and ungraded. |
 
@@ -40,7 +40,7 @@ Three different things, measured three different ways. Keep them apart.
 |---|---|---|
 | **Leaderboard marks** | The capstone notebook: `cap01-e1` to `cap01-e5` | Your place on the track, like a session's marks |
 | **Your course grade** | The rubric, in the session 15 defence | The grade. Evidence from your repository, not your notebook scores. |
-| **The certificate** | The private grader: the 30% bar **and** every critical question | The credential, signed, that anyone can verify |
+| **The certificate** | The private grader, on what `uv run bootcamp capstone submit` hands in: the 30% bar **and** every critical question. Your best submission counts. | The credential, signed, that anyone can verify |
 
 The notebook scorecards are formative: they find the gap you would rather not
 meet on stage. The practice grader is formative too. Only the defence grades
@@ -128,10 +128,40 @@ From nothing to a first green in your own repository.
    The impact is what ranks it. Use the same shape as `cap01-e5`.
 7. **Commit and push.** `git add -A`, `git commit -m "first issue"`, `git push`.
    Open the **Actions** tab on GitHub and watch CI run the tests and the grader.
+8. **Later, submit.** When the final opens, `uv run bootcamp capstone submit`
+   hands in your answers. See [submit the final assignment](#submit-the-final-assignment).
 
 With a model in your `.env`, your score is different, and it can change between
 two runs of the same code. Always write down which model produced a number.
 Only the fake model gives the same number on every machine.
+
+## Submit the final assignment
+
+Run it inside your capstone repository, once the final opens. The address of
+the course app is in the course announcement.
+
+```bash
+export DEV3PACK_API_BASE=<the address from the announcement>
+uv run bootcamp capstone submit --github <you> --dry-run
+uv run bootcamp capstone submit --github <you>
+```
+
+1. **It checks your repository first.** Everything must be committed and
+   pushed. Your submission links to one commit on GitHub, so that commit must
+   be the code that answers.
+2. **It simulates locally.** It runs the practice set, prints your practice
+   score and the model it ran on, and changes nothing. On the fake model it
+   warns you: the fake only refuses, so your score would be about 30%.
+3. **It answers the final set.** Your agent answers each question. A question
+   that crashes or times out becomes a flagged refusal, and the run goes on.
+4. **It opens the pull request** to the submissions repository, the same way
+   `bootcamp submit` does. Without `gh`, it prints the browser steps.
+   `--dry-run` prints the bundle and opens nothing.
+
+The pull request merges itself once its check passes. Your score arrives a few
+minutes later, in `finals/<you>/result.json` in the submissions repository.
+Submit as often as you like. The leaderboard shows your best score. The
+certificate needs more than 30% **and** every critical question passed.
 
 ## Reading the grader
 
@@ -190,8 +220,8 @@ Put these sections in this order.
 | **The honest limitation** | Rank 1 of your issue list, and your next step | `docs/ISSUES.md` |
 | **How to run it** | One line. A stranger can copy it and see a result. | Your own clean run |
 
-Also good: a "Sources" line from session 13, and the rollback sentence from
-session 14.
+Also good: a "Sources" line from session 13, the rollback sentence from
+session 14, and a "Credits" section naming any repository you learned from.
 
 **What never goes in it**
 
@@ -200,7 +230,7 @@ session 14.
 | An API key, a token, or a password | A public repository is read by bots within minutes. Keys live in `.env` on your machine, or in your host's secret settings. |
 | Your `.env` file | It holds your keys. Check that `.gitignore` lists it before your first push. |
 | The private question set, or anything copied from it | It stays private, so it can measure what you did not tune. See the rules below. |
-| Another student's answers or code | It is their work, and your showcase is a claim about yours. |
+| Another student's code, unnamed | Read any agent and learn from it: repositories are public on purpose. Name what you borrowed in a Credits section, so your showcase says which parts are yours. |
 
 ## The defence
 

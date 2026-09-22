@@ -80,10 +80,18 @@ def _fork_name(forked_output: str, github: str) -> str:
     return f"{github}/{SUBMISSIONS_REPO.split('/')[1]}"
 
 
-def push(bundle: Path, github: str, item_id: str, run: object = _run) -> str:
+def push(
+    bundle: Path,
+    github: str,
+    item_id: str,
+    run: object = _run,
+    *,
+    command: str = "bootcamp submit",
+) -> str:
     """Put `bundle` on the learner's fork and open a pull request. Returns its URL.
 
     `bundle` is the directory `submit` just wrote: `<root>/<github>/<item>`.
+    `command` names what built it, for the pull request's description.
     """
     _require_gh(run)
     if not bundle.is_dir():
@@ -171,7 +179,7 @@ def push(bundle: Path, github: str, item_id: str, run: object = _run) -> str:
             "--title",
             f"{item_id} — {github}",
             "--body",
-            f"Submission for `{item_id}`, built by `bootcamp submit`.",
+            f"Submission for `{item_id}`, built by `{command}`.",
         ]
     )
     if opened.code != 0:
@@ -182,4 +190,49 @@ def push(bundle: Path, github: str, item_id: str, run: object = _run) -> str:
     return f"https://github.com/{SUBMISSIONS_REPO}/pulls"
 
 
-__all__ = ["HandInError", "Ran", "push"]
+def manual_route(
+    github: str,
+    item_id: str,
+    where: Path,
+    *,
+    files: tuple[str, ...] = ("notebook.ipynb", "submission.json"),
+    command: str | None = None,
+) -> str:
+    """How to hand in without `gh`: which repository, which path, in a browser.
+
+    WHY IT NAMES THE REPOSITORY. The old line was "commit that folder to your fork
+    and open a pull request", and it named neither. A learner reads it standing in
+    their clone of the COURSE, so "your fork" meant the course repository: three
+    pull requests with submissions and edited lessons landed there, where nothing
+    is ever marked. Another copied the folder to the root of the submissions fork,
+    one level too high, where no check runs and the pull request waits for ever.
+    """
+    from bootcamp_agent.curriculum import SUBMISSIONS_URL
+
+    target = f"submissions/{github}/{item_id}"
+    command = command or f"uv run bootcamp submit {item_id} --github {github} --push"
+    return "\n".join(
+        [
+            "",
+            f"Hand it in to {SUBMISSIONS_REPO} — the SUBMISSIONS repository.",
+            "Never open the pull request on the course repository (dev3pack-cohort-2026-09).",
+            "",
+            "Easiest, if you have the GitHub CLI (https://cli.github.com, then: gh auth login):",
+            f"    {command}",
+            "",
+            "Without it, in your browser. No git needed:",
+            f"  1. Open {SUBMISSIONS_URL} and click Fork.",
+            "  2. In YOUR fork, open the `submissions` folder.",
+            "  3. Click Add file, then Upload files. Drag in this folder from your computer:",
+            f"         {where.parent}",
+            "     The files must end up at:",
+            *(f"         {target}/{name}" for name in files),
+            '  4. Choose "Create a new branch", click Propose changes,',
+            f"     then Create pull request. The base must be {SUBMISSIONS_REPO}.",
+            "",
+            "A green check on the pull request means it is accepted. Merging is automatic.",
+        ]
+    )
+
+
+__all__ = ["HandInError", "Ran", "manual_route", "push"]
