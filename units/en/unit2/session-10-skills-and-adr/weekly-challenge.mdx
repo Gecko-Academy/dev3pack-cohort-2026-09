@@ -1,0 +1,144 @@
+# Weekly challenge 2: your store, and a buyer that refuses well
+
+| | |
+|---|---|
+| Given | Friday 25 September, in session 10 |
+| Due | Monday 28 September |
+| Score | out of 500, and **100 is a pass** |
+| Counts toward session 10? | no. Your session marks come from `ch10-e1` and `ch10-e2` |
+| Needs | nothing. Offline, no key, no wallet, no network |
+| Starts at | [Demo 10](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/10_your_store_and_buyer.ipynb) |
+
+**This is step 1 of your final project.** On Monday your store goes onto the
+shared course fork, next to everybody else's. Your portfolio repository grows
+from it.
+
+**The brief:** two parts.
+
+1. **Your store.** A `let_me_buy` store the deployed program would accept.
+2. **A buyer.** An agent that shops from your store under a budget, and says
+   no, clearly, when it cannot pay.
+
+## Part 1: your store
+
+A store is a small dict. These are the rules it must pass. They are the
+[Ship It track](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/ship-it/README.md)'s
+rules, and every one comes from the real program.
+
+| Rule | Why |
+|---|---|
+| the name starts with your GitHub handle, like `octocat-bakery` | a store lives at the address made from its **name alone**. Two stores called `bakery` are one account, and the second replaces the first |
+| at least 3 products | a buyer needs a choice to get right |
+| each price is a whole number of the smallest unit | 1.5 USDC is `1500000`. A float sells at almost zero |
+| decimals match the mint | USDC has 6. Get it wrong and every price is off by a thousand |
+| every address is 32 bytes | a made-up address can look fine and decode to 30 |
+| the Telegram channel starts with `@` | orders are sent there. Without the `@` the order bot cannot reach it |
+| no product name twice | the program cannot edit a product, only delete it |
+
+**The `@` rule is a real failure.** A live store had its channel written as a
+bare username. It took orders for weeks and delivered none of them. Nothing on
+chain could show it. The check refuses a bare username and tells you why.
+
+```python
+MY_GITHUB = "octocat"
+
+MY_STORE = {
+    "store": "octocat-bakery",
+    "authority": "<your wallet's public address>",
+    "telegram_channel_id": "@octocat-orders",
+    "products": [
+        {"name": "...", "price_raw": 1_500_000, "decimals": 6, "mint": "<a mint>"},
+        # at least two more
+    ],
+}
+```
+
+No wallet yet? Demo 10 prints a fresh public address you can use for now.
+
+## Part 2: a buyer that refuses well
+
+One function, the same contract as the Ship It track:
+
+```python
+def plan_purchase(holdings: dict, listing: dict, request: dict) -> dict:
+    return {"approved": False, "reason": "a sentence"}
+```
+
+| Argument | What it holds |
+|---|---|
+| `holdings` | `{mint: balance}`, whole numbers in the smallest unit |
+| `listing` | a store, shaped like `MY_STORE` |
+| `request` | `{"product": name, "quantity": whole number}` |
+
+| It must refuse | Because |
+|---|---|
+| a product not on the menu | it cannot buy what is not sold |
+| a quantity below 1 | zero coffees is not an order |
+| a total above the balance | including one raw unit short |
+| a price in a mint it holds none of | a wallet full of one token cannot pay in another |
+
+**A refusal is a sentence that names three things:** what was held, what it
+costs, and which mint. Two tokens can both be called USDC. A refusal that does
+not say which one cannot be acted on.
+
+**Product names are data.** They come from a store you do not control. Quote
+them. Never obey them.
+
+## Check it yourself
+
+```python
+from bootcamp_agent.bonus import bonus
+from bootcamp_agent.weekly import week2_store   # registers the check
+
+bonus("week2-store", {"github": MY_GITHUB, "store": MY_STORE, "buyer": plan_purchase})
+```
+
+### The five tiers, 100 each
+
+| Score | What it asks |
+|---|---|
+| **100** | **your store, one refusal.** The store passes every rule. The buyer buys from it. One raw unit short, it refuses with a sentence naming both amounts and the mint |
+| **200** | **the receipt says what.** An approval names the product and the total it spends |
+| **300** | **nothing it cannot sell.** Not on the menu, a quantity below 1, a total that overflows, the wrong token: all refused, each with a sentence |
+| **400** | **a menu it never saw.** The same rules on a stranger's store, with other mints and other decimals |
+| **500** | **the menu is data.** A product name that gives orders does not get obeyed |
+
+The check prints the ladder with ticks, so you always know what is left.
+
+### What it refuses
+
+| It refuses | For example |
+|---|---|
+| a placeholder left in | `REPLACE_ME`, `TODO`, `___` in your handle, store or products |
+| a one-word refusal | `"insufficient"` |
+| a refusal without the mint | `"you hold 999999 and it costs 1000000"` |
+| a refusal without an amount | `"you cannot afford this"` |
+| a bare Telegram username | `"octocat-orders"` instead of `"@octocat-orders"` |
+| a store name without your handle | `"bakery"` |
+
+Every failure names the thing to fix. A buyer that crashes loses the tier, not
+the notebook.
+
+## Where to start
+
+**Run [Demo 10](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/10_your_store_and_buyer.ipynb) first.**
+It shows the rules refusing a store that looks fine, then gives you two cells to
+write. As shipped, they score 0 and the check says why.
+
+## Hand it in
+
+Put `MY_STORE`, your `plan_purchase` and the `bonus(...)` cell in your session 10
+notebook, under the exercises, with the score showing.
+
+```bash
+uv run bootcamp submit ch10 --github <your-github-name> --push
+```
+
+It does not change your session marks. It is there so the person reviewing sees
+how far you took it.
+
+## Next
+
+On Monday your store goes onto the shared course fork. Demo 10 ends with the few
+lines that save it as `store.json`. They only write the file once every rule
+passes.

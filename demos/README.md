@@ -18,6 +18,7 @@ intent.
 | [7 — The coach, in a chat](07_the_coach_in_a_chat.ipynb) | Session 5's four exits as four replies to a person, on a recorded chat — then a real one, if you have a token |
 | [8 — The weekly challenge](08_the_weekly_challenge.ipynb) | Ana's expense bot: three tools that refuse by name, a page that talks to the model, and the week-1 challenge scored 300/500 |
 | [9 — RAG on your laptop](09_rag_on_your_laptop.ipynb) | Today's retriever plus a model on your laptop. Alone, the model invents. With the right pages it answers and cites them. An empty search refuses before the model runs, and the wrong pages still come back with confidence 1.0 |
+| [10 · Your store, and a buyer](10_your_store_and_buyer.ipynb) | Weekly challenge 2 and step 1 of the final project: the store rules refusing a store that looks fine, then your store and your buyer to write. Scores 0/500 as shipped, and says why |
 
 ## They run offline
 

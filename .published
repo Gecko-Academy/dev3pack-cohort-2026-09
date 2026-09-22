@@ -62,6 +62,7 @@ demos/06_jupyter_for_beginners.ipynb
 demos/07_the_coach_in_a_chat.ipynb
 demos/08_the_weekly_challenge.ipynb
 demos/09_rag_on_your_laptop.ipynb
+demos/10_your_store_and_buyer.ipynb
 demos/README.md
 demos/fixtures/rag-recorded.json
 demos/fixtures/telegram-getupdates.json
@@ -216,6 +217,7 @@ src/bootcamp_agent/week0_checks/software_engineering.py
 src/bootcamp_agent/week0_checks/software_engineering_classes.py
 src/bootcamp_agent/weekly/__init__.py
 src/bootcamp_agent/weekly/week1_bot.py
+src/bootcamp_agent/weekly/week2_store.py
 units/en/_toctree.yml
 units/en/bonus/b01-graph-rag/introduction.mdx
 units/en/bonus/b02-multimodal-ingestion/introduction.mdx
@@ -394,6 +396,7 @@ units/en/unit2/session-10-skills-and-adr/conclusion.mdx
 units/en/unit2/session-10-skills-and-adr/introduction.mdx
 units/en/unit2/session-10-skills-and-adr/notebook.ipynb
 units/en/unit2/session-10-skills-and-adr/quiz.mdx
+units/en/unit2/session-10-skills-and-adr/weekly-challenge.mdx
 uv.lock
 workspaces/README.md
 workspaces/news-to-telegram/fixtures/hn-front-page.json

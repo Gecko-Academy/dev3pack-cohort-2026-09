@@ -15,6 +15,10 @@ deployed program enforces or a hazard its shape creates:
     the second silently overwrites the first. Hence the handle prefix.
   - a price is an integer count of the smallest unit. `1.5` USDC is `1_500_000`,
     and a float here is the bug that ships a store selling at 0.
+  - the Telegram channel is a delivery address, not a label. Every purchase
+    carries it to the order bot, and a bare username (`mystore`, no `@`) is one
+    the bot cannot send to. Measured on a live store: every order it ever took
+    was silently swallowed, and nothing on chain could show it.
 """
 
 from __future__ import annotations
@@ -86,6 +90,17 @@ def problems(source: Path | str | dict, *, handle: str | None = None) -> list[Pr
             )
         )
 
+    channel = data.get("telegram_channel_id")
+    if channel not in (None, "") and not _is_channel(channel):
+        found.append(
+            Problem(
+                "telegram_channel_id",
+                f"{channel!r} is a bare username. Write it with the @, like '@{channel}'. "
+                "Without it the order bot cannot find the channel, so every order is "
+                "silently swallowed: a real store lost every order it took this way",
+            )
+        )
+
     for field in ("authority",):
         value = data.get(field)
         if not isinstance(value, str):
@@ -116,6 +131,11 @@ def problems(source: Path | str | dict, *, handle: str | None = None) -> list[Pr
             continue
         found.extend(_product_problems(where, product, seen))
     return found
+
+
+def _is_channel(channel: object) -> bool:
+    """A public channel is addressed as `@name`; anything else never arrives."""
+    return isinstance(channel, str) and channel.startswith("@") and len(channel) > 1
 
 
 def _product_problems(where: str, product: dict, seen: set[str]) -> list[Problem]:
