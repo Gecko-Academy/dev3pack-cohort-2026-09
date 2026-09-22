@@ -223,6 +223,8 @@
       title: "Assembled from the sessions"
     - local: unit2/capstone/concepts-3
       title: "What done means"
+    - local: unit2/capstone/road
+      title: "The road to the capstone"
     - local: unit2/capstone/quiz
       title: "Quick quiz (ungraded)"
     - local: unit2/capstone/conclusion

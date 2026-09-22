@@ -1,0 +1,106 @@
+# The road to the capstone
+
+One page for the whole course: what each session gives you, and which part of
+the capstone it becomes. Keep it open when you plan your week.
+
+## The capstone, in one paragraph
+
+You ship a **research assistant**. It answers developer questions from a small
+set of documents, names the document behind every claim, and says "I don't
+know" when the documents don't support an answer. It uses one read-only tool,
+comes with a skill file another assistant can load, and arrives with a test and
+an evaluation report whose numbers you produced. In session 15 you demo it, and
+then you fix a failure you did not prepare for, from your own traces.
+
+The full brief is on the [capstone page](introduction.mdx).
+
+## Three weeks, three goals
+
+| Week | Goal |
+|---|---|
+| **1** | **Contracts before code.** An assistant, one model adapter, a typed output, a bounded tool, and a small agent loop that always stops. |
+| **2** | **Grounding and evidence.** Retrieval, measured. The loop becomes a graph. Traces, evaluation, and your first decision record. The capstone opens. |
+| **3** | **Operating it.** Memory with a leak test, an MCP server that says no, a deployment, and the demo. |
+
+## Fifteen sessions, one line each
+
+| # | Session | In one line |
+|---|---|---|
+| 1 | [Configure the assistant](../../unit1/session-01-assistant-configuration/introduction.mdx) | Your assistant reads the repo's rules before it writes code. |
+| 2 | [Call a model through the adapter](../../unit1/session-02-model-adapter/introduction.mdx) | Call any model through one small interface, and swap it with one setting. |
+| 3 | [Structured outputs](../../unit1/session-03-structured-outputs/introduction.mdx) | The answer comes back in a typed shape, or it is rejected. |
+| 4 | [Bounded tools](../../unit1/session-04-bounded-tools/introduction.mdx) | Tools that do only what you allow, and say no by name. |
+| 5 | [A deterministic mini-agent](../../unit1/session-05-deterministic-mini-agent/introduction.mdx) | A loop that always stops, with a receipt saying why. |
+| 6 | [A retrieval baseline](../session-06-retrieval-baseline/introduction.mdx) | Find passages by the words they share, and see how that fails. |
+| 7 | [Retrieval and grounding metrics](../session-07-grounding-metrics/introduction.mdx) | Measure retrieval and answers with numbers you can defend. |
+| 8 | [Loops and graphs](../session-08-loops-and-graphs/introduction.mdx) | One task as a chain, a loop and a graph, and what each one costs. |
+| 9 | [Trace and evaluate](../session-09-trace-and-evaluate/introduction.mdx) | Record every step, and grade the agent against a test set. |
+| 10 | [Skills and a decision record](../session-10-skills-and-adr/introduction.mdx) | A skill another assistant can load, and why you built it this way. |
+| 11 | State and memory | Decide what it remembers, cap it, and prove it in code. |
+| 12 | MCP architecture | Host, client and server, and every tool marked read or write. |
+| 13 | A secure MCP server | Build the part of a server that says no. |
+| 14 | Deploy and operate | Run the capstone as a service. |
+| 15 | Defend the capstone | Demo it, then fix a failure you did not prepare for. |
+
+Sessions 11 to 15 open in week 3.
+
+## Every requirement, and where you learn it
+
+**The four failures it must handle.** Each one was taught before the capstone
+needs it.
+
+| The failure | What the capstone must do | Learned in |
+|---|---|---|
+| A question the documents can't answer | Refuse **before** calling the model | 5, 6 |
+| A citation retrieval never returned | Remove it, lower the confidence, flag it for a human | 3, 6 |
+| An instruction hidden in a document | Treat it as data to quote, never an order to follow | 4, 13 |
+| A model that never answers | Return a refusal the caller can read, not a crash | 2 |
+
+**The five checks** (`uv run bootcamp check cap01`):
+
+| Check | What it reads | Goes green after |
+|---|---|---|
+| `cap01-e1` | a supported question, answered with a verified citation | 6 |
+| `cap01-e2` | an unsupported question, refused with **zero** model calls | 6 |
+| `cap01-e3` | a trace a reviewer can follow | 9 |
+| `cap01-e4` | the evaluation gate: every case passes | 9 |
+| `cap01-e5` | your ranked issue list, written by you | 9, and kept until 14 |
+
+**The evidence you hand in**, and the session that produces each piece:
+
+| After session | You add to the capstone |
+|---|---|
+| 6 | Load the documents strictly and retrieve over them. Supported questions get passages, and unsupported ones get nothing. |
+| 7 | Your baseline pass rate on the golden set, plus one honest weakness of your evaluator. |
+| 8 | The shape of the run (chain, loop or graph) and the model calls each one cost. |
+| 9 | Tracing on, `run_evals` rerun, and the first failure named with the trace line that decided it. |
+| 10 | A `SKILL.md` with a before and after pair of runs, and a decision record for step 8's choice. |
+| 11 | What a session remembers, its cap, and the line naming what you refuse to store. |
+| 12 | Every tool marked read or write. Only the readers stay wired to the capstone. |
+| 13 | One outside source used through a recording, with where the data came from written down. |
+| 14 | The hardening: the injection test, the timeout, and a regression test for your top issue, with the numbers before and after. |
+| 15 | The demo, and a live diagnosis. |
+
+**Ranked issue list first, fixes second.** An unfinished item you have
+diagnosed is worth more on demo day than a finished one you can't explain.
+
+## Start now
+
+**You can do step 6 as soon as session 6 is done.** Load `data/corpus/`,
+retrieve over it, and watch a supported question come back with passages while
+an unsupported one comes back empty. That is the ground under checks 1 and 2.
+
+## The projects, and how they fit
+
+The projects are **practice on real, messy data.** They are optional, never
+counted, and they do not change the capstone. The capstone stays on the six
+documents in `data/corpus/`, runs offline on the fake model, and needs no
+database and no new dependency.
+
+| Project | Practises | For capstone step |
+|---|---|---|
+| [01: What are customers really saying?](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/01-clothing-reviews/notebook.ipynb) | Embeddings and a vector database on 1,000 reviews | 6 |
+| 02: What are these companies worried about? | A complete RAG on real company filings: clean, load, chunk, embed, retrieve, answer, measure | 6, 7 |
+| 03: An analyst team | A graph of agents that choose a parsing tool and check its result | 8, 9 |
+
+Projects 02 and 03 open this week.
