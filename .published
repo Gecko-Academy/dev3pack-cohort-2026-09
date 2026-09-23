@@ -167,6 +167,7 @@ scripts/course_site.py
 scripts/dev3pack_entry.py
 scripts/diagrams.py
 scripts/fill_notebooks.py
+scripts/inline_slide_images.py
 scripts/notebook_colab.py
 scripts/notebook_index.py
 scripts/publish_cohort.py

@@ -8,6 +8,10 @@ number the pictures quote; the numbers are written here, next to where they came
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
+from dataclasses import dataclass
+from functools import wraps
 from pathlib import Path
 
 import matplotlib
@@ -25,9 +29,170 @@ from matplotlib.patches import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-INK, DIM, LINE, PAGE, PANEL = "#1f2937", "#5b6472", "#c9ced6", "#ffffff", "#fbfcfd"
-BLUE, GREEN, BROWN, PURPLE, RED = "#2f5f9e", "#2f7a4f", "#8c5a24", "#5a4696", "#c2413b"
-TINT = {BLUE: "#e8eef8", GREEN: "#e6f2ea", BROWN: "#f7ede0", PURPLE: "#ece8f6", RED: "#fbe9e8"}
+# The light figures the course pages link by raw GitHub URL, and the dark deck
+# they are re-rendered into. A light path never moves.
+UNIT_08 = "units/en/unit2/session-08-loops-and-graphs/img"
+DECK_08 = "docs/instructor/sessions/session-08-loops-and-graphs/img"
+
+
+@dataclass(frozen=True)
+class Theme:
+    """One drawing, two renderings: the course page is light, the deck is dark.
+
+    A figure is written once and rendered under either theme. The light values
+    must stay exactly what they have always been: the course pages link their
+    PNGs by raw GitHub URL, so a light file that moves is a broken page.
+    """
+
+    name: str
+    ink: str  # primary text, and every icon outline
+    dim: str  # secondary text, arrows, dashed paths
+    line: str  # panel borders
+    page: str  # figure background, and the savefig facecolor
+    panel: str  # panel fill
+    blue: str
+    green: str
+    brown: str
+    purple: str
+    red: str
+    tint: dict[str, str]  # accent -> box fill, keyed by THIS theme's own accents
+    tab_ink: str  # text printed on top of an accent fill
+    badge_face: str
+    badge_edge: str
+
+    def target(self, light: Path, dark: Path | None) -> Path | None:
+        """Where this rendering is written. Nothing else may choose the path."""
+        return light if self.name == "light" else dark
+
+
+LIGHT = Theme(
+    name="light",
+    ink="#1f2937",
+    dim="#5b6472",
+    line="#c9ced6",
+    page="#ffffff",
+    panel="#fbfcfd",
+    blue="#2f5f9e",
+    green="#2f7a4f",
+    brown="#8c5a24",
+    purple="#5a4696",
+    red="#c2413b",
+    tint={
+        "#2f5f9e": "#e8eef8",
+        "#2f7a4f": "#e6f2ea",
+        "#8c5a24": "#f7ede0",
+        "#5a4696": "#ece8f6",
+        "#c2413b": "#fbe9e8",
+    },
+    tab_ink="white",
+    badge_face="#f5c518",
+    badge_edge="#1f2937",
+)
+
+# Sampled from the deck itself: the navy ground and the cyan/green/yellow of
+# session 7's road. The dark accents are brighter than the light ones because a
+# #2f5f9e box on a near-black ground is unreadable.
+DARK = Theme(
+    name="dark",
+    ink="#e5e7eb",
+    dim="#8b97ab",
+    line="#2a3446",
+    page="#0b1220",
+    panel="#111a2c",
+    blue="#22d3ee",
+    green="#22c55e",
+    brown="#facc15",  # the yellow accent takes brown's slot on dark
+    purple="#a78bfa",
+    red="#f87171",
+    tint={
+        "#22d3ee": "#0f2530",
+        "#22c55e": "#102a1c",
+        "#facc15": "#2a2410",
+        "#a78bfa": "#1d1a33",
+        "#f87171": "#2d1718",
+    },
+    tab_ink="#0b1220",
+    badge_face="#facc15",
+    badge_edge="#0b1220",
+)
+
+# The active palette. Every drawing primitive reads these names, so switching
+# theme is one rebinding rather than 94 edits — and a figure cannot half-switch.
+INK, DIM, LINE, PAGE, PANEL = LIGHT.ink, LIGHT.dim, LIGHT.line, LIGHT.page, LIGHT.panel
+BLUE, GREEN, BROWN, PURPLE, RED = LIGHT.blue, LIGHT.green, LIGHT.brown, LIGHT.purple, LIGHT.red
+TINT, TAB_INK = LIGHT.tint, LIGHT.tab_ink
+BADGE_FACE, BADGE_EDGE = LIGHT.badge_face, LIGHT.badge_edge
+
+_NAMES = (
+    "INK",
+    "DIM",
+    "LINE",
+    "PAGE",
+    "PANEL",
+    "BLUE",
+    "GREEN",
+    "BROWN",
+    "PURPLE",
+    "RED",
+    "TINT",
+    "TAB_INK",
+    "BADGE_FACE",
+    "BADGE_EDGE",
+)
+
+
+@contextmanager
+def use_theme(theme: Theme) -> Iterator[Theme]:
+    """Draw under one palette, then put the previous one back.
+
+    `TINT` stays per-theme on purpose: a figure that reaches past this and names
+    a foreign accent raises KeyError instead of quietly drawing the wrong fill.
+    """
+    values = (
+        theme.ink,
+        theme.dim,
+        theme.line,
+        theme.page,
+        theme.panel,
+        theme.blue,
+        theme.green,
+        theme.brown,
+        theme.purple,
+        theme.red,
+        theme.tint,
+        theme.tab_ink,
+        theme.badge_face,
+        theme.badge_edge,
+    )
+    globals_ = globals()
+    previous = [globals_[name] for name in _NAMES]
+    globals_.update(dict(zip(_NAMES, values, strict=True)))
+    try:
+        yield theme
+    finally:
+        globals_.update(dict(zip(_NAMES, previous, strict=True)))
+
+
+def figure(light: str, dark: str | None = None) -> Callable[..., Callable[..., None]]:
+    """Turn a drawing into a figure that can be rendered under either theme.
+
+    The drawing itself is written once and receives only where to save. The
+    theme decides the palette and the destination together, so a dark rendering
+    can never land on a light file's path.
+    """
+
+    def decorate(draw: Callable[[Path], None]) -> Callable[..., None]:
+        @wraps(draw)
+        def render(theme: Theme = LIGHT) -> None:
+            relative = theme.target(Path(light), Path(dark) if dark else None)  # type: ignore[arg-type]
+            if relative is None:
+                raise ValueError(f"{draw.__name__} has no {theme.name} rendering")
+            with use_theme(theme):
+                draw(ROOT / relative)
+
+        return render
+
+    return decorate
 
 
 class Canvas:
@@ -75,7 +240,7 @@ class Canvas:
             label,
             fontsize=17,
             fontweight="bold",
-            color="white",
+            color=TAB_INK,
             ha="center",
             va="center",
             linespacing=1.15,
@@ -105,7 +270,10 @@ class Canvas:
             )
         )
 
-    def label(self, x, y, text, size=11.5, color=INK, bold=True, va="top"):
+    def label(self, x, y, text, size=11.5, color=None, bold=True, va="top"):
+        # Resolved here, not in the signature: a default argument binds at import
+        # time and would keep the light ink under a dark theme.
+        color = INK if color is None else color
         self.ax.text(
             x,
             y,
@@ -118,7 +286,8 @@ class Canvas:
             linespacing=1.2,
         )
 
-    def note(self, x, y, text, color=DIM, size=9.2, ha="center"):
+    def note(self, x, y, text, color=None, size=9.2, ha="center"):
+        color = DIM if color is None else color
         self.ax.text(
             x,
             y,
@@ -131,7 +300,8 @@ class Canvas:
             style="italic",
         )
 
-    def arrow(self, p1, p2, text="", color=DIM, rad=0.0, dy=0.14, dx=0.0, solid=False):
+    def arrow(self, p1, p2, text="", color=None, rad=0.0, dy=0.14, dx=0.0, solid=False):
+        color = DIM if color is None else color
         self.ax.add_patch(
             FancyArrowPatch(
                 p1,
@@ -157,7 +327,8 @@ class Canvas:
                 linespacing=1.15,
             )
 
-    def path(self, points, text="", color=DIM, text_at=None):
+    def path(self, points, text="", color=None, text_at=None):
+        color = DIM if color is None else color
         xs, ys = zip(*points, strict=True)
         self.ax.plot(xs[:-1], ys[:-1], color=color, linewidth=1.3, linestyle=(0, (4, 3)), zorder=2)
         self.arrow(points[-2], points[-1], color=color)
@@ -172,7 +343,9 @@ class Canvas:
 
     def badge(self, x, y, text):
         self.ax.add_patch(
-            Circle((x, y), 0.26, facecolor="#f5c518", edgecolor=INK, linewidth=1.2, zorder=6)
+            Circle(
+                (x, y), 0.26, facecolor=BADGE_FACE, edgecolor=BADGE_EDGE, linewidth=1.2, zorder=6
+            )
         )
         self.ax.text(
             x,
@@ -180,7 +353,7 @@ class Canvas:
             text,
             fontsize=8.5,
             fontweight="bold",
-            color=INK,
+            color=BADGE_EDGE,
             ha="center",
             va="center",
             zorder=7,
@@ -580,7 +753,7 @@ class Canvas:
             label,
             fontsize=15,
             fontweight="bold",
-            color="white",
+            color=TAB_INK,
             ha="center",
             va="center",
         )
@@ -1096,7 +1269,8 @@ def capstone() -> None:
     c.save(ROOT / "units/en/unit2/capstone/img/architecture.png")
 
 
-def loop_vs_graph() -> None:
+@figure(light=f"{UNIT_08}/loop-vs-graph.png", dark=f"{DECK_08}/01-loop-vs-graph.png")
+def loop_vs_graph(target: Path) -> None:
     """One loop beside a graph of roles: the same task, and what each one spends."""
     c = Canvas(20, 13)
     c.title(
@@ -1222,10 +1396,11 @@ def loop_vs_graph() -> None:
         color=DIM,
         va="top",
     )
-    c.save(ROOT / "units/en/unit2/session-08-loops-and-graphs/img/loop-vs-graph.png")
+    c.save(target)
 
 
-def rag_family() -> None:
+@figure(light=f"{UNIT_08}/rag-family.png", dark=f"{DECK_08}/02-rag-family.png")
+def rag_family(target: Path) -> None:
     """A ladder: each rung adds one thing to the rung below, and one new way to fail."""
     c = Canvas(18, 19.4)
     c.title(
@@ -1348,10 +1523,11 @@ def rag_family() -> None:
         color=DIM,
         va="top",
     )
-    c.save(ROOT / "units/en/unit2/session-08-loops-and-graphs/img/rag-family.png")
+    c.save(target)
 
 
-def vector_indexes() -> None:
+@figure(light=f"{UNIT_08}/vector-indexes.png", dark=f"{DECK_08}/03-vector-indexes.png")
+def vector_indexes(target: Path) -> None:
     """What sits under a vector database: four structures, and no measurements.
 
     Deliberately numberless. Speed, memory and recall belong in the table on the
@@ -1580,7 +1756,211 @@ def vector_indexes() -> None:
         color=DIM,
         va="top",
     )
-    c.save(ROOT / "units/en/unit2/session-08-loops-and-graphs/img/vector-indexes.png")
+    c.save(target)
+
+
+# ---------------------------------------------------------------------- road
+# One line per session: the short label on its card, and the capstone piece it
+# hands you. Both are read from units/en/unit2/capstone/road.mdx — change them
+# there first, then here.
+ROAD_SESSIONS: tuple[tuple[str, str | None], ...] = (
+    ("assistant", None),
+    ("model\nadapter", None),
+    ("typed\noutput", None),
+    ("bounded\ntools", None),
+    ("mini-\nagent", None),
+    ("retrieval", "load +\nretrieve"),
+    ("metrics", "baseline\npass rate"),
+    ("graphs", "run shape\n+ cost"),
+    ("trace +\neval", "trace +\nrun_evals"),
+    ("skill +\nADR", "SKILL.md\n+ ADR"),
+    ("memory", "retention\npolicy"),
+    ("MCP", "tools:\nread only"),
+    ("secure\nserver", "recorded\nsource"),
+    ("deploy", "harden +\nregression"),
+    ("defend", "demo +\ndiagnose"),
+)
+ROAD_WEEKS = (
+    (1, 5, "WEEK 1 \u00b7 contracts before code"),
+    (6, 10, "WEEK 2 \u00b7 grounding and evidence"),
+    (11, 15, "WEEK 3 \u00b7 operating it"),
+)
+ROAD_CHECKS = {6: "e1  e2", 9: "e3  e4  e5"}
+ROAD_TODAY_FILL = "#10231a"  # the one lit card: dark green, not an accent
+
+
+def road(today: int) -> None:
+    """The fifteen-session road, with TODAY on one card. One render per session day.
+
+    `today` is the session number, 1 to 15. It picks the badged card, decides
+    which cards are lit and which are dimmed ahead of the class, and chooses the
+    output directory: docs/instructor/sessions/session-<today>-*/img/00-the-road.png.
+    """
+    if not 1 <= today <= len(ROAD_SESSIONS):
+        raise ValueError(f"today must be a session number 1..{len(ROAD_SESSIONS)}, got {today}")
+    sessions = sorted((ROOT / "docs/instructor/sessions").glob(f"session-{today:02d}-*"))
+    if not sessions:
+        raise FileNotFoundError(f"no docs/instructor/sessions/session-{today:02d}-* to write into")
+
+    # geometry: one row of fifteen cards, everything else measured off that row
+    card_w, gap, x0 = 0.92, 0.12, 0.35
+    step = card_w + gap
+    width, height = 2 * x0 + 15 * step - gap, 6.4
+    y_week, y_rule = 5.95, 5.8
+    y_badge, y_card, card_h = 5.54, 4.2, 1.3
+    y_piece, piece_h = 2.45, 1.1
+    y_checks, y_projects, y_capstone = 2.1, 1.2, 0.55
+
+    def card_x(session: int) -> float:
+        return x0 + (session - 1) * step
+
+    with use_theme(DARK):
+        week_colour = (BLUE, GREEN, BROWN)
+        fig = plt.figure(figsize=(width, height), facecolor=PAGE)
+        ax = fig.add_axes((0, 0, 1, 1), facecolor=PAGE)
+        ax.set_xlim(0, width)
+        ax.set_ylim(0, height)
+        ax.axis("off")
+
+        for (first, last, label), colour in zip(ROAD_WEEKS, week_colour, strict=True):
+            ax.text(card_x(first), y_week, label, fontsize=13, fontweight="bold", color=colour)
+            ax.plot([card_x(first), card_x(last) + card_w], [y_rule] * 2, color=colour, linewidth=3)
+
+        for number, (label, piece) in enumerate(ROAD_SESSIONS, start=1):
+            left, centre = card_x(number), card_x(number) + card_w / 2
+            colour = week_colour[(number - 1) // 5]
+            ahead = number > today
+            ax.add_patch(
+                FancyBboxPatch(
+                    (left, y_card),
+                    card_w,
+                    card_h,
+                    boxstyle="round,pad=0.02,rounding_size=0.1",
+                    linewidth=2.2,
+                    edgecolor=colour,
+                    facecolor=ROAD_TODAY_FILL if number == today else PAGE,
+                )
+            )
+            ax.text(
+                centre,
+                y_card + 0.92,
+                str(number),
+                ha="center",
+                fontsize=14,
+                fontweight="bold",
+                color=colour,
+            )
+            ax.text(
+                centre,
+                y_card + 0.5,
+                label,
+                ha="center",
+                va="center",
+                fontsize=10.5,
+                color=DIM if ahead else INK,
+            )
+
+            if piece is None:
+                continue
+            ax.plot([centre] * 2, [y_card, y_piece + piece_h], color=DIM, linewidth=1.2)
+            ax.add_patch(
+                FancyBboxPatch(
+                    (left, y_piece),
+                    card_w,
+                    piece_h,
+                    boxstyle="round,pad=0.02,rounding_size=0.1",
+                    linewidth=1.8,
+                    edgecolor=BROWN,
+                    facecolor=PAGE,
+                )
+            )
+            ax.text(
+                centre,
+                y_piece + piece_h / 2,
+                piece,
+                ha="center",
+                va="center",
+                fontsize=9.5,
+                color=INK,
+            )
+
+        for number, checks in ROAD_CHECKS.items():
+            ax.text(
+                card_x(number) + card_w / 2,
+                y_checks,
+                checks,
+                ha="center",
+                fontsize=11,
+                fontweight="bold",
+                color=GREEN,
+            )
+
+        gutter = card_x(6) - 0.05
+        ax.text(
+            gutter,
+            y_piece + piece_h / 2,
+            "capstone\npieces",
+            ha="right",
+            va="center",
+            fontsize=11,
+            fontweight="bold",
+            color=BROWN,
+        )
+        ax.text(
+            gutter,
+            y_checks + 0.02,
+            "checks\ngo green",
+            ha="right",
+            va="center",
+            fontsize=11,
+            fontweight="bold",
+            color=GREEN,
+        )
+
+        # the TODAY badge, sitting on its card
+        ax.add_patch(
+            FancyBboxPatch(
+                (card_x(today) + 0.1, y_badge - 0.14),
+                card_w - 0.2,
+                0.28,
+                boxstyle="round,pad=0.01,rounding_size=0.06",
+                linewidth=0,
+                facecolor=GREEN,
+            )
+        )
+        ax.text(
+            card_x(today) + card_w / 2,
+            y_badge,
+            "TODAY",
+            ha="center",
+            va="center",
+            fontsize=10,
+            fontweight="bold",
+            color=PAGE,
+        )
+
+        ax.text(
+            x0,
+            y_projects,
+            "Projects (optional practice):   02 real RAG on company filings  ->  steps 6, 7"
+            "      03 an agent team in a graph  ->  steps 8, 9",
+            fontsize=12,
+            color=BLUE,
+        )
+        ax.text(
+            x0,
+            y_capstone,
+            "The capstone: answers from the corpus, cites every claim, refuses when "
+            "unsupported. Five checks, then you defend it live.",
+            fontsize=12.5,
+            color=INK,
+        )
+
+        target = sessions[0] / "img/00-the-road.png"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(target, dpi=110, facecolor=PAGE)
+        plt.close(fig)
+        print(f"wrote {target.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
@@ -1588,5 +1968,9 @@ if __name__ == "__main__":
     project_02()
     capstone()
     loop_vs_graph()
+    loop_vs_graph(DARK)
     rag_family()
+    rag_family(DARK)
     vector_indexes()
+    vector_indexes(DARK)
+    road(8)
