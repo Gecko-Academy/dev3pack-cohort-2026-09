@@ -48,3 +48,6 @@ site/
 .~lock.*#
 
 projects/02-sec-filings/data/clean/
+
+# Personal assistant preferences. Never shared, never committed.
+CLAUDE.local.md

@@ -51,10 +51,18 @@ CLAUDE.md            ← points there + Claude specifics
 ```
 
 Duplicated policy drifts. This repository does it this way; read all three
-today. `CLAUDE.md` is eleven lines and carries only what differs for Claude
-Code: targeted test runs while iterating, plan before edit, notebook check
-after a notebook edit. `.cursor/rules/bootcamp.mdc` restates five key points
-under a frontmatter that makes them always apply.
+today. `CLAUDE.md` carries only what differs for Claude Code: which commands
+verify your work, plan before edit, notebook check after a notebook edit.
+`.cursor/rules/bootcamp.mdc` restates the key points under a frontmatter that
+makes them always apply.
+
+**How the pointing is done matters.** A Markdown link to `AGENTS.md` is a link:
+a human follows it, the assistant does not. `@AGENTS.md` on its own line is an
+import, and Claude Code reads the file in. Ours starts with the import, so the
+canonical policy loads rather than being merely mentioned. Claude Code can also
+read `AGENTS.md` by itself, but only when no `CLAUDE.md` is present, and this
+repository has one. Run `/context` and read which instruction files loaded
+instead of assuming.
 
 ## Scoped rules
 

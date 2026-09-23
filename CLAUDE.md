@@ -9,8 +9,10 @@ stays canonical; only Claude-specific differences belong below.
 
 Claude-specific notes:
 
-- Prefer targeted `uv run pytest tests/test_<module>.py` runs over full sweeps
-  while iterating; run the full suite before claiming done.
+- Verify with the commands this copy actually has: `uv run bootcamp check chNN`
+  for an exercise, `uv run ruff check .`, and
+  `uv run python scripts/check_setup.py`. `tests/` is not published, so pytest
+  is not a verification step here (AGENTS.md says the same).
 - When asked to add a feature, present the plan and wait for approval before
   editing (this repo teaches the inspect → plan → implement → test → review loop —
   model it).

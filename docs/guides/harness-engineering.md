@@ -1,8 +1,13 @@
 # Harness Engineering
 
-*Thread sessions: 4 (assistant configuration), 9 (tracing and evaluation),
-14 (hardening). Reference implementations: `AGENTS.md`, `src/bootcamp_agent/evals.py`,
-`.github/workflows/test.yml`.*
+*Thread sessions: 1 (assistant configuration), 9 (tracing and evaluation),
+14 (hardening). Reference implementations: `AGENTS.md` and
+`src/bootcamp_agent/evals.py`.*
+
+*Two layers below are described, not shipped. `tests/` and the CI workflow hold
+the solved value of every exercise, so they stay in the course's own repository
+and are not in your copy. Read those rows as what a finished harness has, not
+as something to run today.*
 
 The model is the smallest part of a reliable agent system. Everything around it
 — the instructions it reads, the contracts on its tools, the traces it leaves,
@@ -34,9 +39,9 @@ schema output, using only bounded tools, within a budget, in front of a trace.
 
 `AGENTS.md` is executed by every assistant that touches the repo, thousands of
 times. A wrong sentence there is a bug with fan-out. Treat it accordingly:
-version it, review diffs to it, and improve it from observed failures (Session
-4's homework — fix the instruction that let the assistant make a wrong
-assumption — is a bugfix workflow). Keep one canonical policy file and make the
+version it, review diffs to it, and improve it from observed failures (fixing
+the instruction that let the assistant make a wrong assumption is Session 1's
+homework, and it is a bugfix workflow). Keep one canonical policy file and make the
 per-assistant files point to it; duplicated policy drifts.
 
 ## A claim needs a probe
