@@ -35,9 +35,11 @@ exactly what you asked for. Ask for `agents` on its own and it uninstalls the
 `projects` extra, ChromaDB goes with it, and project 02's index stops building.
 Name both, every time.
 
-**What `--extra agents` adds.** LangGraph, and only for the project. Today's
-exercise needs nothing new: it runs offline, on fakes, in milliseconds. The
-project runs without LangGraph too, and says so when it falls back.
+**What `--extra agents` adds.** LangGraph, a DuckDuckGo search tool, and
+`grandalf` so the graph can be drawn without the network. All three are for the
+project only. Today's exercise needs nothing new: it runs offline, on fakes, in
+milliseconds. The project runs without any of them, and says so when it falls
+back.
 
 **Ollama is optional today.** The project replays a recorded run for the cells
 that need a model, and prints `[recorded]` where it does. If you have Ollama and
@@ -72,18 +74,29 @@ for the capstone; everything you learn is.
 
 ## 2. Project 03, together
 
-Open the project notebook and run it from the top. Seven parts, and the moments
-to watch for:
+Open the project notebook and run it from the top. Twelve steps now, which is
+more than one session holds, so **run 1 to 8 together and leave 9 to 12 for
+after**. The moments to watch for:
 
 | Step | What happens |
 |---|---|
-| **1. Build the index** | Yesterday's eight filings, chunked and embedded again: **1,927 passages, no word lost**, the shortest 6 characters and the longest 799. |
+| **1. Build the index** | Yesterday's eight filings, chunked again: **1,927 passages, no word lost**, the shortest 6 characters and the longest 799. |
 | **2. One agent, one loop** | The number to beat. One model call per question, and on **5 of the 20 labelled questions it reads the wrong company's filing** and answers fluently, with a real citation to the wrong document. |
 | **3. The coordinator** | A router that picks the company from the question with **no model call at all**. Measured on its own against the 20 labels, because routing and answering fail for different reasons and a single score hides which one broke. |
-| **4. The team** | Four narrow roles over one `TeamState`: coordinator, researcher with read-only tools, writer that may cite only what retrieval returned, critic with exactly one revision. Every exit names why it stopped. |
-| **5. Fail first** | The critic as a conversation. Uncapped, writer and critic argue until the budget stops them, and the run ends with `stopped_because="budget"` instead of an answer. The cap is one line. |
-| **6. The framework seam** | The same four nodes as a LangGraph `StateGraph` and as plain Python, and the same state out of both. The graph is yours; the framework is a way to run it. |
+| **4. The output contract** | `ANSWER_JSON_INSTRUCTIONS`, printed and taken apart a line at a time. Four malformed replies, four refusals that name the field. Session 3's rule in a team: **the application validates, never the model.** |
+| **5. Every prompt in the open** | Both system prompts and both user messages, whole. Then the word the code actually reads: `APPROVE`. "Looks good to me" approves in English and rejects in code, and the run pays two more calls for it. |
+| **6. Build the team by hand** | Four node functions, one transition dict, a nine-line walker. Then `build_team` beside it, field by field, all `==`. **They wrote it, so they can say what it does.** |
+| **7. The team** | The imported team over one `TeamState`. Every exit names why it stopped, and every citation is one retrieval returned. |
+| **8. Fail first** | The critic as a conversation. Uncapped, writer and critic argue until the budget stops them, and the run ends with `stopped_because="budget"` instead of an answer. The cap is one line. |
+| **9 to 11. Tools** | A tool package written from a cell and imported, a researcher that picks between tools, an optional DuckDuckGo search that is honest about not being reproducible, and which role may hold which tool. |
+| **12. The framework seam** | The same four nodes as a LangGraph `StateGraph` and as plain Python. The graph gets **drawn** and one run gets **streamed**, node by node. The graph is yours; the framework is a way to run it. |
 | **Measure** | The team against the single loop on the same questions. Loop: **1 call**. Team: **2**, or **4** when the critic sends it back. |
+
+**If the room wants the full LangGraph build**, it is a tutorial of its own:
+[`projects/tutorials/03-build-a-team-with-langgraph.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/tutorials/03-build-a-team-with-langgraph.ipynb)
+walks the state and its reducer, the team as data, each node under the prompt it
+sends, the wiring, the drawn graph and the streamed run. Not graded, and it runs
+with no model and no LangGraph.
 
 **The point of the project:** the second, third and fourth role are not free, and
 the table is how you find out what they bought. Right company in the retrieved
@@ -126,7 +139,7 @@ Three moments, and nothing raises in any of them.
 
 | Where | The failure |
 |---|---|
-| **Project, step 5** | The critic as a conversation: no cap, so the run ends on budget with no answer. |
+| **Project, step 8** | The critic as a conversation: no cap, so the run ends on budget with no answer. |
 | **Session notebook, section 10** | A retry storm: one edge back to the state it came from, with nothing counting. `visited` only grows, and that is the counter that caps it. |
 | **Session notebook, section 11** | A partial tool failure: two sources, one down, half the passages back. Which event is that? It is a decision, made in the open, and the flag travels with the answer. |
 

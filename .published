@@ -159,6 +159,7 @@ projects/tutorials/fixtures/01-calling-a-model.json
 projects/tutorials/fixtures/02-tools-with-limits.json
 projects/tutorials/fixtures/03-build-a-team-with-langgraph.json
 pyproject.toml
+scripts/check_generated.py
 scripts/check_notebooks.py
 scripts/check_setup.py
 scripts/collect_submissions.py
