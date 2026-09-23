@@ -56,7 +56,7 @@ Every step runs on both. The recorded lane replays one real run from
 
 ```bash
 uv sync                              # the course
-uv sync --extra agents               # optional: LangGraph, for step 6
+uv sync --extra projects --extra agents               # optional: LangGraph, for step 6
 ollama pull qwen2.5:7b-instruct      # optional: without it, every model call plays the recording
 uv run jupyter lab                   # open projects/03-analyst-team/notebook.ipynb
 ```

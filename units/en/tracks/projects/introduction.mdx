@@ -22,7 +22,7 @@ know when you are done, not to score you.
 uv sync --extra projects          # ChromaDB, scikit-learn, pandas, matplotlib
 ollama pull nomic-embed-text      # a 274 MB embedding model
 ollama pull qwen2.5:7b-instruct   # project 02 only: the model that writes the answers (4.7 GB)
-uv sync --extra agents            # project 03 only: LangGraph
+uv sync --extra projects --extra agents   # project 03 also needs LangGraph
 ```
 
 Project 02 also runs without the 7B model. Its first cell prints `[live]` when Ollama

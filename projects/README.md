@@ -23,7 +23,7 @@ and the checklist a project passes before it ships.
 uv sync --extra projects          # ChromaDB, scikit-learn, pandas, matplotlib
 ollama pull nomic-embed-text      # a 274 MB embedding model
 ollama pull qwen2.5:7b-instruct   # project 02 only: the model that writes the answers (4.7 GB)
-uv sync --extra agents            # project 03 only: LangGraph
+uv sync --extra projects --extra agents   # project 03 also needs LangGraph
 ```
 
 No room for the 7B model? Project 02 has a recorded lane: it replays one real run and

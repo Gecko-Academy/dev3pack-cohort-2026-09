@@ -19,7 +19,7 @@ From your course folder:
 ```bash
 git stash push -m "my work before today's update"
 git pull
-uv sync --extra agents
+uv sync --extra projects --extra agents
 uv run jupyter lab
 ```
 
@@ -30,7 +30,12 @@ back as you left it, see [when `git pull` stops](../../unit0/get-settled.mdx).
 
 Check that the pull worked: the folder `projects/03-analyst-team/` must exist.
 
-**What `--extra agents` installs.** LangGraph, and only for the project. Today's
+**Name both extras, or you lose ChromaDB.** `uv sync` makes the environment match
+exactly what you asked for. Ask for `agents` on its own and it uninstalls the
+`projects` extra, ChromaDB goes with it, and project 02's index stops building.
+Name both, every time.
+
+**What `--extra agents` adds.** LangGraph, and only for the project. Today's
 exercise needs nothing new: it runs offline, on fakes, in milliseconds. The
 project runs without LangGraph too, and says so when it falls back.
 

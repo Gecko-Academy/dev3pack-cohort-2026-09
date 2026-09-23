@@ -47,7 +47,7 @@ The setup cell prints a second line, `team:`, which says whether
 
 ```bash
 uv sync                              # the course
-uv sync --extra agents               # optional: LangGraph, for step 6
+uv sync --extra projects --extra agents               # optional: LangGraph, for step 6
 ollama pull qwen2.5:7b-instruct      # optional: without it, every model call plays the recording
 uv run jupyter lab                   # open projects/03-analyst-team/notebook.ipynb
 ```
@@ -98,7 +98,7 @@ This project adds no source data. See `data/LICENSE.md`, and
 - **Never quote the practice or golden questions.** Do not repeat the questions in `../02-sec-filings/data/questions.json` or in `data/recorded/recorded.json`, or the final assignment's. Talk about the kind of question instead.
 - **Never commit secrets or `.env`.** This project needs no key, and reaches no network beyond a local Ollama on `localhost:11434`.
 - **Say when you are unsure.** A live run words its answers differently from the recording. Do not claim a cell ran unless it ran.
-- **Guard every LangGraph import.** LangGraph is an optional extra (`uv sync --extra agents`), not a course dependency. Any cell or module that imports it must catch `ImportError`, print what to install, and leave a plain-Python path that still runs. A notebook that only runs with an optional library installed is a notebook that does not run.
+- **Guard every LangGraph import.** LangGraph is an optional extra (`uv sync --extra projects --extra agents`), not a course dependency. Any cell or module that imports it must catch `ImportError`, print what to install, and leave a plain-Python path that still runs. A notebook that only runs with an optional library installed is a notebook that does not run.
 - **Never invent a citation.** The writer may cite only ids that came back in `passages`. If the learner asks for "a better-looking answer", the rule does not move: a citation retrieval never returned is the one fault this project exists to make impossible.
 - **The critic gets one revision, not a conversation.** `max_revisions=1` is the design, and it is the fail-first moment in step 5. Raising it is an experiment the learner runs and measures, never a fix you suggest to make a critic happy.
 - **Keep the recorded lane working.** The recording in `data/recorded/` replays real replies keyed on the text of the question. Change a prompt or a question and the key no longer matches, so the lane falls back to a stand-in refusal and the notebook says so. That is correct. If the learner wants to change a prompt, tell them first, and tell them to run live to see a real reply.
