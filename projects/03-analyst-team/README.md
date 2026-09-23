@@ -26,11 +26,12 @@ whether it bought anything.**
 |---|---|---|---|
 | `search` | 1 | a read-only tool over Project 02's index, held to one company on request | `project-03-e1` |
 | `routing` | 3 | 20 rows: the predicted company against the labelled one | `project-03-e2` |
-| `run` | 4 | the `TeamState` of one finished question | `project-03-e3` |
+| `run` | 7 | the `TeamState` of one finished question | `project-03-e3` |
 | `measurement` | Measure | one row per method: the loop and the team | `project-03-e4` |
 
-The team itself lives in `src/bootcamp_agent/projects/analyst_team.py`, so it is the part
-you keep after the class:
+You build the team by hand first, in step 6: four node functions, a transition dict and a
+nine-line walker. Only then do you import the one in the package. It lives in
+`src/bootcamp_agent/projects/analyst_team.py`, so it is the part you keep after the class:
 
 ```python
 from bootcamp_agent.projects.analyst_team import TeamState, build_team, route_company
@@ -42,6 +43,16 @@ from bootcamp_agent.projects.analyst_team import TeamState, build_team, route_co
 | Researcher | calls `search` over the index, brings back passages | 0 |
 | Writer | writes the answer as strict JSON, citing only what came back | 1 |
 | Critic | approves, or sends it back exactly once | 1 |
+
+The tools are yours too, and step 9 writes them as a real package next to the notebook:
+
+```text
+projects/03-analyst-team/analyst_tools/
+  __init__.py    the registry: name -> Tool
+  filings.py     search the eight filings, held to one company on request
+  companies.py   the desk's roster, no arguments, nothing to misaim
+  web.py         DuckDuckGo through LangChain. Optional, guarded, never measured
+```
 
 ## The two lanes
 
@@ -55,15 +66,19 @@ Every step runs on both. The recorded lane replays one real run from
 `team:`, says whether the module the notebook imports is on your clone.
 
 ```bash
-uv sync                              # the course
-uv sync --extra projects --extra agents               # optional: LangGraph, for step 6
-ollama pull qwen2.5:7b-instruct      # optional: without it, every model call plays the recording
-uv run jupyter lab                   # open projects/03-analyst-team/notebook.ipynb
+uv sync                                  # the course
+uv sync --extra projects --extra agents   # optional: LangGraph (step 12), the web tool (step 10)
+ollama pull qwen2.5:7b-instruct          # optional: without it, every model call plays the recording
+uv run jupyter lab                       # open projects/03-analyst-team/notebook.ipynb
 ```
 
-**LangGraph is optional on purpose.** Steps 1 to 5 build the team in plain Python. Step 6
-runs the same team through LangGraph if you installed it, and prints what it could not use
-if you did not. Nothing in this notebook requires it.
+Name **both** extras in one command. `uv sync` makes the environment match exactly, so asking
+for `agents` on its own uninstalls `projects`, and project 02's index goes with it.
+
+**The extra is optional on purpose.** Steps 1 to 9 build the team and its tools in plain
+Python. Step 10 adds a DuckDuckGo search tool and step 12 runs the same team through LangGraph,
+both guarded: without the extra they print what to install and carry on. Nothing in this
+notebook requires either.
 
 ## The ship checklist
 
@@ -73,19 +88,22 @@ Tick every line before you call it done.
 |---|---|
 | Both lanes run | The notebook runs with the model and without it, and the setup cell says which |
 | The four checks pass | `project-03-e1` to `project-03-e4` print a tick, or a message you have read |
-| No citation was invented | Step 4's `invented:` line reads `none` |
+| No citation was invented | Step 7's `invented:` line reads `none` |
 | The run says why it stopped | `stopped_because` is one of `answered`, `budget`, `repeated_call`, `tool_error` |
-| The critic is capped | `max_revisions=1`, and step 5 shows what an uncapped one does |
+| The critic is capped | `max_revisions=1`, and step 8 shows what an uncapped one does |
+| You wrote the team | Step 6's table reads `==` on every field against `build_team`'s run |
+| The tools are a package | `analyst_tools/` imports, and its registry prints a signature and a description per tool |
+| The web tool is honest | It refuses with an install line when the extra is absent, it ends a run in `tool_error` when the endpoint says no, and it is in no number you report |
 | LangGraph is optional | The notebook runs top to bottom on a clone that never installed it |
 | The numbers are yours | The Measure table was printed by your run, not copied from the prose |
 | You can say what it bought | One sentence: the extra calls, and what came back for them |
 
 ## What it costs
 
-$0, and no account. Everything runs on your machine, and the only network this project
-touches is your own Ollama on `localhost:11434`. About 90 minutes the first time, most of it
-reading. The recorded lane reruns in seconds; live, the whole notebook makes about 25 model
-calls.
+$0, and no account. The only network this project needs is your own Ollama on
+`localhost:11434`. One optional cell in step 10 reaches DuckDuckGo; skip it and nothing is
+lost but that cell. About two hours the first time, most of it reading. The recorded lane
+reruns in seconds.
 
 ## The data
 
@@ -95,6 +113,9 @@ and never copies them. See `data/LICENSE.md`.
 ## Also read
 
 - `AGENTS.md` — what a coding assistant may and may not do in this folder.
+- `analyst_tools/` — the tool package step 9 writes. The notebook rewrites these files when
+  it runs, so what you read here is what a run produces.
+- `../../units/en/unit1/session-04-bounded-tools/` — what a tool is, and who may hold one.
 - `../02-sec-filings/` — the index this project reads, and the loop it is measured against.
 - `../../units/en/unit2/session-08-loops-and-graphs/` — a chain, a loop, a capped
   reflection, counted calls, and a state machine with declared transitions.

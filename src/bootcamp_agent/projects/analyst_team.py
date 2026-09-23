@@ -17,7 +17,8 @@ TWO RUNNERS, ONE TEAM. `build_team` returns the same nodes either as a LangGraph
 construction: both read `NEXT_NODE` for the transitions, both call the same node
 functions, and both start from the same seeded state. A test asserts the two
 finish in identical states. LangGraph is an optional extra (`uv sync --extra
-agents`); without it the plain runner takes over and says so in `Team.why_not`.
+projects --extra agents`, both of them, because uv sync uninstalls the extra you
+leave out); without it the plain runner takes over and says so in `Team.why_not`.
 
 THE ONE RULE THAT MAKES BOTH RUNNERS SIMPLE. A state with `stopped_because` set
 is a finished state. Every edge asks that first, so "what happens after a parse
@@ -94,6 +95,22 @@ CRITIC_RULES = (
 #: The first line of each role's prompt. It is also the recorded-reply key, so a
 #: recording made on one machine replays on another. See `reply_key`.
 ROLE_MARKERS = {"writer": "Write the answer.", "critic": "Review the draft answer."}
+
+#: The questions the notebook asks a model. ONE list, read by the notebook and by
+#: `data/recorded/record.py`, because two copies drift and the drift is invisible:
+#: a question the recording never covers replays as a refusal, and the notebook
+#: still prints something that looks like an answer. A test asserts every one of
+#: these has a recorded writer reply and a recorded critic reply.
+DEMO_QUESTIONS: dict[str, str] = {
+    "bottlers": "Which company says its bottling partners could hurt its business?",
+    "sweet_drinks": "Who is exposed to taxes on sweet drinks?",
+    "musk": "Which company depends on Elon Musk?",
+    "azure": "Which company is exposed to risks in its Azure datacenters?",
+    "hosts": "Which company depends on hosts listing their homes?",
+    "gpus": "Who worries about export controls on its GPUs to China?",
+    "batteries": "Who depends on suppliers of lithium-ion battery cells?",
+    "foreign_attacks": "Who worries about attacks from foreign governments on its online services?",
+}
 
 _WORD = re.compile(r"[a-z0-9]+")
 
@@ -211,16 +228,29 @@ class Team:
         self._max_revisions = max_revisions
         self._graph = graph
 
+    @property
+    def graph(self) -> Any | None:
+        """The compiled LangGraph graph, or None when the plain runner is in charge.
+
+        Public because a graph you cannot draw or stream is a graph you have to take
+        on trust. The notebook draws it and streams one run through it.
+        """
+        return self._graph
+
+    def seed_state(self, question: str) -> TeamState:
+        """The state every run starts from. Public so a caller can stream it itself."""
+        return TeamState(
+            question=question,
+            passages=[],
+            calls=[],
+            revisions=0,
+            max_revisions=self._max_revisions,
+            rejected=[],
+        )
+
     def run(self, question: str) -> TeamState:
         """Answer one question and return the finished state, receipt included."""
-        state: TeamState = {
-            "question": question,
-            "passages": [],
-            "calls": [],
-            "revisions": 0,
-            "max_revisions": self._max_revisions,
-            "rejected": [],
-        }
+        state = self.seed_state(question)
         if self._graph is not None:
             return cast(TeamState, dict(self._graph.invoke(state)))
         return _walk(self._nodes, state)
@@ -256,9 +286,12 @@ def build_team(
         if framework == "langgraph":
             raise TeamError(
                 "framework='langgraph' needs the optional extra. Install it with: "
-                "uv sync --extra agents"
+                "uv sync --extra projects --extra agents"
             ) from error
-        why_not = "langgraph is not installed, so the plain runner ran: uv sync --extra agents"
+        why_not = (
+            "langgraph is not installed, so the plain runner ran: "
+            "uv sync --extra projects --extra agents"
+        )
         return Team(nodes, "plain", why_not, max_revisions)
     return Team(nodes, "langgraph", "", max_revisions, graph=graph)
 
@@ -587,10 +620,13 @@ def _revisions(revisions: Any) -> str | None:
 
 
 __all__ = [
+    "CRITIC_RULES",
+    "DEMO_QUESTIONS",
     "END_NODE",
     "HINTS",
     "NEXT_NODE",
     "Passage",
+    "ROLE_MARKERS",
     "Searcher",
     "Team",
     "TeamError",

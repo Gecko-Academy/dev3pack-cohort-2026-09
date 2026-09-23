@@ -95,7 +95,7 @@ instructor-only; learners never run it.
 | 7. Retrieve, two ways | Keyword scoring against nearest-vector search, and a floor for nonsense |
 | 8. Answer, with citations | The prompt, typed output, the pipeline, and the architecture |
 | 9. Measure | Both methods on every labelled question, in one table |
-| Resources | The two reference tutorials, sessions 6 and 7, demo 9 |
+| Resources | The reference tutorials, sessions 6 and 7, demo 9 |
 | Your turn | Ask your own, move the floor, filter by company |
 | Ask your assistant about this project | Five prompts that explain the project and point to the step |
 

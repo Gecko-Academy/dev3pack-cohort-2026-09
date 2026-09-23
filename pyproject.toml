@@ -36,11 +36,24 @@ projects = [
   "scipy>=1.12",
   "matplotlib>=3.8",
 ]
-# Project 03's optional lane: the analyst team as a LangGraph graph. The same
-# team runs without it (`bootcamp_agent.projects.analyst_team` ships a plain
-# runner and falls back to it), so a framework nobody needs to learn to pass the
-# course never lands on a learner's default `uv sync`, and CI never installs it.
-agents = ["langgraph>=0.2"]
+# Project 03's optional lane: the analyst team as a LangGraph graph, and the one
+# tool in it that leaves the machine. The same team runs without any of this
+# (`bootcamp_agent.projects.analyst_team` ships a plain runner and falls back to
+# it), so a framework nobody needs to learn to pass the course never lands on a
+# learner's default `uv sync`, and CI never installs it.
+#
+# `ddgs` is the DuckDuckGo client. It was called `duckduckgo-search` until the
+# rename, and langchain-community's DuckDuckGo wrapper now imports `ddgs`, so the
+# old name installs a package the wrapper will not find. Name it here or a
+# learner reads "please install duckduckgo-search" and installs the wrong one.
+#
+# `grandalf` is what `graph.get_graph().draw_ascii()` needs. Without it the only
+# drawing left needs the network (`draw_mermaid_png` posts to mermaid.ink), and a
+# tutorial whose picture only appears online is a tutorial with no picture.
+#
+# Sync BOTH extras: `uv sync --extra projects --extra agents`. Naming one alone
+# uninstalls the other.
+agents = ["langgraph>=0.2", "langchain-community>=0.3", "ddgs>=9", "grandalf>=0.8"]
 
 [dependency-groups]
 dev = [

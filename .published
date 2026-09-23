@@ -138,6 +138,10 @@ projects/02-sec-filings/img/architecture.png
 projects/02-sec-filings/notebook.ipynb
 projects/03-analyst-team/AGENTS.md
 projects/03-analyst-team/README.md
+projects/03-analyst-team/analyst_tools/__init__.py
+projects/03-analyst-team/analyst_tools/companies.py
+projects/03-analyst-team/analyst_tools/filings.py
+projects/03-analyst-team/analyst_tools/web.py
 projects/03-analyst-team/data/LICENSE.md
 projects/03-analyst-team/data/recorded/README.md
 projects/03-analyst-team/data/recorded/record.py
@@ -150,8 +154,10 @@ projects/_template/data/LICENSE.md
 projects/_template/notebook.ipynb
 projects/tutorials/01-calling-a-model.ipynb
 projects/tutorials/02-tools-with-limits.ipynb
+projects/tutorials/03-build-a-team-with-langgraph.ipynb
 projects/tutorials/fixtures/01-calling-a-model.json
 projects/tutorials/fixtures/02-tools-with-limits.json
+projects/tutorials/fixtures/03-build-a-team-with-langgraph.json
 pyproject.toml
 scripts/check_notebooks.py
 scripts/check_setup.py

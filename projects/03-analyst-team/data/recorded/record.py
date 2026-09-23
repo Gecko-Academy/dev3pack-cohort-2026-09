@@ -1,104 +1,88 @@
 """Record one real run of the analyst team, so the notebook has a free lane.
 
-    uv run --extra projects python projects/03-analyst-team/data/recorded/record.py
+    uv run python projects/03-analyst-team/data/recorded/record.py
 
-It needs Ollama with `qwen2.5:7b-instruct` and `nomic-embed-text`, and it reuses
-project 02's chunks and chunk vectors rather than making its own: the chunks are
-rebuilt by running project 02's own `clean` and `chunk_all` cells, and the run
-stops if their fingerprint no longer matches the vectors on disk.
+It needs Ollama with `qwen2.5:7b-instruct`, and nothing else: no embedding model,
+no numpy, no vectors.
+
+IT RECORDS AGAINST THE NOTEBOOK'S OWN INDEX, and that is the whole point of this
+file. The first version recorded against project 02's embedding vectors while the
+notebook searched by keyword, so every recorded draft cited chunk ids the notebook
+never retrieved. The writer dropped all of them, and a learner on the recorded
+lane saw an answer with no citations and a `needs_human_review` flag on every
+single run. A recording made against a different retrieval is not a recording of
+this notebook. So the index here is built by executing the notebook's own cells.
+
+The questions come from `analyst_team.DEMO_QUESTIONS` plus project 02's twenty
+labelled ones. ONE list, imported, never retyped: a demo question that drifts out
+of the recording replays as a refusal, and the notebook still prints something
+that looks like an answer.
 
 Nothing here is a benchmark. It is one run of one 7B model on one day, kept so
-that a learner with no local model still sees the graph move.
+that a learner with no local model still sees the team move.
 """
 
 from __future__ import annotations
 
-import hashlib
 import json
+import math
 import re
 import sys
-import urllib.request
+from collections import Counter
 from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 sys.path.insert(0, str(ROOT / "src"))
 
-from bootcamp_agent.documents import Document  # noqa: E402
 from bootcamp_agent.ollama import DEFAULT_MODEL, OllamaClient  # noqa: E402
-from bootcamp_agent.projects.analyst_team import Passage, build_team  # noqa: E402
-from bootcamp_agent.projects.sec_filings import raw_filing, sources  # noqa: E402
-from bootcamp_agent.retrieval import Chunk  # noqa: E402
+from bootcamp_agent.projects import sec_filings  # noqa: E402
+from bootcamp_agent.projects.analyst_team import (  # noqa: E402
+    DEMO_QUESTIONS,
+    Passage,
+    build_team,
+)
 
-PROJECT_02 = ROOT / "projects" / "02-sec-filings"
-RECORDED_02 = PROJECT_02 / "data" / "recorded"
-OLLAMA = "http://localhost:11434"
-EMBED_MODEL = "nomic-embed-text"
+NOTEBOOK = HERE.parents[1] / "notebook.ipynb"
 OUT = HERE / "recorded.json"
 
 
-def notebook_chunks() -> list[Chunk]:
-    """Project 02's chunks, rebuilt by running its own cells. No reimplementation."""
-    cells = json.loads((PROJECT_02 / "notebook.ipynb").read_text("utf-8"))["cells"]
-    code = ["".join(c["source"]) for c in cells if c["cell_type"] == "code"]
-    clean_cell = next(c for c in code if "def clean(" in c)
-    chunk_cell = next(c for c in code if "def chunk_all(" in c)
-    namespace: dict[str, Any] = {"re": re, "HTMLParser": HTMLParser, "Chunk": Chunk}
-    exec(clean_cell.split("cleaned = {")[0], namespace)  # noqa: S102 - our own notebook
-    exec(chunk_cell.split("chunks = [")[0], namespace)  # noqa: S102 - our own notebook
-    documents = [
-        Document(
-            doc_id=entry["ticker"].lower(),
-            title=entry["company"],
-            text=namespace["clean"](raw_filing(entry["ticker"])),
-            source=entry["url"],
-            tags=(),
-        )
-        for entry in sources()
-    ]
-    return [chunk for document in documents for chunk in namespace["chunk_all"](document)]
+def notebook_search() -> Any:
+    """The notebook's own `search`, built by running the notebook's own cells.
 
-
-def embed(texts: list[str]) -> list[list[float]]:
-    request = urllib.request.Request(
-        f"{OLLAMA}/api/embed",
-        data=json.dumps({"model": EMBED_MODEL, "input": texts}).encode(),
-        headers={"Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(request, timeout=600) as response:
-        return list(json.loads(response.read())["embeddings"])
+    Two cells, cut at the line where each stops defining and starts printing. No
+    reimplementation, so the recording cannot drift from what a learner runs.
+    """
+    cells = json.loads(NOTEBOOK.read_text("utf-8"))["cells"]
+    code = ["".join(cell["source"]) for cell in cells if cell["cell_type"] == "code"]
+    index_cell = next(c for c in code if "def passages_of(" in c)
+    search_cell = next(c for c in code if "def search(" in c)
+    namespace: dict[str, Any] = {
+        "re": re,
+        "math": math,
+        "Counter": Counter,
+        "HTMLParser": HTMLParser,
+        "sec_filings": sec_filings,
+    }
+    exec(index_cell.split('print(f"{len(INDEX)}')[0], namespace)  # noqa: S102 - our own notebook
+    exec(search_cell.split("QUESTION = ")[0], namespace)  # noqa: S102 - our own notebook
+    print(f"index: {len(namespace['INDEX'])} passages from {len(namespace['TICKERS'])} companies")
+    return namespace["search"]
 
 
 def main() -> int:
-    recorded_02 = json.loads((RECORDED_02 / "recorded.json").read_text("utf-8"))
-    chunks = notebook_chunks()
-    fingerprint = hashlib.sha256("\n\x00".join(c.text for c in chunks).encode()).hexdigest()
-    if fingerprint != recorded_02["chunk_fingerprint"]:
-        print("project 02's chunks moved; its recorded vectors no longer match them")
-        return 1
-    vectors = np.load(RECORDED_02 / "chunk_vectors.npy").astype(np.float32)
-    vectors /= np.linalg.norm(vectors, axis=1, keepdims=True)
-    ids = [f"{chunk.doc_id}#{chunk.position}" for chunk in chunks]
-    tickers = [chunk.doc_id for chunk in chunks]
+    search = notebook_search()
 
-    def search(question: str, ticker: str | None, top_k: int) -> list[Passage]:
-        """The same cosine search the notebook gets from Chroma, without Chroma."""
-        query = np.asarray(embed(["search_query: " + question])[0], dtype=np.float32)
-        query /= np.linalg.norm(query)
-        scores = vectors @ query
-        allowed = [i for i in range(len(ids)) if ticker in (None, tickers[i])]
-        best = sorted(allowed, key=lambda i: -scores[i])[:top_k]
-        return [(round(float(scores[i]), 4), ids[i], chunks[i].text) for i in best]
+    def searcher(question: str, ticker: str | None, top_k: int) -> list[Passage]:
+        return list(search(question, ticker, top_k))
 
     replies: dict[str, str] = {}
 
     class Recorder:
-        """Wraps the live model and files each reply under the prompt's first lines.
+        """Wraps the live model and files each reply under the prompt's first two lines.
 
         Those two lines are `analyst_team.reply_key`, which is what `FakeLLM`
         matches on, so the recording replays without storing whole prompts.
@@ -112,9 +96,14 @@ def main() -> int:
             replies.setdefault("\n".join(user.split("\n")[:2]), reply)
             return reply
 
-    team = build_team(search, Recorder(), framework="plain")
+    # The notebook's demo questions first, then project 02's labelled twenty. A
+    # question in both lists is recorded once: the key is the question.
+    labelled = [item["question"] for item in sec_filings.questions()]
+    asked: list[str] = list(dict.fromkeys([*DEMO_QUESTIONS.values(), *labelled]))
+
+    team = build_team(searcher, Recorder(), framework="plain")
     runs = []
-    for question in recorded_02["queries"]:
+    for number, question in enumerate(asked, start=1):
         state = team.run(question)
         runs.append(
             {
@@ -125,16 +114,25 @@ def main() -> int:
                 "revisions": state.get("revisions", 0),
                 "stopped_because": state.get("stopped_because"),
                 "approved": state.get("approved", False),
+                "cited": list(getattr(state.get("answer"), "citations", ()) or ()),
+                "dropped": list(state.get("rejected", [])),
             }
         )
-        print(f"{question[:60]:62} {runs[-1]['stopped_because']:11} {runs[-1]['calls']}")
+        print(
+            f"{number:3}/{len(asked)} {question[:56]:58} "
+            f"{runs[-1]['stopped_because']:11} {runs[-1]['calls']}"
+        )
 
+    dropped = sum(len(run["dropped"]) for run in runs)
     payload = {
         "_provenance": {
             "recorded": date.today().isoformat(),
             "model": DEFAULT_MODEL,
-            "embedding_model": EMBED_MODEL,
             "auth_sent": "none",
+            "retrieval": (
+                "the notebook's own keyword search, built by executing the notebook's "
+                "index and search cells. No embeddings, no vectors, no second model"
+            ),
             "lane": "one real run of the local model, replayed when no model is running",
             "is_evidence_of": (
                 "what this model wrote for these prompts, on these passages, on that run"
@@ -145,21 +143,25 @@ def main() -> int:
                 "graded the content. Run it live to see yours."
             ),
         },
-        "chunk_fingerprint": recorded_02["chunk_fingerprint"],
-        "vectors": {
-            "chunks": "../../../02-sec-filings/data/recorded/chunk_vectors.npy",
-            "queries": "../../../02-sec-filings/data/recorded/query_vectors.npy",
+        "questions": {
+            "demo": list(DEMO_QUESTIONS.values()),
+            "labelled": labelled,
             "note": (
-                "Project 02's vectors, by path. They are not copied here: one corpus, "
-                "one set of vectors. 'queries' below is their order."
+                "'demo' is analyst_team.DEMO_QUESTIONS, the questions the notebook asks a "
+                "model. It is imported, never retyped, so it cannot drift out of this file."
             ),
         },
-        "queries": list(recorded_02["queries"]),
+        "queries": asked,
         "runs": runs,
         "replies": replies,
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"\n{len(replies)} replies -> {OUT.relative_to(ROOT)}")
+    approved = sum(1 for run in runs if run["approved"])
+    calls = sum(len(run["calls"]) for run in runs)
+    print(
+        f"\n{len(asked)} questions, {calls} model calls, {approved} approved on the first draft, "
+        f"{dropped} citation(s) dropped -> {OUT.relative_to(ROOT)}"
+    )
     return 0
 
 
