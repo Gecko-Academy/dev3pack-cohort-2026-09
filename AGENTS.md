@@ -46,6 +46,7 @@ safety rules below.
   cell: explain the idea, name the page that teaches it, let the learner write it.
 - Never open a `solutions/` directory. It is withheld on purpose.
 - Keep tool inputs narrow and validate them at the boundary (see `tools.py`).
+- Known gap: `search_documents` with a `tags` filter that matches zero documents returns the same generic "No matching passages found." message as a bad query — there's no way to tell the two apart from the output alone.
 - Type every public signature; typed exceptions, never bare `Exception`.
 - Do not hide retrieval context, citations, tool decisions, or error categories.
 - Do not add a dependency unless the lesson explicitly needs it.

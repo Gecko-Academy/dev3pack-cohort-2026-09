@@ -34,11 +34,38 @@ def build_tools(documents: Sequence[Document], client: LLMClient) -> dict[str, T
     """Build the tool registry over a corpus. All tools are read-only."""
     by_id = {doc.doc_id: doc for doc in documents}
 
-    def search_documents(query: str, max_results: int = 3) -> str:
+    def _normalize_tags(raw_tags: str | Sequence[str] | None) -> tuple[str, ...]:
+        if raw_tags is None:
+            return ()
+        values = raw_tags.split(",") if isinstance(raw_tags, str) else raw_tags
+        normalized = []
+        for value in values:
+            if not isinstance(value, str):
+                raise ToolError("search_documents: 'tags' must be a string or sequence of strings")
+            cleaned = value.strip().lower()
+            if cleaned:
+                normalized.append(cleaned)
+        if not normalized:
+            raise ToolError("search_documents: 'tags' must contain at least one non-empty tag")
+        return tuple(dict.fromkeys(normalized))
+
+    def search_documents(
+        query: str,
+        max_results: int = 3,
+        tags: str | Sequence[str] | None = None,
+    ) -> str:
         if not query or not query.strip():
             raise ToolError("search_documents: 'query' must be a non-empty string")
         capped = max(1, min(int(max_results), MAX_SEARCH_RESULTS))
-        results = retrieve(query, documents, top_k=capped)
+        requested_tags = _normalize_tags(tags) if tags is not None else ()
+        filtered_docs = documents
+        if requested_tags:
+            filtered_docs = [
+                doc
+                for doc in documents
+                if set(requested_tags).issubset({tag.lower() for tag in doc.tags})
+            ]
+        results = retrieve(query, filtered_docs, top_k=capped)
         if not results:
             return "No matching passages found."
         return "\n\n".join(
@@ -72,8 +99,8 @@ def build_tools(documents: Sequence[Document], client: LLMClient) -> dict[str, T
     return {
         "search_documents": Tool(
             name="search_documents",
-            description="Search the corpus for passages relevant to a query "
-            f"(max_results capped at {MAX_SEARCH_RESULTS}).",
+            description="Search the corpus for passages relevant to a query, optionally "
+            f"filtered by tags (max_results capped at {MAX_SEARCH_RESULTS}).",
             run=search_documents,
         ),
         "get_document_metadata": Tool(
