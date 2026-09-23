@@ -143,6 +143,13 @@ ALWAYS = (
     "CLAUDE.md",
     ".cursor",
     ".claude-plugin",
+    # The skills and subagents a learner receives without installing anything.
+    # `builder-kit/` is a plugin: an install step and a namespace. This is the
+    # same help sitting in the clone instead, so it is already loaded the first
+    # time they start Claude Code in the course folder. Withhold it and the
+    # README's own "Get started with Claude Code" section, which ships, points
+    # at files nobody has.
+    ".claude",
     "pyproject.toml",
     "uv.lock",
     ".env.example",

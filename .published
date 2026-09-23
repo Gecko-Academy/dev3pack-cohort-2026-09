@@ -1,4 +1,12 @@
 .claude-plugin/marketplace.json
+.claude/agents/exercise-coach.md
+.claude/agents/session-tutor.md
+.claude/agents/setup-doctor.md
+.claude/skills/check-my-exercise/SKILL.md
+.claude/skills/fix-my-setup/SKILL.md
+.claude/skills/hand-my-work-in/SKILL.md
+.claude/skills/run-a-project/SKILL.md
+.claude/skills/study-a-session/SKILL.md
 .cursor/rules/bootcamp.mdc
 .env.example
 .gitignore

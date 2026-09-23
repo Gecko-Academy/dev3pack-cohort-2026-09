@@ -164,6 +164,11 @@ REPO_MAP: tuple[tuple[str, str], ...] = (
     ("uv.lock", "The resolved dependency set. CI installs from it frozen."),
     (".github/", "CI. It runs every notebook, the full test suite, and the generator's `--check`."),
     (".claude-plugin/", "The plugin manifest that ships the course's own slash commands."),
+    (
+        ".claude/",
+        "Skills and subagents for Claude Code, already in the clone rather than installed. They "
+        "teach a session, read a failing check and fix a setup; none writes an exercise answer.",
+    ),
     (".cursor/", "Cursor rules, pointing at `AGENTS.md`."),
     (".env.example", "Every variable the course reads, with empty values."),
     (".gitignore", "What never enters git, including keys and a learner's own submissions."),

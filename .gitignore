@@ -51,3 +51,6 @@ projects/02-sec-filings/data/clean/
 
 # Personal assistant preferences. Never shared, never committed.
 CLAUDE.local.md
+
+# Claude Code's own per-machine permissions. The skills and agents beside it are shared.
+.claude/settings.local.json
