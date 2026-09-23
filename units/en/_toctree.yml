@@ -183,6 +183,12 @@
       title: "The same work as a graph"
     - local: unit2/session-08-loops-and-graphs/concepts-3
       title: "Typed transitions, and the edge you refuse to follow"
+    - local: unit2/session-08-loops-and-graphs/concepts-4
+      title: "Loop engineering and graph engineering"
+    - local: unit2/session-08-loops-and-graphs/concepts-5
+      title: "The RAG family, and the index underneath"
+    - local: unit2/session-08-loops-and-graphs/follow-along
+      title: "Follow along: today's class"
     - local: unit2/session-08-loops-and-graphs/quiz
       title: "Quick quiz (ungraded)"
     - local: unit2/session-08-loops-and-graphs/conclusion

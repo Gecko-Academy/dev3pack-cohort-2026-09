@@ -12,8 +12,9 @@ know when you are done, not to score you.
 |---|---|
 | [01 — What are customers really saying?](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/01-clothing-reviews/notebook.ipynb) | Embeddings of 958 real clothing reviews, a 2-D map of them, topics, and a "find reviews like this one" search with ChromaDB |
 | [02 — What are these companies worried about?](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/02-sec-filings/notebook.ipynb) | A RAG pipeline on the risk sections of eight real annual reports, in the order a real project goes: the model alone, the raw HTML, cleaning, chunking, embedding, ChromaDB, answers with the paragraph they came from, and keyword search measured against embeddings on 20 labelled questions |
+| [03 — Did the extra agents earn their calls?](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/03-analyst-team/notebook.ipynb) | Four narrow roles over project 02's filings index: a coordinator that picks the company with no model call, a researcher with read-only tools, a writer that may cite only what came back, and a critic with exactly one revision. The same team runs as a LangGraph state graph and as plain Python, routing is measured on its own against the 20 labelled questions, and the team's model calls are counted against a single loop's |
 
-**Ask your assistant.** Each project has a file your coding assistant reads first, with the project's purpose, goals and how to run it: [project 01](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/01-clothing-reviews/AGENTS.md), [project 02](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/02-sec-filings/AGENTS.md).
+**Ask your assistant.** Each project has a file your coding assistant reads first, with the project's purpose, goals and how to run it: [project 01](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/01-clothing-reviews/AGENTS.md), [project 02](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/02-sec-filings/AGENTS.md), [project 03](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/03-analyst-team/AGENTS.md).
 
 ## Before you start
 
@@ -21,6 +22,7 @@ know when you are done, not to score you.
 uv sync --extra projects          # ChromaDB, scikit-learn, pandas, matplotlib
 ollama pull nomic-embed-text      # a 274 MB embedding model
 ollama pull qwen2.5:7b-instruct   # project 02 only: the model that writes the answers (4.7 GB)
+uv sync --extra agents            # project 03 only: LangGraph
 ```
 
 Project 02 also runs without the 7B model. Its first cell prints `[live]` when Ollama

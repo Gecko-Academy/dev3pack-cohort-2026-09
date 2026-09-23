@@ -33,6 +33,17 @@ answer.
 `done` is terminal for one reason only — no row in the table starts there — so
 terminality is a fact about the data and not a guard somebody can delete.
 
+## Take it further
+
+Today's graph has no model inside it, on purpose. [Project 03 — Did the extra
+agents earn their calls?](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/03-analyst-team/notebook.ipynb)
+puts four of them in one: a coordinator that picks the company without calling a
+model, a researcher with read-only tools, a writer that may cite only what came
+back, and a critic that gets exactly one revision. You build it twice, once with
+LangGraph and once in plain Python, and you count what the second, third and
+fourth role cost against a single loop answering the same question. Optional,
+never counted.
+
 ## Into session 9
 
 Session 9 assumes you can draw the graph your agent walks, and it starts

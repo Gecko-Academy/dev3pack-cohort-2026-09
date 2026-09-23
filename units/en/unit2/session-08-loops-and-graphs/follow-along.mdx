@@ -1,0 +1,149 @@
+# Follow along: today's class
+
+Keep this page open during the session. Every step says what to open and what to
+run, in the order we run it in class.
+
+| Part | What | Time |
+|---|---|---|
+| [0](#0-before-we-start) | Before we start: pull, and one extra to install | 5 min |
+| [1](#1-where-we-are-going) | Where we are going: the autonomy ladder | 10 min |
+| [2](#2-project-03-together) | Project 03, together: four roles over yesterday's index | 45 min |
+| [3](#3-your-exercise) | Your exercise: three counted numbers and a table with no fall-through | 40 min |
+| [4](#4-break-it-on-purpose) | Break it on purpose: a retry storm, a half-failed tool, an edge nobody drew | 10 min |
+| [5](#5-hand-it-in) | Hand it in | 10 min |
+
+## 0. Before we start
+
+From your course folder:
+
+```bash
+git stash push -m "my work before today's update"
+git pull
+uv sync --extra agents
+uv run jupyter lab
+```
+
+**Why the stash first.** `git pull` stops when you have typed into a notebook it
+wants to update, and it says "your local changes would be overwritten". `git
+stash` puts your changes on a shelf and deletes nothing. To take one notebook
+back as you left it, see [when `git pull` stops](../../unit0/get-settled.mdx).
+
+Check that the pull worked: the folder `projects/03-analyst-team/` must exist.
+
+**What `--extra agents` installs.** LangGraph, and only for the project. Today's
+exercise needs nothing new: it runs offline, on fakes, in milliseconds. The
+project runs without LangGraph too, and says so when it falls back.
+
+**Ollama is optional today.** The project replays a recorded run for the cells
+that need a model, and prints `[recorded]` where it does. If you have Ollama and
+did yesterday's project, you already have what you need.
+
+Open two files:
+
+- [`projects/03-analyst-team/notebook.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/03-analyst-team/notebook.ipynb), the project we run together
+- `units/en/unit2/session-08-loops-and-graphs/notebook.ipynb`, today's exercise
+
+**No setup on your laptop?** Open them in Colab. The first cell of each fetches
+the course for you.
+
+## 1. Where we are going
+
+Yesterday you measured retrieval. Today you count calls.
+
+| Row | What it adds | The new way it fails |
+|---|---|---|
+| A model call | nothing but the prompt | it answers from memory, fluently |
+| RAG | passages retrieved first, cited back | the wrong passages, cited with confidence |
+| An agent | a loop: decide, call a tool, read the result, go again | it never stops, unless you make it |
+| Agents in a graph | several narrow roles, one shared state, declared edges | more calls, and a transition nobody declared |
+
+Every row costs more than the one above it. Nobody can tell you from taste which
+row your problem is on. You count, and then you decide.
+
+**The projects are practice, not the capstone.** Project 03 runs on the real
+filings index. The capstone stays on the six documents in `data/corpus/`,
+offline, on the fake model. Nothing you build today in the project is required
+for the capstone; everything you learn is.
+
+## 2. Project 03, together
+
+Open the project notebook and run it from the top. Seven parts, and the moments
+to watch for:
+
+| Step | What happens |
+|---|---|
+| **1. Build the index** | Yesterday's eight filings, chunked and embedded again: **1,927 passages, no word lost**, the shortest 6 characters and the longest 799. |
+| **2. One agent, one loop** | The number to beat. One model call per question, and on **5 of the 20 labelled questions it reads the wrong company's filing** and answers fluently, with a real citation to the wrong document. |
+| **3. The coordinator** | A router that picks the company from the question with **no model call at all**. Measured on its own against the 20 labels, because routing and answering fail for different reasons and a single score hides which one broke. |
+| **4. The team** | Four narrow roles over one `TeamState`: coordinator, researcher with read-only tools, writer that may cite only what retrieval returned, critic with exactly one revision. Every exit names why it stopped. |
+| **5. Fail first** | The critic as a conversation. Uncapped, writer and critic argue until the budget stops them, and the run ends with `stopped_because="budget"` instead of an answer. The cap is one line. |
+| **6. The framework seam** | The same four nodes as a LangGraph `StateGraph` and as plain Python, and the same state out of both. The graph is yours; the framework is a way to run it. |
+| **Measure** | The team against the single loop on the same questions. Loop: **1 call**. Team: **2**, or **4** when the critic sends it back. |
+
+**The point of the project:** the second, third and fourth role are not free, and
+the table is how you find out what they bought. Right company in the retrieved
+passages: the loop **15 of 20**, the team **20 of 20**, for 3 model calls against
+8 over the same three questions. Then the last cell undercuts it honestly: the
+same loop with `k=8` reaches **17 of 20** at one call per question. Decide out
+loud whether the rest of that gap is worth the calls.
+
+## 3. Your exercise
+
+In the session notebook. **300 marks, three exercises, in notebook order:**
+
+| Challenge | What you write | Marks |
+|---|---|---|
+| `ch08-e1` | the comparison table: what the chain, the loop and the capped reflection each cost, in counted calls | 100 |
+| `ch08-e2` | the graph appendix: what its trace showed, or why you did not run it | 100 |
+| `ch08-e3` | `step(state, event)`: five states, six declared edges, and a refusal that does not raise | 100 |
+
+```bash
+uv run bootcamp check ch08
+```
+
+As shipped it prints `0/3` and says what is wrong in each one. That is where you
+start.
+
+**The three that catch people:**
+
+- **`ch08-e1` re-reads the code.** Two of the three numbers are facts the
+  notebook can check for itself. A number you remembered rather than counted
+  will not match.
+- **`ch08-e2` takes both answers but refuses a blank.** "I did not run it, and
+  here is why" passes. An empty string does not.
+- **`ch08-e3` drives every pair, legal and not.** An undeclared event must leave
+  the state exactly as it was, raise nothing, and come back with `rejected`
+  naming the event and the state it was refused from.
+
+## 4. Break it on purpose
+
+Three moments, and nothing raises in any of them.
+
+| Where | The failure |
+|---|---|
+| **Project, step 5** | The critic as a conversation: no cap, so the run ends on budget with no answer. |
+| **Session notebook, section 10** | A retry storm: one edge back to the state it came from, with nothing counting. `visited` only grows, and that is the counter that caps it. |
+| **Session notebook, section 11** | A partial tool failure: two sources, one down, half the passages back. Which event is that? It is a decision, made in the open, and the flag travels with the answer. |
+
+**The question for the room:** in your own `step` table, which pair did you leave
+out because it felt impossible? That pair is the edge nobody drew, and it is the
+one that reaches production.
+
+## 5. Hand it in
+
+When the check is green:
+
+```bash
+uv run bootcamp submit ch08 --github <your-github-name> --push
+```
+
+**Save the notebook first.** `submit` reads the file on disk.
+
+It goes to **dev3pack-submissions**, never to the course repository. No `gh` on
+your machine? The command prints the browser route. Type the path exactly as it
+shows: `submissions/<your-github-name>/ch08/`, **with no spaces**.
+
+## Tomorrow
+
+Session 9 stops asking what the graph is and starts asking whether it is the
+right one: a trace with events you can read back, a golden set, and a pass rate.

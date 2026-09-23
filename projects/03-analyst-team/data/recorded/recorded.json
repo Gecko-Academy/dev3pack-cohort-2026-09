@@ -1,0 +1,428 @@
+{
+ "_provenance": {
+  "recorded": "2026-09-22",
+  "model": "qwen2.5:7b-instruct",
+  "embedding_model": "nomic-embed-text",
+  "auth_sent": "none",
+  "lane": "one real run of the local model, replayed when no model is running",
+  "is_evidence_of": "what this model wrote for these prompts, on these passages, on that run",
+  "is_not_evidence_of": "what it writes every time, nor that the answers are right. No temperature is pinned, a 7B model words things differently on every run, and nobody graded the content. Run it live to see yours."
+ },
+ "chunk_fingerprint": "eace5ac61cb58d6c3a02ec0ec36ed57a555f9258b36c50e45f0ae74dc5a1e701",
+ "vectors": {
+  "chunks": "../../../02-sec-filings/data/recorded/chunk_vectors.npy",
+  "queries": "../../../02-sec-filings/data/recorded/query_vectors.npy",
+  "note": "Project 02's vectors, by path. They are not copied here: one corpus, one set of vectors. 'queries' below is their order."
+ },
+ "queries": [
+  "Which company says its bottling partners could hurt its business?",
+  "Who warns about the devaluation of the Argentine peso?",
+  "Which company depends on Elon Musk?",
+  "Who worries about export controls on its GPUs to China?",
+  "Which company depends on hosts listing their homes?",
+  "Who relies on athletes and endorsers for its brand?",
+  "Which company is exposed to risks in its Azure datacenters?",
+  "Who outsources manufacturing to partners in Vietnam and India?",
+  "Who runs a lending business through Mercado Pago?",
+  "Who depends on suppliers of lithium-ion battery cells?",
+  "Which drinks maker relies on outside companies to package and deliver its products?",
+  "Who is hurt when a South American country's money loses value?",
+  "Which carmaker would suffer if its chief executive left?",
+  "Which chip designer could lose sales if governments limit what it can ship abroad?",
+  "Who depends on people renting out their spare rooms?",
+  "Which shoe brand worries about the celebrities it sponsors?",
+  "Who worries about attacks from foreign governments on its online services?",
+  "Which phone maker depends on factories it does not own in Asia?",
+  "Who is exposed to taxes on sweet drinks?",
+  "Which online marketplace also lends money to its sellers?",
+  "What does MercadoLibre's latest annual report say about Argentina's currency?",
+  "Which of these companies is exposed to taxes on sweet drinks, and how?",
+  "What is Nike's refund policy for online orders?",
+  "xylophone recital giraffe",
+  "who won the 1998 world cup final"
+ ],
+ "runs": [
+  {
+   "question": "Which company says its bottling partners could hurt its business?",
+   "ticker": "ko",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Who warns about the devaluation of the Argentine peso?",
+   "ticker": "meli",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Which company depends on Elon Musk?",
+   "ticker": "tsla",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Who worries about export controls on its GPUs to China?",
+   "ticker": "nvda",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Which company depends on hosts listing their homes?",
+   "ticker": "abnb",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Who relies on athletes and endorsers for its brand?",
+   "ticker": "nke",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Which company is exposed to risks in its Azure datacenters?",
+   "ticker": "msft",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Who outsources manufacturing to partners in Vietnam and India?",
+   "ticker": null,
+   "routed_by": "unrouted",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Who runs a lending business through Mercado Pago?",
+   "ticker": "meli",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Who depends on suppliers of lithium-ion battery cells?",
+   "ticker": "tsla",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Which drinks maker relies on outside companies to package and deliver its products?",
+   "ticker": "ko",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Who is hurt when a South American country's money loses value?",
+   "ticker": null,
+   "routed_by": "unrouted",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Which carmaker would suffer if its chief executive left?",
+   "ticker": "tsla",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Which chip designer could lose sales if governments limit what it can ship abroad?",
+   "ticker": "nvda",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Who depends on people renting out their spare rooms?",
+   "ticker": "abnb",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Which shoe brand worries about the celebrities it sponsors?",
+   "ticker": "nke",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Who worries about attacks from foreign governments on its online services?",
+   "ticker": null,
+   "routed_by": "unrouted",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Which phone maker depends on factories it does not own in Asia?",
+   "ticker": "aapl",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "Who is exposed to taxes on sweet drinks?",
+   "ticker": "ko",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Which online marketplace also lends money to its sellers?",
+   "ticker": "meli",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "What does MercadoLibre's latest annual report say about Argentina's currency?",
+   "ticker": "meli",
+   "routed_by": "company name",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "Which of these companies is exposed to taxes on sweet drinks, and how?",
+   "ticker": "ko",
+   "routed_by": "word",
+   "calls": [
+    "writer",
+    "critic"
+   ],
+   "revisions": 0,
+   "stopped_because": "answered",
+   "approved": true
+  },
+  {
+   "question": "What is Nike's refund policy for online orders?",
+   "ticker": "nke",
+   "routed_by": "company name",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "xylophone recital giraffe",
+   "ticker": null,
+   "routed_by": "unrouted",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  },
+  {
+   "question": "who won the 1998 world cup final",
+   "ticker": null,
+   "routed_by": "unrouted",
+   "calls": [
+    "writer",
+    "critic",
+    "writer",
+    "critic"
+   ],
+   "revisions": 1,
+   "stopped_because": "budget",
+   "approved": false
+  }
+ ],
+ "replies": {
+  "Write the answer.\nQuestion: Which company says its bottling partners could hurt its business?": "{\"answer\": \"The company refers to its bottling partners as having the potential to hurt its business.\", \"citations\": [\"ko#64\", \"ko#65\", \"ko#67\"], \"confidence\": 0.95, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which company says its bottling partners could hurt its business?": "REVIEW: The draft answer is not directly supported by the passages. A concrete fix is needed.\n\nFIX: The company suggests that its bottling partners' actions, which may maximize their own short-term profits but are detrimental to the company, could hurt its business. This is directly supported by ko#64.",
+  "Write the answer.\nQuestion: Who warns about the devaluation of the Argentine peso?": "{\"answer\": \"The devaluation of the Argentine peso is not directly warned in the provided documents. However, the context suggests that such devaluations could occur.\", \"citations\": [], \"confidence\": 0.0, \"needs_human_review\": true}",
+  "Review the draft answer.\nQuestion: Who warns about the devaluation of the Argentine peso?": "Add a reference to one of the passages that suggest a warning about the devaluation of the Argentine peso, for example: \"Passage [meli#212] hints at the possibility of future devaluations, mentioning that 'Brazil, Argentina and Mexico, which together accounted for 95.6% and 95.7% of our net revenues and financial income for 2025 and 2024, respectively, have experienced volatility and significant devaluations in the past.'\"",
+  "Write the answer.\nQuestion: Which company depends on Elon Musk?": "{\"answer\": \"Tesla\", \"citations\": [\"tsla#61\", \"tsla#57\", \"tsla#60\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which company depends on Elon Musk?": "APPROVE\n\nThe draft answer \"Tesla\" is supported by the passages, which consistently highlight Tesla's dependence on Elon Musk. One relevant citation is given: \"tsla#61\".",
+  "Write the answer.\nQuestion: Who worries about export controls on its GPUs to China?": "{\"answer\": \"NVIDIA\", \"citations\": [\"nvda#119\", \"nvda#140\", \"nvda#142\", \"nvda#117\", \"nvda#130\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who worries about export controls on its GPUs to China?": "APPROVE",
+  "Write the answer.\nQuestion: Which company depends on hosts listing their homes?": "{\"answer\": \"Airbnb depends on hosts listing their homes.\", \"citations\": [\"abnb#4\", \"abnb#32\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which company depends on hosts listing their homes?": "APPROVE",
+  "Write the answer.\nQuestion: Who relies on athletes and endorsers for its brand?": "{\"answer\": \"Professional athletes, sports teams and leagues, as well as other public figures\", \"citations\": [\"nke#59\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who relies on athletes and endorsers for its brand?": "FIX: Remove \"and other public figures\" from the answer as it is not directly supported by the passages which specifically mention athletes, sports teams, and leagues.",
+  "Write the answer.\nQuestion: Which company is exposed to risks in its Azure datacenters?": "{\"answer\": \"Microsoft's Azure datacenters\", \"citations\": [\"msft#85\"], \"confidence\": 0.9, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which company is exposed to risks in its Azure datacenters?": "Fix: The draft answer should specify which company is exposed to risks, i.e., \"Microsoft\" is exposed to risks in its Azure datacenters.",
+  "Write the answer.\nQuestion: Who outsources manufacturing to partners in Vietnam and India?": "{\"answer\": \"A significant majority of the Company’s manufacturing is performed in whole or in part by outsourcing partners located primarily in China mainland, India, Japan, South Korea, Taiwan and Vietnam\", \"citations\": [\"aapl#26\", \"aapl#7\"], \"confidence\": 0.8, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who outsources manufacturing to partners in Vietnam and India?": "The answer is not directly supported by the provided passages. One concrete fix is to clarify which company is outsourcing manufacturing based on the relevant passage. For example: \"According to [aapl#26], a significant majority of the Company's manufacturing is performed in whole or in part by outsourcing partners located primarily in China mainland, India, Japan, South Korea, Taiwan and Vietnam.\"",
+  "Write the answer.\nQuestion: Who runs a lending business through Mercado Pago?": "{\"answer\": \"A lending business through Mercado Pago is not directly run by Mercado Pago itself, but rather by third party providers who acquire Mercado Pago’s receivables and fund transactions. Mercado Pago provides the technology infrastructure and sends instructions to these third party providers, but does not have decision-making authority over funding strategies or investments.\", \"citations\": [\"meli#65\", \"meli#68\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who runs a lending business through Mercado Pago?": "APPROVE\n\nThe draft answer is supported by the passages, which emphasize that Mercado Pago does not run lending businesses directly but works with third-party providers who have decision-making authority over funding strategies. The passages cited (meli#65, meli#68) are directly relevant to the question.",
+  "Write the answer.\nQuestion: Who depends on suppliers of lithium-ion battery cells?": "{\"answer\": \"companies dependent on the production and supply of lithium-ion battery cells include Tesla, as they are reliant on the continued supply of these cells for their vehicles and energy storage products.\", \"citations\": [\"tsla#21\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who depends on suppliers of lithium-ion battery cells?": "APPROVE\n\nThe answer is supported by the passage and cites it appropriately.",
+  "Write the answer.\nQuestion: Which drinks maker relies on outside companies to package and deliver its products?": "{\"answer\": \"The Company\", \"citations\": [\"ko#63\", \"ko#66\"], \"confidence\": 0.95, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which drinks maker relies on outside companies to package and deliver its products?": "APPROVE\n\nThe passage [ko#63] explicitly states that the company \"generate[s] a significant portion of our net operating revenues by selling concentrates and syrups to independent bottling partners,\" indicating that the company relies on outside companies to package and deliver its products.",
+  "Write the answer.\nQuestion: Who is hurt when a South American country's money loses value?": "{\"answer\": \"Consumers and merchants are hurt when a South American country's money loses value.\", \"citations\": [\"meli#212\"], \"confidence\": 0.85, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who is hurt when a South American country's money loses value?": "CONConcrete fix: The answer should be directly supported by the passages. The passage [meli#212] states that \"Brazil, Argentina and Mexico, which together accounted for 95.6% and 95.7% of our net revenues and financial income for 2025 and 2024, respectively, have experienced volatility and significant devaluations in the past.\" This passage supports that consumers and merchants are hurt when a South American country's money loses value.",
+  "Write the answer.\nQuestion: Which carmaker would suffer if its chief executive left?": "{\"answer\": \"Tesla would suffer if its chief executive, Elon Musk, left.\", \"citations\": [\"tsla#57\"], \"confidence\": 0.95, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which carmaker would suffer if its chief executive left?": "APPROVE",
+  "Write the answer.\nQuestion: Which chip designer could lose sales if governments limit what it can ship abroad?": "{\"answer\": \"NVIDIA\", \"citations\": [\"nvda#142\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which chip designer could lose sales if governments limit what it can ship abroad?": "APPROVE\n\nThe answer is well-supported by the passages, which highlight NVIDIA's vulnerability to export controls.",
+  "Write the answer.\nQuestion: Who depends on people renting out their spare rooms?": "{\"answer\": \"Homeowners and neighborhood associations\", \"citations\": [\"abnb#107\"], \"confidence\": 0.95, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who depends on people renting out their spare rooms?": "Fix: The draft answer is incorrect. According to the passage [abnb#107], it is private groups, such as homeowners and neighborhood associations, rather than the mentioned homeowners and neighborhood associations, who may adopt contracts or regulations that restrict short-term rentals. Therefore, the correct answer should be \"Guests who use the service\" or a similar phrasing that aligns with the passage.",
+  "Write the answer.\nQuestion: Which shoe brand worries about the celebrities it sponsors?": "{\"answer\": \"NIKE worries about the celebrities it sponsors.\", \"citations\": [\"nke#59\", \"nke#61\", \"nke#62\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which shoe brand worries about the celebrities it sponsors?": "Fix: The passage does not explicitly state that NIKE worries about the celebrities it sponsors. It discusses risks related to sponsorships and endorsements but does not attribute worry directly to NIKE.",
+  "Write the answer.\nQuestion: Who worries about attacks from foreign governments on its online services?": "{\"answer\": \"foreign governments\", \"citations\": [\"msft#45\", \"msft#36\", \"nvda#56\", \"nvda#55\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who worries about attacks from foreign governments on its online services?": "Fix: The draft answer should specify Microsoft as it is the subject of the question and the appropriate entity based on the context of the citations.\n\nAPPROVE",
+  "Write the answer.\nQuestion: Which phone maker depends on factories it does not own in Asia?": "{\"answer\": \"Apple\", \"citations\": [\"aapl#2\", \"aapl#7\", \"aapl#26\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which phone maker depends on factories it does not own in Asia?": "APPROVE\n\nThe draft answer \"Apple\" is supported by the passages, particularly [aapl#26], which states that Apple relies on partners primarily located in Asia for the final assembly of its hardware products.",
+  "Write the answer.\nQuestion: Who is exposed to taxes on sweet drinks?": "{\"answer\": \"Consumers are exposed to taxes on sweet drinks.\", \"citations\": [\"ko#82\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Who is exposed to taxes on sweet drinks?": "FIX: The draft answer should specifically mention that consumers are exposed to taxes on sweet drinks based on the evidence from passage [ko#82], which directly states that taxes on sweetened beverages are levied directly on consumers.",
+  "Write the answer.\nQuestion: Which online marketplace also lends money to its sellers?": "{\"answer\": \"Mercado Libre (Mercado Pago) also lends money to its sellers.\", \"citations\": [\"meli#117\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which online marketplace also lends money to its sellers?": "Fix: The passage meli#117 does not directly state that Mercado Libre lends money to its sellers. The answer should be revised to show the correct connection.",
+  "Write the answer.\nQuestion: What does MercadoLibre's latest annual report say about Argentina's currency?": "{\"answer\": \"MercadoLibre's latest annual report mentions that Argentina's official exchange rate against the U.S. dollar increased by 41.0%, 27.7%, and 356.3% for the years ended December 31, 2025, 2024, and 2023, respectively. However, the report does not elaborate further on the specifics of Argentina's currency or its impact on the company's operations.\", \"citations\": [\"meli#213\"], \"confidence\": 0.80, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: What does MercadoLibre's latest annual report say about Argentina's currency?": "CONCRETE FIX: The draft should correct the years in the exchange rate figures to match the correct years as provided in the citation. Specifically, the exchange rates for 2023, 2024, and 2025 should be 356.3%, 27.7%, and 41.0%, respectively.",
+  "Write the answer.\nQuestion: Which of these companies is exposed to taxes on sweet drinks, and how?": "{\"answer\": \"Companies operating in the beverage industry, especially those that produce sweetened beverages, are exposed to taxes on sweet drinks.\", \"citations\": [\"ko#82\", \"ko#40\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: Which of these companies is exposed to taxes on sweet drinks, and how?": "APPROVE\n\nThe draft answer is supported by the passages, specifically ko#82 and ko#40, which mention taxes on sweetened beverages.",
+  "Write the answer.\nQuestion: What is Nike's refund policy for online orders?": "{\"answer\": \"I do not know\", \"citations\": [], \"confidence\": 0.0, \"needs_human_review\": true}",
+  "Review the draft answer.\nQuestion: What is Nike's refund policy for online orders?": "Concrete fix: The draft answer does not provide information about Nike's refund policy for online orders. There are no passages about refund policies, so a relevant citation cannot be provided. Add information from Nike's official refund policy or recent financial reports.",
+  "Write the answer.\nQuestion: xylophone recital giraffe": "{\"answer\": \"I do not know\", \"citations\": [], \"confidence\": 0.0, \"needs_human_review\": true}",
+  "Review the draft answer.\nQuestion: xylophone recital giraffe": "Fix: The answer is not supported by the given passages and should be: I do not know.",
+  "Write the answer.\nQuestion: who won the 1998 world cup final": "{\"answer\": \"France\", \"citations\": [\"ko#72\"], \"confidence\": 1.0, \"needs_human_review\": false}",
+  "Review the draft answer.\nQuestion: who won the 1998 world cup final": "Fix: The answer should refer to the 1998 World Cup final and not discuss OECD projects."
+ }
+}

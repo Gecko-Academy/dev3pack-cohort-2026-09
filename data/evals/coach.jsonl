@@ -20,6 +20,6 @@
 {"question": "when does week 3 start", "expected_doc_ids": ["unit0/week3"]}
 {"question": "what happens on demo day", "expected_doc_ids": ["unit0/week3"]}
 {"question": "how is the course marked", "expected_doc_ids": ["unit0/introduction", "unit0/how-to-submit"]}
-{"question": "what is AGENTS.md for", "expected_doc_ids": ["unit1/session-01-assistant-configuration/concepts-1", "unit0/runtime-lanes"]}
+{"question": "what is AGENTS.md for", "expected_doc_ids": ["unit1/session-01-assistant-configuration/concepts-1", "unit0/runtime-lanes", "tracks/coding-assistant/introduction"]}
 {"question": "what is a model adapter", "expected_doc_ids": ["unit1/session-02-model-adapter/introduction", "unit1/session-02-model-adapter/concepts-1"]}
 {"question": "what are structured outputs", "expected_doc_ids": ["unit1/session-03-structured-outputs/introduction", "unit1/session-03-structured-outputs/concepts-1"]}

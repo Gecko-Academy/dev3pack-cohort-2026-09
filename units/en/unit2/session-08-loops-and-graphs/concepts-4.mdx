@@ -1,0 +1,91 @@
+# Loop engineering and graph engineering [[loop-or-graph-engineering]]
+
+Both words describe work you do after the thing already runs. They are not two
+frameworks, and picking LangGraph does not put you in one of them. They are two
+different questions about the same system.
+
+**Loop engineering** tunes one agent's cycle: decide, call a tool, read the
+result, go again. Your levers are the tool list, the stop conditions, the budget,
+what goes back into the context each turn, and what happens after a failed call.
+There is one actor, and you are making it terminate well.
+
+**Graph engineering** decides who exists and which moves are legal. Your levers
+are the roles, the state they share, the edges you declare between them, and the
+cap on any edge that points backwards. There are several actors, and you are
+making the route inspectable.
+
+![Loop engineering and graph engineering side by side: one agent looping against a tool with a counter that stops it, and four named roles passing one state along declared edges](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit2/session-08-loops-and-graphs/img/loop-vs-graph.png)
+
+## The two questions
+
+| | Loop engineering | Graph engineering |
+|---|---|---|
+| The question | when does this stop, and why | who acts next, and is that move legal |
+| The unit you tune | a turn | an edge |
+| What goes wrong | it never stops, or it stops holding nothing | a transition nobody drew, and it is reachable |
+| What you count | calls per run | calls per role |
+| The evidence it works | a stop reason on every run | a route on every run |
+| Where you met it | sessions 4 and 5 | today, and project 03 |
+
+## Which one your problem needs
+
+The honest default is a loop. It is one actor, one budget and one stop reason,
+and most work that looks like it needs a committee does not.
+
+| The work | Reach for | Why |
+|---|---|---|
+| One kind of question, one or two tools. A lookup that answers from a table. | a loop | A second role adds a model call and decides nothing. |
+| An unknown number of the same step. Keep searching until something clears the floor, or the budget runs out. | a loop | The steps are alike. What you need is a counter, not a committee. |
+| Latency or cost is the constraint. A user is waiting, or you run this a million times. | a loop | Every role is a call, and calls are the bill. |
+| Distinct skills in sequence. Find, then read, then write, then check. | a graph | Each role gets its own prompt, its own tools and its own failure policy. |
+| Different failure policies per stage. A retrieval miss should refuse; a parse failure should retry once. | a graph | In one loop these collapse into a single `except`. |
+| Somebody will ask what happened. Support, audit, a regulator, or you in three months. | a graph | The state carries the route, so the answer is read rather than reconstructed. |
+| A step waits for a person. An approval, a signature, a human review. | a graph | Waiting is a state. In a loop it is a blocked turn nobody can see. |
+| Two parts have nothing to say to each other and could run at once. | a graph | Independent edges are visible, so the parallelism is a fact rather than a hope. |
+
+## What it costs, measured
+
+[Project 03](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/03-analyst-team/notebook.ipynb)
+answers the same questions both ways, over the same index:
+
+| | Right company in the passages | Model calls, over 3 questions |
+|---|---|---|
+| One agent, one loop | 15 of 20 | 3 |
+| The team | 20 of 20 | 8 |
+
+Read the second row twice. The extra calls did not buy better prose. They bought
+a mistake that stopped happening: the router picks the company before anything is
+retrieved, and it spends no model call to do it. It routed 17 of the 20 questions
+and named no company for the other 3, which is an answer too, and it was wrong
+zero times.
+
+Then the project argues against itself. Give the single loop `k=8` instead of
+`k=4` and it reaches 17 of 20 for **one** model call per question. Most of the gap
+closes by retrieving more, not by hiring anybody. That is the number a team has to
+beat, and quoting the 15 without the 17 would be the comfortable version. If your
+graph cannot name what it bought against the cheapest fix, it is a loop wearing a
+diagram.
+
+## Three ways people get this wrong
+
+**Multi-agent as a goal.** Roles get added because the diagram looks more serious
+with five boxes. Every box is a call. The test is the comparison table, not the
+picture.
+
+**The critic nobody capped.** Writer and critic will argue until something stops
+them. An edge that points backwards needs a number on it, and the number belongs
+in the state where anyone can read it. Project 03 ships that failure on purpose,
+in step 5, before it ships the cap.
+
+**The fall-through.** A workflow written as `if`/`elif` has an implicit edge for
+every case nobody wrote. A table has no fall-through: a pair that is not in it is
+not an edge. That is the whole argument for writing the graph down, and it holds
+whether or not you install a framework.
+
+## The graph is yours, the framework is a runner
+
+Project 03 builds the same four roles twice, once with LangGraph and once in
+plain Python, and asserts the two produce the same state. That is deliberate. A
+framework gives you a place to declare edges, a way to draw them, and somebody
+else's bugs. What it does not give you is the graph. You still have to know which
+transitions exist, and be able to show that the others cannot happen.

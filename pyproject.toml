@@ -36,6 +36,11 @@ projects = [
   "scipy>=1.12",
   "matplotlib>=3.8",
 ]
+# Project 03's optional lane: the analyst team as a LangGraph graph. The same
+# team runs without it (`bootcamp_agent.projects.analyst_team` ships a plain
+# runner and falls back to it), so a framework nobody needs to learn to pass the
+# course never lands on a learner's default `uv sync`, and CI never installs it.
+agents = ["langgraph>=0.2"]
 
 [dependency-groups]
 dev = [

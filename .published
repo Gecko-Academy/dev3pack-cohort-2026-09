@@ -128,6 +128,13 @@ projects/02-sec-filings/data/sources.json
 projects/02-sec-filings/fetch.py
 projects/02-sec-filings/img/architecture.png
 projects/02-sec-filings/notebook.ipynb
+projects/03-analyst-team/AGENTS.md
+projects/03-analyst-team/README.md
+projects/03-analyst-team/data/LICENSE.md
+projects/03-analyst-team/data/recorded/README.md
+projects/03-analyst-team/data/recorded/record.py
+projects/03-analyst-team/data/recorded/recorded.json
+projects/03-analyst-team/notebook.ipynb
 projects/README.md
 projects/_template/AGENTS.md
 projects/_template/README.md
@@ -183,6 +190,7 @@ src/bootcamp_agent/ollama.py
 src/bootcamp_agent/patterns.py
 src/bootcamp_agent/preflight.py
 src/bootcamp_agent/projects/__init__.py
+src/bootcamp_agent/projects/analyst_team.py
 src/bootcamp_agent/projects/clothing_reviews.py
 src/bootcamp_agent/projects/sec_filings.py
 src/bootcamp_agent/questions_api.py
@@ -376,8 +384,14 @@ units/en/unit2/session-07-grounding-metrics/quiz.mdx
 units/en/unit2/session-08-loops-and-graphs/concepts-1.mdx
 units/en/unit2/session-08-loops-and-graphs/concepts-2.mdx
 units/en/unit2/session-08-loops-and-graphs/concepts-3.mdx
+units/en/unit2/session-08-loops-and-graphs/concepts-4.mdx
+units/en/unit2/session-08-loops-and-graphs/concepts-5.mdx
 units/en/unit2/session-08-loops-and-graphs/conclusion.mdx
+units/en/unit2/session-08-loops-and-graphs/follow-along.mdx
+units/en/unit2/session-08-loops-and-graphs/img/loop-vs-graph.png
 units/en/unit2/session-08-loops-and-graphs/img/model-rag-agent-team.png
+units/en/unit2/session-08-loops-and-graphs/img/rag-family.png
+units/en/unit2/session-08-loops-and-graphs/img/vector-indexes.png
 units/en/unit2/session-08-loops-and-graphs/introduction.mdx
 units/en/unit2/session-08-loops-and-graphs/langgraph_capstone.py
 units/en/unit2/session-08-loops-and-graphs/langgraph_subagents.py
