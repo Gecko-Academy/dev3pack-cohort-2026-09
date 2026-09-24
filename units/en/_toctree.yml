@@ -203,6 +203,8 @@
       title: "Error analysis: name the bucket, then aim the fix"
     - local: unit2/session-09-trace-and-evaluate/concepts-3
       title: "Redaction, and the missing span"
+    - local: unit2/session-09-trace-and-evaluate/follow-along
+      title: "Follow along: today's class"
     - local: unit2/session-09-trace-and-evaluate/quiz
       title: "Quick quiz (ungraded)"
     - local: unit2/session-09-trace-and-evaluate/conclusion

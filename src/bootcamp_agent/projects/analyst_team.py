@@ -480,7 +480,7 @@ def _as_state(value: Any) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
-@register("project-03-e1")
+@register("project-03-e3")
 def _receipt(team_state: Any) -> str | None:
     """The receipt: a named exit, the calls it took, and citations it can prove."""
     state = _as_state(team_state)
@@ -513,109 +513,105 @@ def _receipt(team_state: Any) -> str | None:
     return None
 
 
+@register("project-03-e1")
+def _tool(search: Any) -> str | None:
+    """Step 1's tool: ranked rows, holdable to one company, and nothing written."""
+    if not callable(search):
+        return "pass the search function from step 1: check_step('project-03-e1', search)"
+    item = questions()[0]
+    try:
+        rows = search(item["question"], None, 4)
+    except TypeError:
+        return (
+            "search must take (question, ticker, k) positionally: the researcher calls "
+            "it that way, and a keyword-only signature breaks the team"
+        )
+    if not isinstance(rows, Sequence) or isinstance(rows, str):
+        return "search must return a list of (score, chunk_id, text)"
+    for row in rows:
+        if not isinstance(row, (list, tuple)) or len(row) != 3:
+            return f"every row is (score, chunk_id, text); got {row!r}"
+        score, chunk_id, text = row
+        if not isinstance(score, (int, float)) or isinstance(score, bool):
+            return f"the score must be a number; got {score!r}"
+        if not isinstance(chunk_id, str) or not isinstance(text, str):
+            return "chunk_id and text are strings, and the id is retrieval's own"
+    if len(rows) > 4:
+        return f"k=4 asked for four passages and {len(rows)} came back"
+    held = search(item["question"], item["company"], 4)
+    strays = [chunk_id for _, chunk_id, _ in held if not chunk_id.startswith(f"{item['company']}#")]
+    if strays:
+        return f"held to {item['company']!r}, search still returned {strays}"
+    return None
+
+
+@register("project-03-e4")
+def _measurement(measurement: Any) -> str | None:
+    """The table: both methods, the company they found, and the calls they spent."""
+    if not isinstance(measurement, Sequence) or isinstance(measurement, str):
+        return "pass the measurement table: one row per method"
+    rows = {}
+    for row in measurement:
+        if not isinstance(row, dict) or not {
+            "method",
+            "right_company",
+            "total",
+            "model_calls",
+        } <= set(row):
+            return "every row needs 'method', 'right_company', 'total' and 'model_calls'"
+        rows[row["method"]] = row
+    missing = {"one loop", "the team"} - set(rows)
+    if missing:
+        return f"the table compares both methods; {sorted(missing)} is not in it"
+    for method, row in rows.items():
+        right, total, calls = row["right_company"], row["total"], row["model_calls"]
+        for name, value in (("right_company", right), ("total", total), ("model_calls", calls)):
+            if not isinstance(value, int) or isinstance(value, bool):
+                return f"{method!r}: {name}={value!r}; count it, do not describe it"
+        if not 0 <= right <= total:
+            return f"{method!r}: {right} right out of {total} is not a count"
+        if calls < 1:
+            return f"{method!r}: model_calls={calls}; a method that answers spends at least one"
+    # The numbers themselves are the student's to read. A check that demanded the
+    # team win would teach the answer instead of the measurement.
+    return None
+
+
 @register("project-03-e2")
 def _routing(routing: Any) -> str | None:
     """The deterministic router, on every labelled question, with its accuracy."""
     if not isinstance(routing, Sequence) or isinstance(routing, str) or not routing:
-        return "expected a list of rows: {'question', 'expected', 'routed', 'how'}"
+        return "expected a list of rows: {'question', 'actual', 'predicted', 'how'}"
     labelled = {item["question"]: item["company"] for item in questions()}
     tickers = set(companies())
     seen: dict[str, dict[str, Any]] = {}
     for row in routing:
-        if not isinstance(row, dict) or not {"question", "expected", "routed", "how"} <= set(row):
-            return "every row needs 'question', 'expected', 'routed' and 'how'"
+        if not isinstance(row, dict) or not {"question", "actual", "predicted", "how"} <= set(row):
+            return "every row needs 'question', 'actual', 'predicted' and 'how'"
         question = row["question"]
         if question not in labelled:
             return f"{question!r} is not one of the labelled questions"
-        if row["expected"] not in tickers:
-            return f"{question!r}: expected={row['expected']!r} is not one of {sorted(tickers)}"
-        if row["expected"] != labelled[question]:
+        if row["actual"] not in tickers:
+            return f"{question!r}: actual={row['actual']!r} is not one of {sorted(tickers)}"
+        if row["actual"] != labelled[question]:
             return (
                 f"{question!r}: the label says {labelled[question]!r}, "
-                f"the row says {row['expected']!r}"
+                f"the row says {row['actual']!r}"
             )
-        if row["routed"] is not None and row["routed"] not in tickers:
-            return f"{question!r}: routed={row['routed']!r} is neither None nor a real ticker"
+        if row["predicted"] is not None and row["predicted"] not in tickers:
+            return f"{question!r}: predicted={row['predicted']!r} is neither None nor a real ticker"
         if not isinstance(row["how"], str) or not row["how"].strip():
             return f"{question!r}: 'how' must say which rung decided it"
         seen[question] = row
     missing = sorted(set(labelled) - set(seen))
     if missing:
         return f"{len(missing)} labelled questions have no row, starting with {missing[0]!r}"
-    hits = sum(1 for row in seen.values() if row["routed"] == row["expected"])
-    wrong = sum(1 for row in seen.values() if row["routed"] not in (None, row["expected"]))
+    hits = sum(1 for row in seen.values() if row["predicted"] == row["actual"])
+    wrong = sum(1 for row in seen.values() if row["predicted"] not in (None, row["actual"]))
     print(
         f"   routing: {hits}/{len(seen)} right, {wrong} sent to the wrong company, "
         f"{len(seen) - hits - wrong} left to every filing"
     )
-    return None
-
-
-@register("project-03-e3")
-def _comparison(comparison: Any) -> str | None:
-    """The team against one loop, on the same questions: what the roles cost."""
-    if not isinstance(comparison, dict) or not {"team", "loop"} <= set(comparison):
-        return "expected {'team': {...}, 'loop': {...}} and a written 'difference'"
-    totals = []
-    for side in ("team", "loop"):
-        run = comparison[side]
-        if not isinstance(run, dict) or not {"llm_calls", "answered", "refused"} <= set(run):
-            return f"{side!r} needs 'llm_calls', 'answered' and 'refused'"
-        calls = run["llm_calls"]
-        if not isinstance(calls, int) or isinstance(calls, bool) or calls < 1:
-            return f"{side!r}: llm_calls={calls!r}; count the model calls you actually made"
-        counts = [run["answered"], run["refused"]]
-        if any(not isinstance(n, int) or isinstance(n, bool) or n < 0 for n in counts):
-            return f"{side!r}: 'answered' and 'refused' are counts of questions"
-        totals.append(sum(counts))
-    if totals[0] != totals[1]:
-        return (
-            f"the team answered or refused {totals[0]} questions and the loop {totals[1]}; "
-            "run both on the SAME questions or the call counts compare nothing"
-        )
-    if totals[0] < 1:
-        return "no questions were run"
-    written = [
-        comparison.get("difference"),
-        *(comparison[s].get("difference") for s in ("team", "loop")),
-    ]
-    difference = next((text for text in written if isinstance(text, str) and text.strip()), "")
-    if len(difference.strip()) < 40:
-        return (
-            "add 'difference': one or two sentences on what the extra calls bought, "
-            "at the top level or on either side. Say it in your own words"
-        )
-    return None
-
-
-@register("project-03-e4")
-def _revisions(revisions: Any) -> str | None:
-    """The critic's cap: one send-back, one rerun of the writer, then it stops."""
-    runs = [revisions] if isinstance(revisions, dict) else revisions
-    if not isinstance(runs, Sequence) or isinstance(runs, str) or not runs:
-        return "pass the finished states you ran: one TeamState, or a list of them"
-    revised = 0
-    for run in runs:
-        state = _as_state(run)
-        if state is None:
-            return "every item must be a finished TeamState"
-        count, cap = state.get("revisions"), state.get("max_revisions")
-        if not isinstance(count, int) or not isinstance(cap, int):
-            return "every run carries 'revisions' and 'max_revisions'"
-        if count > cap:
-            return f"{count} revisions under a cap of {cap}: the cap is not holding"
-        if state.get("stopped_because") not in STOP_REASONS:
-            return f"a run stopped_because={state.get('stopped_because')!r}, which is not a reason"
-        if count:
-            revised += 1
-            writes = sum(1 for call in state.get("calls", []) if call == "writer")
-            if writes < count + 1:
-                return (
-                    f"a run records {count} revision(s) but called the writer {writes} time(s); "
-                    "a revision the writer never reran is a revision in name only"
-                )
-    if not revised:
-        return "no run here was ever sent back. Show the critic asking for one revision"
     return None
 
 

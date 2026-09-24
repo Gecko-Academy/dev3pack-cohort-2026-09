@@ -97,6 +97,40 @@ Session 7 attacked this evaluator directly and found what its pass condition
 never checks. Keep that in view: a green report is evidence that the cases you
 wrote pass, and nothing more.
 
+## A number that is true by construction
+
+On 23 September 2026 we published a rerank comparison in our own repository and
+withdrew it the same day. Six cells. The headline was that a refusing reranker
+reached an out-of-scope pass rate of 1.00 and a recall identical to the arm
+underneath it. A reviewer refuted it in one pass by reading five lines:
+
+```python
+gold = self.gold_by_query.get(query, frozenset())
+hits = [name for name in candidates if name in gold]
+if not hits:
+    return []
+```
+
+A query absent from the gold map yields an empty gold set, so the function
+returns nothing. For any arm, any pool, any corpus. The 1.00 is that branch
+written out as a decimal. The recall is the next branch: it never drops a gold
+name, because it is written not to. Four of the six cells were arithmetic
+identities.
+
+A number that is true by construction is not a measurement. It restates how your
+code is written, it survives a model swap and a corpus swap, and it looks like
+evidence the whole time.
+
+Your own baseline has one in it. The plain fake scores 3/8, and all three passes
+are refusal cases, passed by a model that refuses everything unconditionally. A
+refusal rate of 1.00 from a model that cannot read is not a measurement of
+refusal. Read the whole report, not the total.
+
+The guard is a **negative control**: run the same harness against a corpus where
+the answers are wrong by construction. Anything that still scores well is
+describing your code, not your retrieval. Two lines in a notebook, and it is the
+cheapest thing in this session.
+
 ## Traces make failures cheap
 
 Without a trace, a red case is an investigation: reproduce it, add prints, guess.

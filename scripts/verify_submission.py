@@ -115,7 +115,9 @@ def check_evidence(directory: Path, claim: dict) -> Path:
     actual = submission.sha256_of(notebook)
     if expected != actual:
         raise VerifyError(
-            "the notebook is not the one this score was claimed for "
+            "the notebook changed after you submitted, so it no longer matches "
+            "the score claimed for it. Saving or re-running it is enough. Run "
+            "`bootcamp submit` again, and do not open the notebook afterwards "
             f"(claim says {str(expected)[:12]}…, the file is {actual[:12]}…)"
         )
     return notebook

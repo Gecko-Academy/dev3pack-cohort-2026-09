@@ -12,9 +12,10 @@ file travels alone — it is what the designer generates the deck from.
 Re-run it after re-rendering a figure; it is idempotent and reads nothing but
 `slides.mdx` and the PNGs beside it.
 
-Sessions 3, 4, 5 and 7 have standalone decks that interleave the generated spine,
-assembled by hand before this existed. This does not rebuild those: pass it a
-session directory, never a glob.
+Sessions 3 to 7 have standalone decks that interleave the generated spine,
+assembled by hand before this existed. Rebuilding one would throw those slides
+away, so `--refresh` only swaps the image payloads a deck already carries. Pass
+it a session directory, never a glob.
 """
 
 from __future__ import annotations
@@ -29,6 +30,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 END = "<!-- generated:end -->"
 IMAGE = re.compile(r"!\[([^\]]*)\]\((?!data:|https?:)([^)]+)\)")
+#: A payload already inlined, however it is wrapped — markdown or an <img> tag.
+PAYLOAD = re.compile(r"data:(image/[a-z+.-]+);base64,[A-Za-z0-9+/=]+")
 
 HEADER = """<!-- Presentation order, and the deck we stand up and present. These are the
 slides after `generated:end` in slides.mdx, in the order they are taught; the
@@ -59,6 +62,36 @@ def inline_images(text: str, base: Path) -> str:
     return IMAGE.sub(swap, text)
 
 
+def refresh(deck: str, slides: str, base: Path) -> str:
+    """Re-read the images a hand-assembled deck already carries, in order.
+
+    A deck assembled before `standalone` existed cannot be rebuilt from
+    slides.mdx without losing the slides somebody interleaved by hand. Its
+    payloads are the same figures slides.mdx names, in the same order, so a
+    re-render only has to swap the bytes. Disagreeing counts mean the deck and
+    the slides have drifted apart, and guessing which is right is how a deck
+    ends up showing last month's figure.
+    """
+    sources = [base / reference.strip() for _, reference in IMAGE.findall(slides)]
+    payloads = PAYLOAD.findall(deck)
+    if len(sources) != len(payloads):
+        raise DeckError(
+            f"{base.name}: slides.mdx names {len(sources)} images, "
+            f"the standalone deck carries {len(payloads)} — refresh cannot pair them"
+        )
+
+    remaining = iter(sources)
+
+    def swap(match: re.Match[str]) -> str:
+        source = next(remaining)
+        if not source.is_file():
+            raise DeckError(f"{source} is referenced by the deck and is not on disk")
+        payload = base64.b64encode(source.read_bytes()).decode("ascii")
+        return f"data:{match.group(1)};base64,{payload}"
+
+    return PAYLOAD.sub(swap, deck)
+
+
 def standalone(slides: Path) -> str:
     """The frontmatter, the title slide, the header note, then the presented slides."""
     text = slides.read_text()
@@ -86,6 +119,11 @@ def standalone(slides: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("session", type=Path, help="a docs/instructor/sessions/<session> directory")
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="swap the payloads of a hand-assembled deck instead of rebuilding it",
+    )
     args = parser.parse_args(argv)
 
     session = args.session if args.session.is_absolute() else Path.cwd() / args.session
@@ -93,7 +131,12 @@ def main(argv: list[str] | None = None) -> int:
     if not slides.is_file():
         raise DeckError(f"no slides.mdx in {session}")
     target = session / "slides-standalone.mdx"
-    target.write_text(standalone(slides))
+    if args.refresh:
+        if not target.is_file():
+            raise DeckError(f"no slides-standalone.mdx in {session} to refresh")
+        target.write_text(refresh(target.read_text(), slides.read_text(), session))
+    else:
+        target.write_text(standalone(slides))
     print(f"wrote {target.relative_to(ROOT)} ({target.stat().st_size // 1024} KB)")
     return 0
 

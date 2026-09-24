@@ -28,7 +28,17 @@ wants to update, and it says "your local changes would be overwritten". `git
 stash` puts your changes on a shelf and deletes nothing. To take one notebook
 back as you left it, see [when `git pull` stops](../../unit0/get-settled.mdx).
 
-Check that the pull worked: the folder `projects/03-analyst-team/` must exist.
+Check that the pull worked before you sync:
+
+```bash
+grep agents pyproject.toml     # one line back means today's update is here
+```
+
+**If `uv` says `Extra 'agents' is not defined`, your pull did not land.** The
+error names the extra, so it reads like a broken course. It is not: it is the
+old `pyproject.toml` still on your disk. Run `git pull` again and read what it
+says. The usual cause is the stash step above being skipped, so the pull stopped
+on a notebook you had typed into and you never saw the message.
 
 **Name both extras, or you lose ChromaDB.** `uv sync` makes the environment match
 exactly what you asked for. Ask for `agents` on its own and it uninstalls the

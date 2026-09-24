@@ -1,0 +1,251 @@
+# Follow along: today's class
+
+Keep this page open during the session. Every step says what to open and what to
+run, in the order we run it in class.
+
+| Part | What | Time |
+|---|---|---|
+| [0](#0-before-we-start) | Before we start: pull and sync | 5 min |
+| [1](#1-where-we-are-going) | Where we are going: the piece today hands you | 5 min |
+| [2](#2-a-table-we-published-and-withdrew) | A table we published yesterday, and withdrew | 15 min |
+| [3](#3-the-harness-live) | The harness, live: 3/8, one trace, one fix | 20 min |
+| [4](#4-your-exercise) | Your exercise: a bucket named from a trace, and a redactor | 35 min |
+| [5](#5-break-it-on-purpose) | Break it on purpose: the missing span, and the negative control | 10 min |
+| [6](#6-ranking-deciding-and-a-ceiling) | Ranking, deciding, and the ceiling you cannot pick past | 20 min |
+| [7](#7-connect-to-our-mcp) | Connect to our MCP, live | 5 min |
+| [8](#8-hand-it-in) | Hand it in | 5 min |
+
+## 0. Before we start
+
+From your course folder:
+
+```bash
+git stash push -m "my work before today's update"
+git pull
+uv sync --extra projects --extra agents
+uv run jupyter lab
+```
+
+**Why the stash first.** `git pull` stops when you have typed into a notebook it
+wants to update, and it says "your local changes would be overwritten". `git
+stash` puts your changes on a shelf and deletes nothing. To take one notebook
+back as you left it, see [when `git pull` stops](../../unit0/get-settled.mdx).
+
+Check that the pull worked before you sync:
+
+```bash
+wc -l data/evals/golden.jsonl     # 8 means today's golden set is on your disk
+```
+
+**If `uv` says `Extra 'agents' is not defined`, your pull did not land.** The
+error names the extra, so it reads like a broken course. It is not: it is the
+old `pyproject.toml` still on your disk. Run `git pull` again and read what it
+says. The usual cause is the stash step above being skipped, so the pull stopped
+on a notebook you had typed into and you never saw the message.
+
+**Name both extras, or you lose ChromaDB.** `uv sync` makes the environment match
+exactly what you asked for. Ask for `agents` on its own and it uninstalls the
+`projects` extra, ChromaDB goes with it, and project 02's index stops building.
+Name both, every time. Today's notebook needs neither: it runs offline, on
+fakes, on `re` and `hashlib`, in milliseconds.
+
+**A check that says it never ran means you did not save.** `bootcamp check` reads
+the file on disk, not the kernel in your browser. If a check prints that it has
+not been run yet and you are sure you ran it, you ran it and did not press save.
+
+**Ollama is optional today, and so is the second half of part 6.** Every cell in
+the session notebook runs offline on `FakeLLM`. The tool we run together in part
+6 replays a recorded run by default and prints `[recorded]` where it does. The
+live lane is a flag, not a prerequisite, the same way Ollama has been since
+session 4. See [runtime lanes](../../unit0/runtime-lanes.mdx).
+
+Open one file:
+
+- `units/en/unit2/session-09-trace-and-evaluate/notebook.ipynb`
+
+No project today. Project 04 comes after class, and it traces and evaluates the
+analyst team you built yesterday.
+
+**No setup on your laptop?** Open it in Colab. The first cell fetches the course
+for you.
+
+## 1. Where we are going
+
+Yesterday you counted calls. Today you measure whether the thing is any good,
+and you write down what it did while it was being measured.
+
+| You have | You can say | You cannot yet say |
+|---|---|---|
+| an answer | it seemed to work | on which of eight cases |
+| a pass rate | 3 of 8, rerunnable by anybody | which part broke |
+| a trace as well | retrieval returned it and the model ignored it | nothing; the fix has an address |
+
+Two capstone pieces come out of this session: a trace you are allowed to keep,
+and `run_evals` over your own corpus. The third thing you leave with is a habit,
+and it is the one the next hour is actually about.
+
+## 2. A table we published, and withdrew
+
+Yesterday, 23 September, our own repository shipped a rerank comparison. Six
+cells. It said a refusing reranker reached an out-of-scope pass rate of 1.00 and
+a recall equal to the arm underneath it. It looked like the answer to a question
+we had been arguing about for a week.
+
+A reviewer refuted it in one pass, and was right.
+
+| The cell | What we thought it measured | What it actually was |
+|---|---|---|
+| out-of-scope pass 1.00 | the reranker refuses well | the function returns an empty list for any query not in its gold map. Any arm, any pool, any corpus. |
+| recall equal to the arm | the reranker loses nothing | it never drops a gold name, because it is written not to |
+
+Four of the six cells were arithmetic identities. The reviewer confirmed the
+first one over 2000 random query and pool pairs, which is generous: you can
+confirm it by reading five lines of the function. We withdrew the table the same
+day.
+
+**The rule, and it is today's rule.** A number that is true by construction is
+not a measurement. It restates how your code is written. It will survive a model
+swap, a corpus swap and a bad week, and it will look like evidence the whole
+time.
+
+**The guard is a negative control.** Run the same harness against a corpus where
+the answers are wrong by construction. Anything that still scores well is
+describing your code, not your retrieval. We run one in part 5, and it is
+already sitting in your notebook.
+
+## 3. The harness, live
+
+Open the session notebook and run it from the top. Four beats.
+
+| Section | What happens |
+|---|---|
+| **1. The harness** | Eight cases in `data/evals/golden.jsonl`, one JSONL line each. **Five expect a grounded answer, three expect a refusal.** The pass condition is code: a refusal passes when the answer is flagged for review and cites nothing, and a grounded case passes when every expected document id is cited and nothing was flagged. |
+| **2. Baseline** | The plain `FakeLLM` scores **3/8**. Write the number down before you touch anything. It is the number you are allowed to be proud of beating. |
+| | Then look at *which* 3. It passes all three refusals and fails all five grounded cases. It passes the refusals because it refuses everything, unconditionally, every time. **That is yesterday's withdrawn table, at a scale you can hold.** A refusal rate of 1.00 from a model that cannot read is not a measurement of refusal. |
+| **3. The trace decides it** | The report alone fits two buckets equally well. `retrieval`, where the passage never arrived. `instruction_following`, where it arrived and was ignored. One trace ends the argument: the retrieve event returns `rag-basics` three times, the model is called, and the decision cites nothing. Retrieval returned the right document three times over. |
+| **4. One fix, rerun** | A fake seeded to read its context. **8/8.** One change per measurement, and then say out loud what that 8 proves: the harness responds to a real change. It does not prove the agent is good, because the fake was written to pass. |
+
+**The question for the room after section 4:** which of your own green numbers
+would still be green if the corpus were replaced with nonsense?
+
+## 4. Your exercise
+
+In the session notebook. **200 marks, two exercises, in notebook order:**
+
+| Challenge | What you write | Marks |
+|---|---|---|
+| `ch09-e1` | the failure bucket for the grounded cases, and the trace line that decided it | 100 |
+| `ch09-e2` | `redact(event) -> dict`: secrets replaced, every other byte identical | 100 |
+
+```bash
+uv run bootcamp check ch09
+```
+
+As shipped it prints:
+
+```
+running ch09 (Trace and evaluate an agent)…
+ch09: 0/2 passed
+❌ ch09-e1: name the bucket AND why, in one sentence
+❌ ch09-e2: the call event: the API key is still in detail; hint: match it and replace it — a trace with the API key in it is a copy of the secret, kept forever, in a file nobody guards
+```
+
+That is where you start.
+
+**The two that catch people:**
+
+- **`ch09-e1` rejects an answer that starts with `retrieval`.** Not because
+  retrieval is never the bucket, but because on this run the trace shows the
+  chunks it returned. Read the trace before you name the bucket, and name it in
+  the same sentence as the evidence.
+- **`ch09-e2` drives your function with an event that has no secrets in it.**
+  Some values in it look like secrets and are not. A redactor that blanks those
+  fails, for the same reason a parser that accepts anything is not a parser. It
+  also hands you values that are not strings at all. Skip what is not a string;
+  do not raise on it.
+
+## 5. Break it on purpose
+
+Three, and nothing raises in any of them.
+
+| Where | The failure |
+|---|---|
+| **Notebook, section 7** | The missing span. One `llm_call` event never reaches the log. Nothing errors. What is left reads as a run where retrieval answered on its own, and it reads as evidence, not as absence. |
+| **Notebook, section 6** | Replace your placeholder with an empty string and rerun the check. It names the rule you broke: a secret cut out with nothing in its place is indistinguishable from a field that never carried one. |
+| **Section 2, reread** | The negative control you already ran. Three of your baseline's eight passes came from a model that refuses everything. Say which number in your own work is that number. |
+
+**The question for the room:** how long would it have taken you to notice that
+the log was lying, if nobody had told you an event was missing?
+
+## 6. Ranking, deciding, and a ceiling
+
+Two tools, and one of them we said no to.
+
+| | What it returns | What you can do with it |
+|---|---|---|
+| A model | prose | parse it, and hope |
+| A ranker | an ordered list | take the first one. Cosine ranks, so the order means something and the score does not |
+| A decider | typed options with calibrated probabilities summing to 1 | compare a number against a threshold you fitted |
+
+**Jev is the third row, and we rejected it.** TypeSafe AI's classifier takes an
+option set you supply and returns typed options with probabilities that sum to
+1, instead of prose. It is good. It is also a stage-2 selector, and our measured
+loss is stage 1. A selector cannot pick an option retrieval never served. Our
+pooled paraphrase recall@8 is **0.22** over 27 tasks: txodds 0.60, pegana 0.25,
+birdeye 0.12, privy 0.00. Buying a perfect selector buys 0.22. We are not
+running Jev today, and there is no code for it in this repo, on purpose.
+
+**Laya is the same shape and it runs on your laptop**, so we run it together on
+screen. You do not need it installed to follow this part.
+
+Watch two things. The option set that goes in, and the probabilities that come
+out. We ask one question the corpus can answer and one it cannot, and the
+question for you is whether the second number drops far enough that you could
+set a threshold between them. That is the difference between a score that ranks
+and a score you can act on.
+
+## 7. Connect to our MCP
+
+Your own assistant, talking to our hosted server. All of it is the flow you
+already know, with one thing you never touch:
+
+```bash
+gecko login                       # your email, then a one-time code
+gecko connect bootcamp --probe    # connect, list tools, print the result, exit
+```
+
+`login` mints a key on our server and seals it in your OS keychain. It is never
+printed and you never paste it. Your MCP client config holds a command, not a
+credential:
+
+```json
+{"mcpServers": {"gecko-bootcamp": {"command": "gecko", "args": ["connect", "bootcamp"]}}}
+```
+
+`--probe` exists because plain `connect` is a server waiting for a client, so run
+by hand it looks stuck.
+
+**Today I drive it and you watch.** Self-service keys land disabled by design,
+and there is no rate limiter on that surface yet, so a whole cohort hitting it at
+once is a thing I would rather do on purpose than by accident. I enable your
+accounts after class, and the same two commands work from your machine tonight.
+
+## 8. Hand it in
+
+When the check is green:
+
+```bash
+uv run bootcamp submit ch09 --github <your-github-name> --push
+```
+
+**Save the notebook first.** `submit` reads the file on disk.
+
+It goes to **dev3pack-submissions**, never to the course repository. No `gh` on
+your machine? The command prints the browser route. Type the path exactly as it
+shows: `submissions/<your-github-name>/ch09/`, **with no spaces**.
+
+## Tomorrow
+
+Session 10 turns today's habit on a prompt: a skill another assistant can load,
+an architecture decision record, and the before and after measured with the
+harness you just ran.
