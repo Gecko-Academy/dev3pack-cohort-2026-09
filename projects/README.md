@@ -10,6 +10,7 @@ Optional and never counted. Each task has a check so you know when you are done.
 | [01 — What are customers really saying?](01-clothing-reviews/notebook.ipynb) | Embeddings of 958 real clothing reviews, a 2-D map, topics, and "find reviews like this one" with ChromaDB |
 | [02 — What are these companies worried about?](02-sec-filings/notebook.ipynb) | A RAG pipeline on the risk sections of eight real annual reports: clean the HTML, chunk without losing a word, embed into ChromaDB, answer with the paragraph it came from, and measure keyword search against embeddings on 20 labelled questions |
 | [03 — Did the extra agents earn their calls?](03-analyst-team/notebook.ipynb) | A coordinator, a researcher with read-only tools, a writer and a critic over project 02's filings index: the same team written as a LangGraph state graph and as plain Python, with routing measured on its own and the team's model calls counted against a single loop's |
+| [04 — What went wrong on that one?](04-trace-the-team/notebook.ipynb) | The team from project 03, wrapped rather than edited, so one run records what it did in what order. Then the 20 labelled questions graded against a pass condition written down before the run, and every failure read against its own trace and put in one of five buckets, because the bucket is the thing you fix |
 
 ## Reference tutorials
 

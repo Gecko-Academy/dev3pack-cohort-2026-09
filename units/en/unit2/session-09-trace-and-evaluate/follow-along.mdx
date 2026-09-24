@@ -210,9 +210,15 @@ Your own assistant, talking to our hosted server. All of it is the flow you
 already know, with one thing you never touch:
 
 ```bash
+uv tool install "gecko-surf[serve]"
 gecko login                       # your email, then a one-time code
 gecko connect bootcamp --probe    # connect, list tools, print the result, exit
 ```
+
+**Name the `[serve]` extra or nothing connects.** The transport `connect` needs
+ships with that extra and not with the bare package, so a plain install gets you
+a `ModuleNotFoundError` from `anyio` the moment you probe. The quotes matter in
+zsh, which treats the brackets as a glob.
 
 `login` mints a key on our server and seals it in your OS keychain. It is never
 printed and you never paste it. Your MCP client config holds a command, not a

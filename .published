@@ -147,6 +147,10 @@ projects/03-analyst-team/data/recorded/README.md
 projects/03-analyst-team/data/recorded/record.py
 projects/03-analyst-team/data/recorded/recorded.json
 projects/03-analyst-team/notebook.ipynb
+projects/04-trace-the-team/AGENTS.md
+projects/04-trace-the-team/README.md
+projects/04-trace-the-team/data/LICENSE.md
+projects/04-trace-the-team/notebook.ipynb
 projects/README.md
 projects/_template/AGENTS.md
 projects/_template/README.md
@@ -222,6 +226,7 @@ src/bootcamp_agent/projects/__init__.py
 src/bootcamp_agent/projects/analyst_team.py
 src/bootcamp_agent/projects/clothing_reviews.py
 src/bootcamp_agent/projects/sec_filings.py
+src/bootcamp_agent/projects/trace_and_grade.py
 src/bootcamp_agent/questions_api.py
 src/bootcamp_agent/read.py
 src/bootcamp_agent/retrieval.py

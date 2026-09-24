@@ -28,9 +28,26 @@ from bootcamp_agent.schema import (
 REFUSAL_TEXT = "I don't know based on the provided corpus."
 
 
+#: The kinds a trace event may carry. Declared once because session 9 teaches them,
+#: project 04 grades against them, and a fifth invented in one place and not the
+#: other is how a trace stops being comparable between two runs.
+TRACE_KINDS = ("retrieve", "tool_call", "llm_call", "decision")
+
+#: The five failure buckets from session 9. Every failure goes in exactly one, and
+#: the bucket is the work item. Here rather than in prose so a checker and a page
+#: cannot drift apart on the spelling.
+FAILURE_BUCKETS = (
+    "retrieval",
+    "tool_selection",
+    "instruction_following",
+    "formatting",
+    "unsupported_claim",
+)
+
+
 @dataclass(frozen=True)
 class TraceEvent:
-    kind: str  # "retrieve" | "tool_call" | "llm_call" | "decision"
+    kind: str  # one of TRACE_KINDS
     detail: str
 
 
