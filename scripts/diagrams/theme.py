@@ -29,6 +29,7 @@ DECK_05 = "docs/instructor/sessions/session-05-deterministic-mini-agent/img"
 DECK_06 = "docs/instructor/sessions/session-06-retrieval-baseline/img"
 DECK_07 = "docs/instructor/sessions/session-07-grounding-metrics/img"
 DECK_09 = "docs/instructor/sessions/session-09-trace-and-evaluate/img"
+DECK_10 = "docs/instructor/sessions/session-10-skills-and-adr/img"
 
 
 @dataclass(frozen=True)

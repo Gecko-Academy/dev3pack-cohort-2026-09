@@ -1,0 +1,205 @@
+# Follow along: today's class
+
+Keep this page open during the session. Every step says what to open and what to
+run, in the order we run it in class.
+
+| Part | What | Time |
+|---|---|---|
+| [0](#0-before-we-start) | Before we start: pull and sync | 5 min |
+| [1](#1-where-we-are-going) | Where we are going: what week 2 ends with | 5 min |
+| [2](#2-a-skill-and-how-to-tell-it-did-anything) | A skill, and how to tell it did anything | 30 min |
+| [3](#3-your-exercise) | Your exercise: a skill that changed something, and a decision with a trigger | 35 min |
+| [4](#4-the-reversal-test) | The reversal test: a decision, or a preference | 20 min |
+| [5](#5-weekly-challenge-2-and-the-capstone-project) | Weekly challenge 2, and the capstone project | 15 min |
+| [6](#6-hackathons) | Hackathons, and two to put in your calendar | 5 min |
+| [7](#7-hand-it-in) | Hand it in | 5 min |
+
+## 0. Before we start
+
+From your course folder:
+
+```bash
+git stash push -m "my work before today's update"
+git pull
+uv sync --extra projects --extra agents
+uv run jupyter lab
+```
+
+**Why the stash first.** `git pull` stops when you have typed into a notebook it
+wants to update, and it says "your local changes would be overwritten". `git
+stash` puts your changes on a shelf and deletes nothing. To take one notebook
+back as you left it, see [when `git pull` stops](../../unit0/get-settled.mdx).
+
+**Name both extras, or you lose ChromaDB.** `uv sync` makes the environment match
+exactly what you asked for. Ask for `agents` on its own and it uninstalls the
+`projects` extra, ChromaDB goes with it, and project 02's index stops building.
+
+**Today needs no model and no key.** Nothing in this session calls one.
+
+**The lab runs in your assistant, not in the notebook.** Claude Code, Cursor,
+whatever you use. The notebook is the logbook: it records what happened and runs
+the checks. Start your assistant in the course folder now, so it is warm.
+
+Open one file:
+
+- `units/en/unit2/session-10-skills-and-adr/notebook.ipynb`
+
+## 1. Where we are going
+
+Week 2 ends today. You leave with two artifacts and one habit.
+
+| You have | You can say | You cannot yet say |
+|---|---|---|
+| an instruction you keep retyping | it helps, I think | whether it changed anything |
+| a skill file | anybody can load it | same as above, until you measure |
+| both runs, saved | here is what it changed, in two excerpts | nothing; that is the claim |
+
+The habit is the reversal test, and it is the one that outlives the course: **a
+decision that does not name the measurement which would overturn it is an
+opinion.**
+
+## 2. A skill, and how to tell it did anything
+
+**Do this before anything else.** Pick one repeatable job you already do by hand
+in your assistant on this repository — a code review, generating tests. Run it
+now, with no skill loaded, and save the output.
+
+That run is the **before**, and you only get one chance at it. Write the skill
+first and you have nothing to compare.
+
+| Beat | What happens |
+|---|---|
+| **The five sections** | written live from `builder-kit/plugin/skills/corpus-answers/SKILL.md`: when to use (and when not to), workflow with a stop condition, output format, failure rules, safety boundary |
+| **The `description` line** | the one the model reads to decide whether this file is relevant at all. Write it for that decision, not as a summary |
+| **What a skill is not** | not code, not a permission, not always loaded. The safety line is a wish; the permission that stops a write lives in the tool |
+| **The same task twice** | your saved "before", then the same task with the skill loaded. Two concrete differences, and the one instruction you had to fix |
+
+**The question for the room:** if your two excerpts came back identical, what
+exactly did you write?
+
+## 3. Your exercise
+
+In the session notebook. **200 marks, two exercises, in notebook order:**
+
+| Challenge | What you write | Marks |
+|---|---|---|
+| `ch10-e1` | your second skill, two excerpts that differ, and the one instruction you fixed | 100 |
+| `ch10-e2` | one architecture decision: four fields, last one a trigger | 100 |
+
+```bash
+uv run bootcamp check ch10
+```
+
+As shipped it prints:
+
+```
+ch10: 0/2 passed
+   ch10-e1: not checked yet; run its check cell
+   ch10-e2: not checked yet; run its check cell
+```
+
+**The two that catch people:**
+
+- **`ch10-e1` refuses two identical excerpts.** Not because your skill is bad,
+  but because a file that changed nothing is decoration however well it reads.
+  If they come back the same, that is a result: say which instruction was too
+  vague to follow.
+- **`ch10-e2` refuses a description.** "The capstone loop is hand-written"
+  describes the code. "We keep the hand-written loop and leave the graph
+  framework out" records that a person decided, which means a person can
+  undecide.
+
+## 4. The reversal test
+
+A decision that cannot be reversed by evidence is a preference with citations.
+
+The rule the check enforces is small and hard to argue with: **a number and a
+unit.**
+
+| Not a trigger | A trigger |
+|---|---|
+| when it gets slow | p95 for one answer stays over 2000 ms for 15 minutes |
+| if quality drops | the golden set falls below 0.8 pass rate on two consecutive runs |
+| when we have more users | the corpus passes 500 documents |
+
+**Break it on purpose:** write `reverses_it` as "when it becomes a problem" and
+run the check. Read what it says. Then ask yourself how many decisions you have
+read this year that were written exactly that way.
+
+## 5. Weekly challenge 2, and the capstone project
+
+**Given today. Due Monday. Out of 500, and 100 is a pass.** It adds to your
+session 10 score on top of the two exercises, so it moves you up the leaderboard.
+Offline: no key, no wallet, no network.
+
+Two parts, and the full brief is in
+[the weekly challenge page](./weekly-challenge.mdx):
+
+| Part | What |
+|---|---|
+| **Your store** | a `let_me_buy` store the deployed program would accept: your handle in the name, at least three products, whole numbers in the smallest unit, decimals matching the mint |
+| **A buyer** | an agent that shops under a budget and says **no**, clearly, when it cannot pay |
+
+**This is step 1 of your capstone project.** On Monday your store goes onto the
+shared course fork, next to everybody else's.
+
+### Your own repository, from Monday
+
+Next week you get a repository that starts as ours and becomes **yours**: your
+commits, your name on it, yours to show anybody. One project lands in it per day
+of week 3. Nothing in it is marked, which is the point — the graded capstone is
+assessed separately, and this is the one you get to be proud of.
+
+```bash
+git clone https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project.git my-capstone
+cd my-capstone
+git remote rename origin upstream        # ours: where the daily projects come from
+gh repo create my-capstone --private --source=. --remote=origin --push   # yours
+```
+
+Then each day: `git pull upstream main`.
+
+**It is not a fork, on purpose.** A fork stays labelled "forked from
+Gecko-Academy" and its stars and issues point back at ours. Yours is a repository
+in its own right that happens to have started from ours.
+
+You do not need to run this today. It is here so you can read it before Monday.
+
+## 6. Hackathons
+
+A hackathon is a deadline with other people watching. That is the whole
+mechanism, and it is why it works when a side project does not.
+
+You already have the two things that stop most people entering: something that
+runs, and the ability to explain why it refuses.
+
+- **Apply to The/Garage** — <https://luma.com/the-garage2>
+- **Register for the hackathon** — <https://hackathon.superteam.com.br>
+
+Superteam Brasil runs the second. Entering is free, the judging is public, and
+the work you are doing this week is the work you would submit.
+
+**What actually gets you through one:** ship something small that works rather
+than something big that nearly does; demo the failure, because a judge has seen
+forty happy paths today and yours is the one that refuses on purpose; write the
+README before the last hour; and go with somebody, because teams finish and
+individuals drift.
+
+## 7. Hand it in
+
+When the check is green:
+
+```bash
+uv run bootcamp submit ch10 --github <your-github-name> --push
+```
+
+**Save the notebook first.** `submit` reads the file on disk.
+
+The weekly challenge has its own deadline: **Monday**. It is handed in the same
+way, and [how to submit](../../unit0/how-to-submit.mdx) has the browser route if
+`gh` is not on your machine.
+
+## Monday
+
+Session 11, state and memory. Week 3 starts, your repository arrives, and the
+first daily project lands in it.

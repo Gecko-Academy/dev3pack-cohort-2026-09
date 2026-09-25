@@ -219,6 +219,8 @@
       title: "The same task twice: your code, or a framework"
     - local: unit2/session-10-skills-and-adr/concepts-3
       title: "The decision record, and the reversal test"
+    - local: unit2/session-10-skills-and-adr/follow-along
+      title: "Follow along: today's class"
     - local: unit2/session-10-skills-and-adr/weekly-challenge
       title: "Weekly challenge 2: your store, and a buyer that refuses well"
     - local: unit2/session-10-skills-and-adr/quiz

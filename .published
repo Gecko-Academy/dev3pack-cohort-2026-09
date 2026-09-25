@@ -181,6 +181,7 @@ scripts/diagrams/session_06.py
 scripts/diagrams/session_07.py
 scripts/diagrams/session_08.py
 scripts/diagrams/session_09.py
+scripts/diagrams/session_10.py
 scripts/diagrams/slide.py
 scripts/diagrams/terminal.py
 scripts/diagrams/theme.py
@@ -443,6 +444,7 @@ units/en/unit2/session-10-skills-and-adr/concepts-1.mdx
 units/en/unit2/session-10-skills-and-adr/concepts-2.mdx
 units/en/unit2/session-10-skills-and-adr/concepts-3.mdx
 units/en/unit2/session-10-skills-and-adr/conclusion.mdx
+units/en/unit2/session-10-skills-and-adr/follow-along.mdx
 units/en/unit2/session-10-skills-and-adr/introduction.mdx
 units/en/unit2/session-10-skills-and-adr/notebook.ipynb
 units/en/unit2/session-10-skills-and-adr/quiz.mdx

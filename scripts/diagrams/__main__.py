@@ -20,6 +20,7 @@ from diagrams import (  # noqa: E402
     SESSION_06,
     SESSION_07,
     SESSION_09,
+    SESSION_10,
     capstone,
     loop_vs_graph,
     model_rag_agent_team,
@@ -37,12 +38,13 @@ def main() -> None:
     for both in (loop_vs_graph, rag_family, vector_indexes):
         both()
         both(DARK)
-    for dark_only in SESSION_04 + SESSION_05 + SESSION_06 + SESSION_07 + SESSION_09:
+    for dark_only in SESSION_04 + SESSION_05 + SESSION_06 + SESSION_07 + SESSION_09 + SESSION_10:
         dark_only(DARK)
     # one road per session day: the badge moves, the geometry does not
     road(7)
     road(8)
     road(9)
+    road(10)
 
 
 if __name__ == "__main__":
