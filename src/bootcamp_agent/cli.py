@@ -403,8 +403,8 @@ def _no_evidence(item: object) -> str:
 def _manual_route(github: str, item_id: str, where: Path) -> str:
     """How to hand in without `gh`. The text lives beside `push`, in `handin`.
 
-    The file list is read off the bundle, so a carried `challenge.ipynb` is named
-    in the upload steps exactly like the notebook is.
+    The file list is read off the bundle, so a carried `challenge.ipynb` or
+    `store.json` is named in the upload steps exactly like the notebook is.
     """
     from bootcamp_agent.handin import manual_route
 
@@ -469,17 +469,26 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None, push: b
 
     carried = carry(item.id, ROOT, item.notebook)
     challenge = carried.carried.raw if carried.carried else None
+    # ch10 only: the student's store, for the course fork. Missing is a warning.
+    from bootcamp_agent.weekly.carry_store import carry_store
+
+    stored = carry_store(item.id, ROOT, item.notebook)
 
     try:
-        payload = submission.build(item, card, item.notebook, github, cohort, challenge=challenge)
+        payload = submission.build(
+            item, card, item.notebook, github, cohort, challenge=challenge, store=stored.raw
+        )
     except submission.SubmissionError as error:
         print(str(error))
         return 2
 
     root = Path(into) if into else Path.cwd() / "submissions"
-    where = submission.write(payload, item.notebook, root / github / item.id, challenge=challenge)
-    if carried.message:
-        print(carried.message)
+    where = submission.write(
+        payload, item.notebook, root / github / item.id, challenge=challenge, store=stored.raw
+    )
+    for message in (carried.message, stored.message):
+        if message:
+            print(message)
 
     result = payload["result"]
     if item.scored:

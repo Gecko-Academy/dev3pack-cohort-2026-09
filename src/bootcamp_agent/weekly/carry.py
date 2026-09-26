@@ -158,7 +158,21 @@ def carry(item_id: str, root: Path, session: Path | None = None) -> Outcome:
                     f'bonus("{challenge.bonus_id}", ...) cell, save it, then submit again.'
                 )
             )
-        return Outcome()
+        # This used to return an empty Outcome: a silent 0 for up to 500 points.
+        # Measured: a student did the challenge in the final-project repository,
+        # saved this demo with no line in it, and `submit` said nothing at all.
+        # So name the file that was read, and say that no other folder is.
+        if _session_has_line(session, week):
+            return Outcome()
+        return Outcome(
+            message=(
+                f"no week {week} challenge points found: {relative} has no saved "
+                f"`week {week} challenge: N/500` line. Only this demo and your session "
+                "notebook are read. Challenge work done in another folder is not read. "
+                f'Do the challenge in one of the two, run its bonus("{challenge.bonus_id}", '
+                "...) cell, save, then submit again."
+            )
+        )
 
     if code_digest(notebook) in SHIPPED_CODE.get(item_id, frozenset()):
         if _session_has_line(session, week):

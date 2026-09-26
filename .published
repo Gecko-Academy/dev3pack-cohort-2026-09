@@ -260,6 +260,7 @@ src/bootcamp_agent/week0_checks/software_engineering.py
 src/bootcamp_agent/week0_checks/software_engineering_classes.py
 src/bootcamp_agent/weekly/__init__.py
 src/bootcamp_agent/weekly/carry.py
+src/bootcamp_agent/weekly/carry_store.py
 src/bootcamp_agent/weekly/week1_bot.py
 src/bootcamp_agent/weekly/week2_store.py
 units/en/_toctree.yml

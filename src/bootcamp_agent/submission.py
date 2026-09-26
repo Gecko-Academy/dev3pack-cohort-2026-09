@@ -65,6 +65,8 @@ SUBMISSION_FILE = "submission.json"
 NOTEBOOK_FILE = "notebook.ipynb"
 #: The third file, only in a ch05/ch10 bundle that carries its challenge demo.
 CHALLENGE_FILE = "challenge.ipynb"
+#: The fourth, only in a ch10 bundle: the student's store, for the course fork.
+STORE_FILE = "store.json"
 
 
 @dataclass(frozen=True)
@@ -269,6 +271,7 @@ def build(
     help: Help | None = None,
     now: datetime | None = None,
     challenge: bytes | None = None,
+    store: bytes | None = None,
 ) -> dict:
     """The submission payload for one chapter or week-0 unit.
 
@@ -279,6 +282,10 @@ def build(
     `challenge` is the raw weekly-challenge demo carried beside the notebook
     (`weekly.carry`), recorded exactly as the notebook is so the checker can bind
     it to this claim. None means the bundle has no third file.
+
+    `store` is the student's `store.json` (`weekly.carry_store`), recorded the
+    same way for the same reason: the store the instructor seeds is the one this
+    claim was made with.
     """
     if isinstance(item, Chapter):  # callers that still hand us a Chapter
         item = resolve(item.chapter_id)
@@ -289,6 +296,14 @@ def build(
 
     taken = help_taken(item.id) if help is None else help
     stamp = (now or datetime.now(UTC)).replace(microsecond=0)
+
+    evidence = {"notebook": NOTEBOOK_FILE, "notebook_sha256": sha256_of(notebook)}
+    # ONLY when the file is attached: the checker fails a claim that names a
+    # digest with no file beside it.
+    if challenge is not None:
+        evidence["challenge_sha256"] = sha256_bytes(challenge)
+    if store is not None:
+        evidence["store_sha256"] = sha256_bytes(store)
 
     payload = {
         "schema": SCHEMA,
@@ -311,19 +326,21 @@ def build(
             "python": platform.python_version(),
             "platform": platform.system().lower(),
         },
-        "evidence": {"notebook": NOTEBOOK_FILE, "notebook_sha256": sha256_of(notebook)},
+        "evidence": evidence,
         "verified": None,
     }
-    # ONLY when the file is attached: the checker fails a claim that names a
-    # challenge digest with no `challenge.ipynb` beside it.
-    if challenge is not None:
-        payload["evidence"]["challenge_sha256"] = sha256_bytes(challenge)
     # Last, because it is taken over everything above it.
     payload["submission_id"] = submission_id_for(payload)
     return payload
 
 
-def write(payload: dict, notebook: Path, into: Path, challenge: bytes | None = None) -> Path:
+def write(
+    payload: dict,
+    notebook: Path,
+    into: Path,
+    challenge: bytes | None = None,
+    store: bytes | None = None,
+) -> Path:
     """Write the bundle a learner commits: the claim and the evidence beside it.
 
     STAGED, THEN SWAPPED. A submission is a claim and the exact notebook it is
@@ -360,6 +377,8 @@ def write(payload: dict, notebook: Path, into: Path, challenge: bytes | None = N
         (stage / NOTEBOOK_FILE).write_bytes(notebook.read_bytes())
         if challenge is not None:
             (stage / CHALLENGE_FILE).write_bytes(challenge)
+        if store is not None:
+            (stage / STORE_FILE).write_bytes(store)
         if into.exists():
             if backup.exists():
                 shutil.rmtree(backup)
