@@ -1,0 +1,96 @@
+# Deploying a bounded agent [[deploying]]
+
+## Deployment is a boundary, not a platform
+
+A deployment is your code running in a process you are not sitting in front of,
+reachable across a boundary somebody else can call. Everything people mean by
+"deployed" — a container, a function, a platform with a dashboard — is a way of
+holding that process up. The boundary is the part that changes your code.
+
+You already have the boundary. It is the contract from session 3 and the
+refusal from session 6, with a route drawn around them:
+
+```python
+def local_service(path, body=None):
+    if path == "/health":
+        return {"status": 200, "body": {"ok": True}, "elapsed_ms": 0}
+    if not (isinstance(body, dict) and isinstance(body.get("question"), str)):
+        return {"status": 400, "body": {"error": "'question' must be a non-empty string"}}
+    ...
+```
+
+Two routes. One says the process is alive. One answers, or refuses, and the
+refusal is a status a caller can branch on. That is a deployable thing. Where it
+runs is a later decision, and a smaller one than it sounds.
+
+## The smallest honest version
+
+Ship the smallest thing that puts a boundary between you and the code, then move
+up only when something forces you to.
+
+| Step | What it is | What it proves | What it still hides |
+|---|---|---|---|
+| In-process | `local_service` in the notebook | the contract holds under a request shape | everything about the process starting |
+| A port on your machine | one process, `uv run python serve.py` | serialisation, status codes, a client that is not you | your machine is not the deployment target |
+| One container | the same process with its dependencies pinned | "works on mine" stops being an argument | limits, cold starts, the platform's own errors |
+| A platform | someone else holds the process up | it survives you closing the laptop | nothing — this is where the four failures live |
+
+This session requires the first two. Every failure it teaches is visible there,
+because a cold start, a memory ceiling, a malformed caller and a bad release are
+properties of the boundary, not of any vendor.
+
+## What changes when the code leaves the notebook
+
+| In the notebook | Behind a boundary |
+|---|---|
+| the first call is like every other call | the first call pays for the process starting |
+| memory is whatever your laptop has | there is a ceiling, and crossing it kills the process |
+| you send the arguments | anyone sends anything, including a typo for a field name |
+| you read the traceback | you read a status code, a body, and whatever you logged |
+| there is one version | there is the one running and the one you last pushed, and they can differ |
+
+And one thing that does not change: the contract. A deployed capstone still
+cites what it read, still refuses what the corpus does not support, still ends a
+loop at its budget. Deployment does not make an agent trustworthy, and it does
+not make it worse. It changes who can reach it and what happens when the process
+underneath it moves.
+
+## The five-minute deployment checklist
+
+Before a service is worth pointing anything at:
+
+- **One route that answers, one that says it is alive.** A health route that
+  runs a real query is better than one that returns `{"ok": true}` from a
+  constant, because the second one is green while the corpus is missing.
+- **A body that validates at the boundary.** Session 3's parser, at the door.
+- **A refusal that is a status, not a silence.** 4xx for the caller's mistake,
+  5xx for yours, and no exception text in either — that is `d1-e2` in the depth
+  track.
+- **One log line per request, with a request id and no secrets.** Session 9 gave
+  you `redact`. The line's shape is `d5-e1`.
+- **A version you can name.** A commit, a tag, a build number. Without one, "roll
+  back" has no object.
+
+## Optional extension: a hosted surface (not available today)
+
+**Read this section as a plan, not as steps.** It describes something that does
+not exist yet. Nothing in this session, the capstone or the assessment depends
+on it, and none of it is an instruction you can run today.
+
+The plan, one day, is that you publish the MCP server from session 13 and
+register it, and a provider flow generates a hosted surface for it —
+comprehension, a catalogue entry, and a URL an agent connects to without a local
+process. That flow is **not merged and not deployed**. There is no
+learner-facing registration path today, so this session's required work is local
+and stays local.
+
+When it lands, it will need, at minimum: your server reachable at a public URL,
+a slug that names it, a description of what the server is for, and a decision
+about who may call it. Those are the four things you would have to write anyway,
+and the last one is the one people skip. Session 13 is where the difference
+between a read-only tool and a mutating one was made explicit; a hosted surface
+is where that difference stops being an exercise.
+
+Until it is real, treat "hosted" as a claim to check rather than a step to
+follow. That is the same standard session 13 applies to a recorded fixture: it
+is evidence of what happened on the day it was recorded, and of nothing else.

@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: A store takes a `user_id` and keys its dict on `key` alone. Why do its tests pass?
+
+<Question
+  choices={[
+    { text: "Because dicts are not thread-safe, and the tests are single-threaded", explain: "Nothing here is a race. The same sequence on one machine gives the same wrong answer every time." },
+    { text: "Because every test uses one user, and one user cannot read anybody else", explain: "Correct. The bug needs a second user to exist, so a suite written for one person can never fail on it. The second user is the test.", correct: true },
+    { text: "Because the values happen to be strings", explain: "The type of the value changes nothing. Two users, one key, one bucket." },
+  ]}
+/>
+
+### Q2: `recall("dan", "locale")` is called and dan has never stored anything. What comes back?
+
+<Question
+  choices={[
+    { text: "`None`", explain: "Correct. A miss is the normal case on every user's first day, and it is an answer, not an exception.", correct: true },
+    { text: "A `KeyError`, so the caller knows it was never stored", explain: "The caller already knows: it got nothing. A raise on the read path takes down an answer over a case you expected." },
+    { text: "The last value anybody stored, as a sensible default", explain: "That default belongs to another user. It answers every miss, it never raises, and it is the leak wearing a helpful face." },
+  ]}
+/>
+
+### Q3: Why is `remember("", "locale", "pt-BR")` refused instead of stored under the empty string?
+
+<Question
+  choices={[
+    { text: "Because empty strings cannot be dict keys", explain: "They can. Nothing in Python stops this, which is exactly why the store has to." },
+    { text: "Because a missing id becomes one bucket that every caller with a missing id reads and writes", explain: "Correct. It does not crash — it silently shares. Refuse it in both functions, before touching the store.", correct: true },
+    { text: "Because the value should be stored under a generated id instead", explain: "Inventing an owner for data whose owner is unknown is the same bucket with a longer name." },
+  ]}
+/>
+
+### Q4: `recall` returns the list it holds. A caller appends one item to it. What changed?
+
+<Question
+  choices={[
+    { text: "Nothing; the caller edited its own copy", explain: "Only if the store made a copy. Returning the stored object hands out the object itself." },
+    { text: "What the next reader sees, without any call to `remember`", explain: "Correct. A returned reference is write access that never appears in the API. Copy on the way out, and on the way in.", correct: true },
+    { text: "The store, but only until the next write refreshes it", explain: "No write is coming. The edited list is the stored list, and it stays edited." },
+  ]}
+/>
+
+### Q5: One memory expired last week. Another never recorded an expiry. Which can you prove is stale?
+
+<Question
+  choices={[
+    { text: "The expired one, and only it", explain: "Correct. The one with no expiry might be true or might be a year out of date, and nothing in your code can tell you which. Unaudited is not the same as fresh.", correct: true },
+    { text: "Both, since neither was written today", explain: "Age is not staleness. A locale set in 2019 may still be right; the expiry is what makes the question answerable." },
+    { text: "Neither, because staleness is a judgement a program cannot make", explain: "It is a judgement you make once, when you store the item, and write down as a date." },
+  ]}
+/>

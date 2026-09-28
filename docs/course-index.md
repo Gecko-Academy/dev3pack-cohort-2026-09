@@ -79,11 +79,11 @@ Mon 28 Sep to Fri 02 Oct
 
 | Day | # | Session | Checks | Runs unattended |
 |---|---|---|---|---|
-| Mon 28 Sep | 11 | State and memory — not yet | 3 | yes |
-| Tue 29 Sep | 12 | MCP architecture and primitives — not yet | 3 | yes |
-| Wed 30 Sep | 13 | Build and secure an MCP server — not yet | 3 | yes |
-| Thu 01 Oct | 14 | Deploy and operate the capstone — not yet | 1 | yes |
-| Fri 02 Oct | 15 | Defend the capstone — not yet | — | no notebook |
+| Mon 28 Sep | 11 | [State and memory](../units/en/unit3/session-11-state-and-memory/) | 3 | yes |
+| Tue 29 Sep | 12 | [MCP architecture and primitives](../units/en/unit3/session-12-mcp-architecture/) | 3 | yes |
+| Wed 30 Sep | 13 | [Build and secure an MCP server](../units/en/unit3/session-13-secure-mcp-server/) | 3 | yes |
+| Thu 01 Oct | 14 | [Deploy and operate the capstone](../units/en/unit3/session-14-deploy-and-operate/) | 1 | yes |
+| Fri 02 Oct | 15 | [Defend the capstone](../units/en/unit3/session-15-defend-the-capstone/) | — | no notebook |
 
 ## Capstone
 

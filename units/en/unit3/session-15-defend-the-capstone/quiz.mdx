@@ -1,0 +1,47 @@
+# Quick quiz (ungraded)
+
+### Q1: Your injected failure makes the agent produce a traceback on screen. What is the best answer?
+
+<Question
+  choices={[
+    { text: "Say the demo environment is misconfigured and move on", explain: "It might be. But you cannot show that in the moment, and the room heard a claim you did not support." },
+    { text: "Read the trace, name the contract that should have caught it, and say what you would fix", explain: "Correct. Failing safely is a pass; diagnosing accurately is the skill being judged.", correct: true },
+    { text: "Re-run it until it works", explain: "A run that works on the fourth attempt is evidence about the first three." },
+  ]}
+/>
+
+---
+
+### Q2: What makes an architecture decision defensible?
+
+<Question
+  choices={[
+    { text: "A benchmark showing the chosen option is faster", explain: "Useful, but a benchmark is the evidence, not the decision." },
+    { text: "Naming the measurement or event that would reverse it", explain: "Correct. A decision with no reversal condition is a preference wearing a decision's clothes.", correct: true },
+    { text: "Following the approach the course used", explain: "Then it is the course's decision, not yours." },
+  ]}
+/>
+
+---
+
+### Q3: A trace with no event between 'retrieved' and 'answered' means what?
+
+<Question
+  choices={[
+    { text: "Nothing happened between them", explain: "That is what it READS as, and that is exactly the danger." },
+    { text: "You cannot tell, and the gap itself is the finding", explain: "Correct. A missing span is not evidence of absence; it is absence of evidence.", correct: true },
+    { text: "The agent was fast", explain: "Latency is a field, not an inference from silence." },
+  ]}
+/>
+
+---
+
+### Q4: Which of these is NOT evidence for the rubric?
+
+<Question
+  choices={[
+    { text: "A hit rate measured on a labeled set", explain: "That is evidence." },
+    { text: "A trace showing a refusal and why", explain: "That is evidence." },
+    { text: "A polished interface and a smooth run-through", explain: "Correct. The rubric grades evidence of engineering practice, not chat-interface polish.", correct: true },
+  ]}
+/>

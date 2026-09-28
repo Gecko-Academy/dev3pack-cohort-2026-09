@@ -1,0 +1,116 @@
+# Ephemeral or persisted, chosen on purpose [[ephemeral-or-persisted]]
+
+## Two stores, and only one of them is a decision you made
+
+Everything an agent holds falls into one of two boxes.
+
+**Ephemeral state** lives for one conversation and dies with the process. Nothing
+to migrate, nothing to delete on request, nothing to leak next month. It is the
+cheap box, and it is the right box far more often than it gets used.
+
+**Persisted memory** outlives the conversation. It buys one thing — the assistant
+knows something on Tuesday that it learned on Monday — and it charges for it in
+storage, correction, expiry, isolation, deletion and disclosure. Every one of
+those is work you have signed up for, and none of them appear in the demo.
+
+The failure is not picking the second box. The failure is arriving in it. A
+prototype keeps a dict at module scope so the notebook is easier to re-run, the
+dict survives the request, and six weeks later it holds two hundred people's
+preferences with no owner and no expiry. Nobody decided that. It happened.
+
+## The four kinds, and what each is for
+
+| Kind | Holds | Example | Lives |
+|---|---|---|---|
+| Conversation state | this exchange | "answer briefly" | one session |
+| Semantic memory | facts | "this user reads Portuguese docs" | until corrected |
+| Episodic memory | past interactions | the last five questions | until it rotates out |
+| Procedural memory | how-to patterns | **your skills from session 10** | until the procedure changes |
+
+The fourth row is the one people miss. A skill is a stored pattern the assistant
+applies without being told again — which is memory, with all four questions still
+to answer. A skill that describes an API you have since changed is a stale memory
+that runs.
+
+## Four questions, asked before anything is stored
+
+1. **Why is it useful?** Name the answer it improves. No answer, no store.
+2. **Who owns it?** A memory with no owner is everybody's memory. That is the
+   third page of this session, and it is `ch11-e3`.
+3. **How is it corrected?** Overwrite, reset, delete — pick one and make it
+   reachable. A user who cannot escape a wrong memory will stop trusting the
+   right ones.
+4. **When does it stop being true?** An item with no expiry cannot be checked for
+   staleness, only quoted.
+
+Four answers per item. Most items do not survive the questions, which is the
+point of asking them.
+
+## The wrapper, deliberately tiny
+
+```python
+@dataclass
+class SessionState:
+    # ONE preference and ONE episode list. Scope creep starts at two.
+    preferences: dict[str, str] = field(default_factory=dict)
+    episodes: list[str] = field(default_factory=list)
+
+    def reset(self) -> None:
+        self.preferences.clear()
+        self.episodes.clear()
+```
+
+One preference, one episode list, one reset. In memory, dying with the process,
+on purpose. The container is not the exercise — what the application does with it
+is.
+
+## A preference the model never sees is decoration
+
+```python
+def answer_with_state(question, state, client):
+    decorated = question
+    if state.preferences.get("answer_style") == "short":
+        decorated += " (answer briefly)"
+    result = answer_question(decorated, documents, client)
+    state.episodes.append(f"Q: {question[:60]}")
+    if len(state.episodes) > 5:      # episodic memory expires
+        state.episodes.pop(0)
+    return result
+```
+
+Storing `answer_style` changes nothing on its own. It has to reach the prompt, and
+the only way to know it did is to read the prompt the model actually received:
+
+```python
+probe = FakeLLM()
+answer_with_state("How does chunking work in RAG?", state, probe)
+probe.calls[-1][1].endswith("(answer briefly)")   # True, or the preference is dead code
+```
+
+`FakeLLM` records every call, so this is testable offline with no model and no
+spend. `ch11-e1` does exactly this, then calls `reset()` and looks for leftovers,
+then asks seven questions and counts the episodes.
+
+## The cap is an expiry, and it is two lines
+
+`if len(state.episodes) > 5: state.episodes.pop(0)` is the smallest honest answer
+to question four. Older episodes stop existing. There is no configuration for it,
+no cleanup job, and nothing to forget to run.
+
+A store with no ceiling grows for as long as the process lives. It grows in the
+prompt, so every answer costs more; it grows in memory; and it grows in what a
+leak would leak. "It is only five strings" is a decision. "It is however many
+strings the user typed" is not.
+
+## Reset is not a feature
+
+It is the correction path for everything the session holds, and it is one method.
+Without it, a user whose preference was inferred wrongly has one option: stop
+using the thing. With it, they have a way out that does not involve you.
+
+Write `reset()` before you write the second preference.
+
+## Choosing, in one line
+
+Start ephemeral. Move an item to persisted memory when you can answer all four
+questions about that item, in writing — and move the item, not the store.

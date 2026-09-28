@@ -1,0 +1,106 @@
+# The smallest honest server [[smallest-honest-server]]
+
+## You are on the other side of the boundary now
+
+Session 12 put you at the client: a surface makes claims, and the client decides
+what to believe. Today you run the server. The claims are yours, and so is
+everything that happens when somebody takes you up on them.
+
+A server is a contract with a caller who does not trust you and whom you do not
+trust either. The smallest honest one declares four things, and can be read in a
+minute:
+
+| Declared | Ours |
+|---|---|
+| what it exposes | one tool, `read_page` |
+| what that tool takes | one argument, `url` |
+| what it may touch | `example.com`, `docs.python.org`, and their subdomains |
+| what it refuses, and why | a refusal with a code and a detail, never an exception |
+
+```python
+TOOL = {
+    "name": "read_page",
+    "description": "Fetch one page from an allowed host and return its text.",
+    "input_schema": {
+        "type": "object",
+        "properties": {"url": {"type": "string"}},
+        "required": ["url"],
+    },
+    "read_only": True,
+}
+
+ALLOWED_DOMAINS = ("example.com", "docs.python.org")
+```
+
+## Excess scope: the failure that arrives as a feature
+
+`read_page` looks like one capability. It is one only because of the last line.
+Take the allowlist away and the tool is no longer "read a page" — it is "make an
+HTTP request to any address this process can route to", which on a normal cloud
+host includes the private network around it, the admin ports on the machine
+itself, and the metadata service that hands out the instance's credentials.
+
+Nobody adds that tool on purpose. It arrives as a convenience: the allowlist was
+awkward during development, or a second caller needed one more host, or the
+argument was widened from `path` to `url` in a hurry. The rule that keeps it
+narrow:
+
+> The tool takes the narrowest argument that does the job, and everything the
+> caller must not choose is configuration.
+
+A caller can pass any `url` it likes. It cannot pass an allowlist. That single
+asymmetry is what makes the tool auditable: the set of hosts this server can
+reach is a line in a config file, not a property of whatever text reached the
+model this morning.
+
+Session 12 already showed the other half of this on the applied surface. Sixteen
+tools, and only two can change on-chain state. Small, separate, honestly named
+capabilities are what makes a sentence like that sayable at all.
+
+## A refusal is a return value
+
+The tool has two outcomes, and both are answers:
+
+```python
+def read_page(url: str) -> dict:
+    verdict = fetch_guard(url)
+    if not verdict["allowed"]:
+        return {"ok": False, "refusal": verdict["reason"]}
+    return {"ok": True, "text": fetch(url)}          # only now does a socket open
+```
+
+An exception here would be a worse contract for the same reason a raised
+`ToolError` was worse in session 5: the caller gets a traceback where it needed
+a decision, and the model on the other side of the protocol gets whatever the
+transport makes of it. A refusal that comes back as data can be logged, counted,
+and read out in class.
+
+And it has to say **which rule fired**. `{"allowed": false, "reason": ""}` is a
+shrug. The three codes in the next page — `scheme`, `not-public`,
+`not-allowlisted` — exist so that a caller can branch and a human can act.
+"Add a host to the allowlist" and "this URL points at the machine you are
+running on" are different next steps, and only the reason distinguishes them.
+
+## What a server must never hold
+
+Two things stay out, and both were settled earlier in the course:
+
+- **Credentials never enter the tool definition, the description, or the client
+  configuration.** They are injected at the transport edge, where the model
+  never sees them. A key that is not in the context cannot be exfiltrated from
+  the context.
+- **The response body is not a log line.** Session 9's redaction rules apply to
+  whatever this server writes down about a fetch: the URL and the verdict are
+  worth keeping, the page is not yours to keep.
+
+## A menu is not an authorization
+
+The last claim a small server makes is the one about itself. When you list your
+tools, you are describing what exists, not granting anything. The recorded
+Orquestra response in section 5 of the notebook makes this point in its own
+words — it calls itself "a MENU read from one node's view of the chain, not an
+authorization", and adds that a purchase re-reads the account it was told about
+rather than trusting the list it just printed.
+
+That is the same discipline as the guard. What you were handed is a claim. What
+you act on is a claim you checked yourself, at the moment you act on it.

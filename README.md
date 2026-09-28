@@ -393,11 +393,11 @@ Each live session is one directory under `units/en/unit1/`, `unit2/` or `unit3/`
 | 8 | Wed 23 Sep | [Loops and graphs](units/en/unit2/session-08-loops-and-graphs/) | Chain vs loop vs graph; illegal edges do not move | [notebook](units/en/unit2/session-08-loops-and-graphs/notebook.ipynb) | — |
 | 9 | Thu 24 Sep | [Trace and evaluate](units/en/unit2/session-09-trace-and-evaluate/) | A redacted event log and named error buckets | [notebook](units/en/unit2/session-09-trace-and-evaluate/notebook.ipynb) | — |
 | 10 | Fri 25 Sep | [Skills and an ADR](units/en/unit2/session-10-skills-and-adr/) | A `SKILL.md` and a decision that names its reversal | [notebook](units/en/unit2/session-10-skills-and-adr/notebook.ipynb) | — |
-| 11 | Mon 28 Sep | State and memory — not yet | Session state, a retention policy, cross-user isolation | notebook — not yet | — |
-| 12 | Tue 29 Sep | MCP architecture — not yet | Host / client / server; a surface read as claims | notebook — not yet | — |
-| 13 | Wed 30 Sep | Build and secure an MCP server — not yet | A fetch guard that refuses *before* it fetches | notebook — not yet | — |
-| 14 | Thu 1 Oct | Deploy and operate — not yet | A smoke test and the rollback sentence | notebook — not yet | — |
-| 15 | Fri 2 Oct | Defend the capstone — opens Fri 02 Oct | A demo, then a failure diagnosed from your own traces | — | — |
+| 11 | Mon 28 Sep | [State and memory](units/en/unit3/session-11-state-and-memory/) | Session state, a retention policy, cross-user isolation | [notebook](units/en/unit3/session-11-state-and-memory/notebook.ipynb) | — |
+| 12 | Tue 29 Sep | [MCP architecture](units/en/unit3/session-12-mcp-architecture/) | Host / client / server; a surface read as claims | [notebook](units/en/unit3/session-12-mcp-architecture/notebook.ipynb) | — |
+| 13 | Wed 30 Sep | [Build and secure an MCP server](units/en/unit3/session-13-secure-mcp-server/) | A fetch guard that refuses *before* it fetches | [notebook](units/en/unit3/session-13-secure-mcp-server/notebook.ipynb) | — |
+| 14 | Thu 1 Oct | [Deploy and operate](units/en/unit3/session-14-deploy-and-operate/) | A smoke test and the rollback sentence | [notebook](units/en/unit3/session-14-deploy-and-operate/notebook.ipynb) | — |
+| 15 | Fri 2 Oct | [Defend the capstone](units/en/unit3/session-15-defend-the-capstone/) | A demo, then a failure diagnosed from your own traces | — | — |
 
 Session 13 uses an instructor-hosted Gecko MCP surface; the URL is handed out in class.
 

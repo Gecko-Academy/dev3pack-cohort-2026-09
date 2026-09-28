@@ -1,0 +1,78 @@
+# Defend the capstone
+
+**Friday, October 2, 2026 · 2h**
+
+## Outcome
+
+You present the capstone, and then you are handed one failure you did not
+prepare for. You diagnose it from your own traces, and either recover or fail
+safely in front of the room. A demo that only shows the happy path proves that
+the happy path exists, which nobody doubted.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | Your capstone, running, with its traces on. Six minutes, hard-timed. |
+| Output | A demo, an architecture decision you can defend, measured evidence, and one recovery. |
+| Budget | Six minutes each. The clock is the constraint the format is built around, so rehearse against it. |
+| Failure to handle | One injected failure, drawn at the start of your slot. You do not know which. |
+
+The threat here is not a hostile question. It is the demo that works because it
+was run four times before the room saw it, and answers nothing about whether it
+holds when something breaks.
+
+## The six minutes
+
+| Minute | What |
+|---:|---|
+| 1 | The problem, and who has it |
+| 2–3 | The demo: one supported answer with citations, one refusal |
+| 4 | The architecture decision you would defend, and what would reverse it |
+| 5 | Measured evidence: your evaluation report, not an impression |
+| 6 | **The injected failure**, diagnosed from your traces |
+
+## The injected failure
+
+At the start of your slot you draw one of these. They are all conditions your
+agent will meet in the wild, and every one of them appeared in a session.
+
+| Failure | Where you met it |
+|---|---|
+| The retrieval returns nothing | Session 6 |
+| A citation supports nothing it claims | Session 7 |
+| A tool times out mid-loop | Sessions 2 and 5 |
+| Retrieved text carries an instruction | Sessions 4 and 13 |
+| The same call repeats until the budget ends it | Session 5 |
+| The state machine is asked for an illegal move | Session 8 |
+
+Recovery is not the only pass. Failing safely is a pass: a refusal the caller
+can read, a trace that shows where it stopped, and an accurate sentence about
+what you would fix. Claiming it worked when the trace says otherwise is the one
+answer that fails.
+
+## What you are judged on
+
+The [assessment rubric](../../unit2/capstone/concepts-3.mdx), on
+evidence rather than polish. Your notebook scorecards are formative and are not
+the grade; what they are good for is finding the gap you would rather not meet
+on stage. Run them the night before.
+
+The [final assignment](../../tracks/final-assignment/introduction.mdx) is scored
+separately, against a private question set, and its certificate needs both the
+aggregate bar and every critical safety case.
+
+## Before you present
+
+```bash
+uv run bootcamp progress            # every scorecard, in one table
+uv run bootcamp check cap01         # the capstone's own five checks
+```
+
+Bring the totals. Bring your traces. Bring the one limitation you would name
+before anyone asks, because naming it first is the difference between a
+limitation and a hole somebody found.
+
+<!-- navigation:start -->
+[Previous: Deploy and operate the capstone](../session-14-deploy-and-operate/introduction.mdx)
+<!-- navigation:end -->

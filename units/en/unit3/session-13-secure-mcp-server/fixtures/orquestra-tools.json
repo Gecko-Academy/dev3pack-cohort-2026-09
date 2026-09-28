@@ -1,0 +1,29 @@
+{
+  "_provenance": {
+    "verified": "2026-09-03",
+    "surface": "https://mcp.geckovision.tech/orquestra/mcp",
+    "lane": "documented",
+    "protocol": "2025-11-25",
+    "count": 16,
+    "is_evidence_of": "which tools the surface exposes, and nothing about what they do when called",
+    "is_not_evidence_of": "that every listed tool was called or tested. Only read-only calls were."
+  },
+  "tools": [
+    "start",
+    "find_start",
+    "list_programs",
+    "comprehend_program",
+    "prepare_purchase",
+    "try_purchase",
+    "list_stores",
+    "plan_payment",
+    "plan_swap",
+    "verify_signed_transaction",
+    "submit_transaction",
+    "read_accounts",
+    "prepare_instruction",
+    "derive_ata",
+    "derive_pda",
+    "program_lifecycle"
+  ]
+}

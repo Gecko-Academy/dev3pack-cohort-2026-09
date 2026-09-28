@@ -63,11 +63,11 @@ uv run bootcamp submit chNN --github YOU  # build the hand-in bundle
 
 ## Unit 3 — State, MCP, deployment, defense
 
-- Session 11. State and memory: arrives Mon 28 Sep, not published yet.
-- Session 12. MCP architecture and primitives: arrives Tue 29 Sep, not published yet.
-- Session 13. Build and secure an MCP server: arrives Wed 30 Sep, not published yet.
-- Session 14. Deploy and operate the capstone: arrives Thu 01 Oct, not published yet.
-- Session 15. Defend the capstone: arrives Fri 02 Oct, not published yet.
+- [Session 11. State and memory](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit3/session-11-state-and-memory/introduction.html): Mon 28 Sep.
+- [Session 12. MCP architecture and primitives](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit3/session-12-mcp-architecture/introduction.html): Tue 29 Sep.
+- [Session 13. Build and secure an MCP server](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit3/session-13-secure-mcp-server/introduction.html): Wed 30 Sep.
+- [Session 14. Deploy and operate the capstone](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit3/session-14-deploy-and-operate/introduction.html): Thu 01 Oct.
+- [Session 15. Defend the capstone](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit3/session-15-defend-the-capstone/introduction.html): Fri 02 Oct.
 
 ## Handing work in
 

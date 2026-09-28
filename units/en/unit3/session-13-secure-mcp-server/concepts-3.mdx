@@ -1,0 +1,123 @@
+# The applied case: a surface that says where its answers came from [[applied-case]]
+
+## Why this surface
+
+Your guard refuses a URL. It is a small piece of work, and it is hard to feel
+the weight of it against `example.com`. So the second half of the session reads
+a surface where the boundary is not hypothetical: Orquestra's catalogue of
+Solana programs, comprehended by Gecko and served over MCP. Some of the tools on
+it build transactions that move money.
+
+Everything you read is a **recording**, stamped with the day it was captured.
+Nothing in the notebook reaches that surface unless you opt in, and nothing in
+any lane can spend.
+
+## Comprehension, and what it is for
+
+Ask any assistant how to call an unfamiliar program's purchase instruction and
+which accounts to pass. It will answer, fluently, with invented account names.
+Docs are written for humans; the structure an agent needs is a graph.
+
+Gecko is the layer that reads a surface — an OpenAPI document, docs, or a
+deployed Solana program — and turns it into something callable:
+
+- question-shaped tools instead of raw endpoints;
+- the instruction↔account graph, in derivation order;
+- **provenance on every edge**, so each account says where its value came from;
+- a recorded mode, so everything can be tried at zero cost before it counts.
+
+## Provenance: the tag that makes an answer auditable
+
+| Tier | Means |
+|---|---|
+| declared | the IDL or spec says so |
+| recovered | read out of the program's source |
+| measured | proven by running it |
+| inferred | a guess, and labelled as one |
+
+An edge that says where it came from can be argued with. An edge that does not
+is a guess wearing a suit. In the recorded `find_start` response the notebook
+reads, every account in the derive plan carries a tag — `extracted`, meaning the
+surface read it out of the program rather than assuming it — and where the
+surface could not work an account out, the response carries a `FLAGGED` gap
+instead of a plausible-looking name.
+
+This is your refusal reason, one layer up. The value of `not-public` on a
+refusal and `extracted` on an account is the same value: the next person can
+tell what was established from what was assumed.
+
+## Four lanes, and one of them is `never`
+
+The activity in this session is placing work in the **lowest lane that can do
+it**. That habit is what stops a demonstration from quietly becoming a live
+spend.
+
+| Lane | Needs | Can do |
+|---|---|---|
+| recorded | nothing | read the tool names, read a derive plan, read the shape of any response |
+| public read-only | a connection | see what a store charges **today** |
+| fork | the instructor | sign, with a throwaway key, against a disposable fork |
+| never | — | spend real money on mainnet |
+
+Two rules decide almost every row. A fixture already holds it, so the network
+adds nothing → `recorded`. It is a fact about today, and a recording goes stale
+→ `public read-only`. `ch13-e2` asks for five of these, and the last one is
+`never` — not as a trick, but because no lane in this course spends, and a
+course that could not say which lane was which would not be able to promise it.
+
+## What a recording is evidence of
+
+Each fixture carries its own `_provenance`, and the interesting field is the
+last one:
+
+| File | Dated | Evidence of | Not evidence of |
+|---|---|---|---|
+| `orquestra-tools.json` | documented 2026-09-03 | which tools the surface exposes, and the protocol version it announced | that any of them was called or works |
+| `list-stores-recorded.json` | recorded 2026-08-19 | the shape of a read-only response, and the public data it returned that day | today's prices, or anything being signed |
+| `find-start-recorded.json` | recorded 2026-08-19 | a derive plan with per-account provenance | that a call was built, submitted, or landed |
+
+A tool list is sixteen names. It says nothing about what any of them does when
+called, and a dated recording of a menu is not a claim about lunch today. Prices
+and stores change; the honest move on the live lane is to re-record rather than
+trust the file.
+
+## The two tools that can change anything
+
+Session 12 split the sixteen: two can change on-chain state, four only build
+unsigned bytes, and the rest read. Carry that finding here, because it is what
+makes the fork lane describable in one sentence.
+
+`prepare_purchase` is the one that looks dangerous and is not. It returns bytes
+that do nothing at all until something else signs them and submits them. What it
+does start is a clock: the bytes carry a live blockhash, so the window is about
+sixty seconds. That gives a working rule with no security content and a lot of
+practical value — **decide while browsing, which is free and has no expiry;
+prepare late; prepare once; never prepare several options to compare them.**
+
+If your class runs the fork lane, `try_purchase` signs with a key that is
+created only after the endpoint proves it is a fork, funded by a cheatcode, with
+no mainnet path. The receipt it returns is judged by what **moved** — lamports
+out, tokens in, accounts created — rather than by whether the call returned. If
+your class does not run it, you have missed nothing that is assessed.
+
+## The checklist, and the honest `False`
+
+`ch13-e1` is self-attested: four boxes about what you did, one honest `True` or
+`False` about whether you ran the fork lane, and one sentence in your own words
+about why nothing you ran could have spent real money.
+
+Most people answer `False` to the fork line, and that is the correct answer for
+them. The check accepts it and refuses a blank explanation, because the exercise
+is not "did you run the exciting lane" — it is whether you can say what you ran
+and what it could have done. An attestation that claims work nobody did is the
+one thing on the sheet that cannot be repaired later.
+
+## Recap
+
+| Lesson | One line |
+|---|---|
+| The server | one tool, one argument, an allowlist a caller cannot widen |
+| The guard | decide on the string, before the socket; every hop, not just the first |
+| The reason | the code is what the next person acts on |
+| Provenance | an account, or a refusal, that says where it came from can be audited |
+| Lanes | the lowest lane that can do it, and one activity's lane is `never` |

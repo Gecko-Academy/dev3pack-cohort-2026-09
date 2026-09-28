@@ -1,0 +1,115 @@
+# Four failures, and what each one looks like from outside [[four-failures]]
+
+You cannot attach a debugger to a deployment. You have a status code, a body, a
+duration and whatever you logged. So learn the four failures by their signature,
+because that is all you will ever get.
+
+| Failure | Status | Duration | Body | The wrong reading |
+|---|---|---|---|---|
+| Cold start | 200 | 2,400 ms, then 38 ms | correct | "it is fast" — measured on the second call |
+| Resource limit | 503 | fast or very slow | the platform's error, not yours | "it is down" — it is up, and being killed |
+| Malformed request | 400, or 200 from a bad deployment | normal | an error, or an invented answer | "it answered, so it works" |
+| No rollback | any | any | any | "we will figure it out when it happens" |
+
+The numbers above are the check's four deployments. The notebook's four use
+different ones on purpose: a report that repeats a figure you read in a cell is
+not a measurement, and it fails.
+
+## 1. The cold start
+
+Nothing is running until somebody calls. The first request pays for the process
+starting, the imports loading, the corpus being read — and then the next fifty
+requests are fast, which is why almost nobody measures it correctly. You reload,
+see 38 ms, and write that number down.
+
+The first caller does not see 38 ms. They see 2.4 seconds and, often enough, a
+client that gave up at two.
+
+```python
+health = request("/health")     # the cold one. This number is the report.
+again = request("/health")      # warm, and a different fact about the system
+```
+
+Measure the first call, report the first call, and keep it separate from the
+verdict. `cold_start_ms: 2400` with `healthy: true` is a coherent report: the
+deployment honours its contract and it is slow. Those are two facts, and
+collapsing them loses both.
+
+## 2. The resource limit
+
+Your process has a ceiling — memory, execution time, request size — and crossing
+it does not raise an exception you can catch. Something above you kills the
+process and answers on its behalf:
+
+```
+503 {"error": "the function exceeded its memory limit and was killed"}
+```
+
+Two things to notice. First, that body is not from your code, so it will not
+have your error shape, your request id or anything else you agreed to return.
+Code that reads `response["body"]["answer"]` raises here — and a smoke test that
+raises reports nothing, which is the moment the report mattered most.
+
+Second, the deployment is not down. It accepts the connection, starts, dies, and
+does it again for the next caller. "It is down" sends you to the wrong page in
+the runbook. The signature to learn is: a 5xx, a body you did not write, and no
+line in your own log for the request.
+
+## 3. The malformed request
+
+Now the caller is the problem. A typo in a field name, an int where a string
+goes, a body that is not JSON, an empty question:
+
+```python
+{"quesiton": 12}
+```
+
+The good answer is a 400 that names the field, which is session 3's parser
+standing at the door. The dangerous answer is a 200:
+
+```
+200 {"answer": "Yes, that is correct.", "citations": [], "confidence": 0.9}
+```
+
+That is a deployment whose validation stopped running — a default that filled
+in, a schema that got relaxed to stop an alert, a route that reads
+`body.get("question", "")` and carries on. It is the worst outcome available,
+because it is indistinguishable from working at every level except the content,
+and nothing downstream will flag it. A citation list of length zero and
+confidence 0.9 is the tell, and only if somebody looks.
+
+Your smoke test has to send garbage on purpose. A boundary you never probe is
+a boundary you are assuming.
+
+## 4. No way back
+
+The fourth failure is not the service's. You deploy a fix at 16:40, it makes
+things worse, and the way back is not written anywhere: which version was good,
+what command returns to it, how long that takes, and how you would know it
+worked.
+
+Every honest answer to that is short and boring, which is exactly why it has to
+exist before the incident:
+
+```
+Stop the service and restart it from the previous tag:
+`git checkout v0.3.1 && uv run python serve.py`; answering again inside 2 minutes.
+```
+
+A rollback needs three things: a named action, a number, and a unit. "We will
+roll back if it looks bad" has none of them and describes a mood. This is the
+same standard the depth track puts on an architecture decision's reversal
+trigger — `d3-e1` rejects "when it gets slow" and accepts "when p95 stays over
+800 ms for 10 minutes" — and `ch14-e3` puts it on the way back.
+
+## Where the four meet the capstone
+
+| Failure | The session that armed you |
+|---|---|
+| Cold start | 9 — a duration is a field in an event, not a feeling |
+| Resource limit | 5 — a budget, and an exit the system chooses |
+| Malformed request | 3 and 4 — validate at the boundary, refuse in a shape |
+| No way back | 10 — a decision carries the condition that reverses it |
+
+None of these is new. What is new is that they now arrive as a status code from
+a process you cannot see, and the next page is the instrument for reading them.

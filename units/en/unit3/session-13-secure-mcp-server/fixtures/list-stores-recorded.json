@@ -1,0 +1,59 @@
+{
+  "_provenance": {
+    "recorded": "2026-08-19",
+    "surface": "https://mcp.geckovision.tech/orquestra/mcp",
+    "lane": "recorded",
+    "is_evidence_of": "the shape of a read-only response, and the public data it returned that day",
+    "is_not_evidence_of": "any signing, preparation, submission or spend, and not of what the surface returns today. Prices and stores change; re-record rather than trust this.",
+    "tool": "list_stores",
+    "args": {
+      "network": "mainnet"
+    }
+  },
+  "network": "mainnet",
+  "program": "BUYuxRfhCMWavaUWxhGtPP3ksKEDZxCD5gzknk3JfAya",
+  "note": "a MENU read from one node's view of the chain, not an authorization: the authorities listed here are what the store accounts SAY, and a purchase still verifies everything before anything signs. Every store here is buyable through prepare_purchase, which re-reads the one you name from its own account rather than trusting this list.",
+  "stores": [
+    {
+      "address": "gi7tTEQVZjhgaX7W5yXPsXCMHRxaP29uWSwfhfXbfwD",
+      "authority": "8D8qFHBnvS6oMsJy7EmGTrpoZcGd3aCC3pnPLi93Ag2V",
+      "fulfilment": {
+        "set": true,
+        "telegram_channel_id": "@superteamjaegermeister"
+      },
+      "products": [
+        {
+          "decimals": 6,
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "mint_note": "USDC",
+          "name": "J\u00e4germeister",
+          "price_raw": 500000,
+          "price_ui": "0.5"
+        }
+      ],
+      "store": "superteamde",
+      "total_purchases": 24
+    },
+    {
+      "address": "23hqxfyG5uDGcQjAVEYQnqd4Vf64dnvHn2Ujpz1JTFx4",
+      "authority": "8D8qFHBnvS6oMsJy7EmGTrpoZcGd3aCC3pnPLi93Ag2V",
+      "fulfilment": {
+        "set": true,
+        "telegram_channel_id": "@skylinebar"
+      },
+      "products": [
+        {
+          "decimals": 6,
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "mint_note": "USDC",
+          "name": "Shot",
+          "price_raw": 500000,
+          "price_ui": "0.5"
+        }
+      ],
+      "store": "skyline",
+      "total_purchases": 13
+    }
+  ],
+  "_trimmed": "12 stores in the recording; 2 kept, 3 products each"
+}

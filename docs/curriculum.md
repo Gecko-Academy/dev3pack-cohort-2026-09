@@ -185,31 +185,31 @@ You leave with two artifacts and one habit. The artifacts: a `SKILL.md` your ass
 
 ### Session 11 — State and memory (Mon 28 Sep)
 
-`ch11` · 3 checks · page — opens Mon 28 Sep
+`ch11` · 3 checks · [page](../units/en/unit3/session-11-state-and-memory/introduction.mdx)
 
 Decide what your assistant remembers, and prove the decision in code. You leave with three things: a `SessionState` whose one preference changes what the model sees and whose episode list has a ceiling, a written retention policy that names something you refuse to store, and a `MemoryStore` that keeps two users' memories apart when both of them use the same key. Every store you build today answers four questions before it holds anything: why this is useful, who owns it, how it is corrected, and when it stops being true.
 
 ### Session 12 — MCP architecture and primitives (Tue 29 Sep)
 
-`ch12` · 3 checks · page — opens Tue 29 Sep
+`ch12` · 3 checks · [page](../units/en/unit3/session-12-mcp-architecture/introduction.mdx)
 
 Draw the host, client and server responsibilities of the Model Context Protocol, discover what a server offers, and tell a tool that reads from one that mutates before anything is called. You leave with two functions and one habit. The functions: `describe_surface(listing)`, which turns a server's handshake and its listings into a map of what it offers and what it claimed and cannot serve, and `review_tool(tool)`, which reads one tool definition and returns a verdict a caller can branch on. The habit is reading a surface as claims rather than as facts — a name is a claim, an annotation is a claim, and a description is somebody else's text sitting in your model's context.
 
 ### Session 13 — Build and secure an MCP server (Wed 30 Sep)
 
-`ch13` · 3 checks · page — opens Wed 30 Sep
+`ch13` · 3 checks · [page](../units/en/unit3/session-13-secure-mcp-server/introduction.mdx)
 
 You build the part of a server that says no. A read-only MCP tool with one narrow argument, and `fetch_guard(url)` — the gate it consults **before** it fetches anything, which refuses private space, loopback, link-local, the cloud metadata address, a scheme that is not http, and any host that is not on a declared allowlist. Every refusal names the rule that fired. Then you read a real comprehended surface — Orquestra's Solana catalogue through Gecko, from dated recordings — and place each activity in the lowest lane that can do it.
 
 ### Session 14 — Deploy and operate the capstone (Thu 01 Oct)
 
-`ch14` · 1 checks · page — opens Thu 01 Oct
+`ch14` · 1 checks · [page](../units/en/unit3/session-14-deploy-and-operate/introduction.mdx)
 
 You put the capstone behind a request boundary and run it as a service you start yourself. Then you write the test that decides whether a deployment is worth keeping: `smoke(request)` sends three probes, measures the first call, sends a malformed body on purpose, and returns a report that is allowed to say the deployment is bad. You also write the rollback sentence today, while nothing is broken and you can still think.
 
 ### Session 15 — Defend the capstone (Fri 02 Oct)
 
-`ch15` · no notebook · page — opens Fri 02 Oct
+`ch15` · no notebook · [page](../units/en/unit3/session-15-defend-the-capstone/introduction.mdx)
 
 You present the capstone, and then you are handed one failure you did not prepare for. You diagnose it from your own traces, and either recover or fail safely in front of the room. A demo that only shows the happy path proves that the happy path exists, which nobody doubted.
 

@@ -1,0 +1,81 @@
+# State and memory
+
+**Monday, September 28, 2026 · 2h · Week 3, session 1**
+
+## Outcome
+
+Decide what your assistant remembers, and prove the decision in code. You leave
+with three things: a `SessionState` whose one preference changes what the model
+sees and whose episode list has a ceiling, a written retention policy that names
+something you refuse to store, and a `MemoryStore` that keeps two users' memories
+apart when both of them use the same key. Every store you build today answers
+four questions before it holds anything: why this is useful, who owns it, how it
+is corrected, and when it stops being true.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | A question and one preference, per conversation. For the store: a `user_id`, a `key`, and a value the caller still holds a reference to. |
+| Output | A preference the model can see in its prompt, an episode list capped at five, a five-line retention policy, and `remember` / `recall` that answer for one owner and nobody else. |
+| Budget | In-memory only, no database, no new dependency, `FakeLLM` throughout. Everything today dies with the process, and that is the policy, not a limitation. The one thing this course persists is your progress file, and it holds outcomes. |
+| Failures this session must handle | **Cross-user leakage.** Ana and bruno both store `locale`; a store keyed on `key` alone hands ana bruno's answer, and no single-user test can fail on it. **An unowned write.** A `user_id` that is empty or `None` becomes one bucket every caller reads, so it is refused before anything is stored. **Stale memory.** A fact that was true in September, quoted in November as if nothing had changed. |
+
+The threat is not a hostile user. It is a store that works. A memory bug does not
+raise, does not fail a test written for one person, and does not look wrong in a
+trace — it just answers, confidently, with somebody else's data or with last
+month's. That is why the properties get asserted rather than assumed.
+
+There is a second boundary, and this course is standing on it. Your progress file
+lives at `~/.bootcamp/progress.db`, on your machine, gitignored, and it records
+exercise ids and outcomes. It does not record your answers, your name or your
+email. Read `src/bootcamp_agent/hints.py` before you write your own policy: a
+course that taught a retention policy it did not keep would be teaching nothing.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. One
+   skill from session 10, read out as procedural memory: it is a stored pattern,
+   it can go stale, and nothing about it is different in kind from a preference.
+2. **Contract and threat boundary (15m).** The four kinds of memory, and the four
+   questions every stored item answers. Fill the table for one thing your capstone
+   wants to remember. An item with no answer to "when does it expire" does not go
+   in.
+3. **Concept and live implementation (30m).** `SessionState` written live: one
+   preference, one rotating episode list, one `reset`. Then the same store with a
+   second user in it, and the line where it breaks.
+4. **Guided lab (35m).** The notebook. Sections 1 to 3: the preference reaches the
+   prompt and the episodes cap (`ch11-e1`). Section 4: your retention policy,
+   refusal list last (`ch11-e2`). Section 5: `MemoryStore`, four fixes
+   (`ch11-e3`).
+5. **Failure injection (15m).** Section 6. Two memories, one with an expiry and
+   one without, read on a date after both were written. Say which one you can
+   prove is stale, and what the other one leaves you able to say.
+6. **Evaluation and artifact receipt (10m).** `review("ch11")` in Jupyter, or
+   `uv run bootcamp check ch11` in the terminal. Then read two refusal lists in
+   the room and take the item you had not thought of.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: add a "what we refuse to remember" section to your
+   project README, and delete one field you are storing without a reason.
+
+## Evidence
+
+This session runs unattended and is scored. All three checks are deterministic
+and model-free:
+
+```bash
+uv run bootcamp check ch11                    # runs your notebook, prints its scorecard
+uv run bootcamp submit ch11 --github <you> --push    # hands in the notebook as it stands
+```
+
+`ch11-e1` runs your state wrapper: it sets the preference and reads the prompt the
+model actually saw, calls `reset()` and looks for leftovers, then asks seven
+questions and counts the episodes. `ch11-e2` reads your retention policy and
+refuses one whose labels are present and whose answers are not. `ch11-e3` drives
+your `remember` and `recall` with two users, a key nobody stored, a missing user
+id, and a list it edits after reading — by calling them, never by looking inside
+your store.
+
+<!-- navigation:start -->
+[Previous: Capstone: the source-grounded research assistant](../../unit2/capstone/introduction.mdx) · [Next: MCP architecture and primitives](../session-12-mcp-architecture/introduction.mdx)
+<!-- navigation:end -->

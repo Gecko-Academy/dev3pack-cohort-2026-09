@@ -245,6 +245,78 @@
       title: "Quick quiz (ungraded)"
     - local: unit2/capstone/conclusion
       title: "Conclusion"
+- title: "Unit 3. State, MCP, deployment, defense"
+  sections:
+  - title: "Session 11. State and memory — Mon 28 Sep"
+    sections:
+    - local: unit3/session-11-state-and-memory/introduction
+      title: "Introduction"
+    - local: unit3/session-11-state-and-memory/concepts-1
+      title: "Ephemeral or persisted, chosen on purpose"
+    - local: unit3/session-11-state-and-memory/concepts-2
+      title: "What a memory must refuse to remember"
+    - local: unit3/session-11-state-and-memory/concepts-3
+      title: "Isolation, and memory that went stale"
+    - local: unit3/session-11-state-and-memory/follow-along
+      title: "Follow along: today's class"
+    - local: unit3/session-11-state-and-memory/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit3/session-11-state-and-memory/conclusion
+      title: "Conclusion"
+  - title: "Session 12. MCP architecture and primitives — Tue 29 Sep"
+    sections:
+    - local: unit3/session-12-mcp-architecture/introduction
+      title: "Introduction"
+    - local: unit3/session-12-mcp-architecture/concepts-1
+      title: "Host, client, server, and which one you are writing"
+    - local: unit3/session-12-mcp-architecture/concepts-2
+      title: "The four primitives, and what each one is for"
+    - local: unit3/session-12-mcp-architecture/concepts-3
+      title: "Reading a surface you did not write"
+    - local: unit3/session-12-mcp-architecture/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit3/session-12-mcp-architecture/conclusion
+      title: "Conclusion"
+  - title: "Session 13. Build and secure an MCP server — Wed 30 Sep"
+    sections:
+    - local: unit3/session-13-secure-mcp-server/introduction
+      title: "Introduction"
+    - local: unit3/session-13-secure-mcp-server/concepts-1
+      title: "The smallest honest server"
+    - local: unit3/session-13-secure-mcp-server/concepts-2
+      title: "The fetch guard, and why a check after the request is not a guard"
+    - local: unit3/session-13-secure-mcp-server/concepts-3
+      title: "The applied case: a surface that says where its answers came from"
+    - local: unit3/session-13-secure-mcp-server/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit3/session-13-secure-mcp-server/conclusion
+      title: "Conclusion"
+  - title: "Session 14. Deploy and operate the capstone — Thu 01 Oct"
+    sections:
+    - local: unit3/session-14-deploy-and-operate/introduction
+      title: "Introduction"
+    - local: unit3/session-14-deploy-and-operate/concepts-1
+      title: "Deploying a bounded agent"
+    - local: unit3/session-14-deploy-and-operate/concepts-2
+      title: "Four failures, and what each one looks like from outside"
+    - local: unit3/session-14-deploy-and-operate/concepts-3
+      title: "The smoke test as a contract"
+    - local: unit3/session-14-deploy-and-operate/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit3/session-14-deploy-and-operate/conclusion
+      title: "Conclusion"
+  - title: "Session 15. Defend the capstone — Fri 02 Oct"
+    sections:
+    - local: unit3/session-15-defend-the-capstone/introduction
+      title: "Introduction"
+    - local: unit3/session-15-defend-the-capstone/concepts-1
+      title: "Demonstrating, and defending"
+    - local: unit3/session-15-defend-the-capstone/concepts-2
+      title: "Reading your own trace under pressure"
+    - local: unit3/session-15-defend-the-capstone/quiz
+      title: "Quick quiz (ungraded)"
+    - local: unit3/session-15-defend-the-capstone/conclusion
+      title: "Conclusion"
 - title: "Depth track (optional)"
   sections:
   - local: tracks/depth/introduction
@@ -311,7 +383,3 @@
     sections:
     - local: bonus/b06-improve-the-coach/introduction
       title: "Improve the coach"
-
-# Not in this repository yet. Each arrives on its Monday and
-# `git pull` brings it; the dates are in the README.
-#   Unit 3. State, MCP, deployment, defense

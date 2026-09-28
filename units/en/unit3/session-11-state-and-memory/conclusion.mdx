@@ -1,0 +1,37 @@
+# Conclusion
+
+You built three things: a `SessionState` with one preference and a capped episode
+list, a written retention policy, and a `MemoryStore` two people can share
+without sharing anything.
+
+## What you did
+
+- The preference is not stored state until it reaches the prompt the model saw,
+  which is why `ch11-e1` reads `FakeLLM.calls` instead of reading your dict.
+- The episode cap is the smallest honest expiry there is: two lines, no cleanup
+  job, and the sixth-oldest question stops existing.
+- `ch11-e2` refuses a policy of labels without answers, and the line it will not
+  let you skip is the one naming what you refuse to remember.
+- The course keeps that policy itself: `~/.bootcamp/progress.db` has columns for
+  outcomes and no column for your answers, your name or your email.
+
+## The failure you handled
+
+Cross-user leakage. A store that accepts a `user_id` and keys on `key` alone
+hands ana bruno's locale, passes every single-user test, and never raises.
+
+`ch11-e3` drives your `remember` and `recall` with two users, a key nobody
+stored, an empty and a `None` id, and a list it edits after reading — by calling
+them, never by looking inside. The four fixes are one shape each: the owner in
+the key, `None` on a miss, a `ValueError` on both paths before anything is
+stored, and a deep copy in each direction.
+
+The second failure is quieter. A memory with no expiry cannot be checked for
+staleness, only quoted, so `EXPIRES:` is what makes "quote it" a claim you can
+defend.
+
+## Into session 12
+
+Session 12 assumes you can say what your assistant holds, who owns it and when it
+expires — because the next thing you do is serve it over MCP, and everything you
+store becomes something a tool could return.

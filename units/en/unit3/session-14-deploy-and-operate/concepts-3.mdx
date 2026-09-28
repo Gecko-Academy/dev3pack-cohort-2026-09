@@ -1,0 +1,102 @@
+# The smoke test as a contract [[smoke-and-rollback]]
+
+## A test that can only pass is not an instrument
+
+The point of a smoke test is not to make you feel better after a deploy. It is
+to answer one question — *is this deployment worth keeping* — with an answer
+that can be no.
+
+Here is the one everybody writes first:
+
+```python
+def rosy(request):
+    response = request("/answer", {"question": QUESTION})
+    return response["status"] == 200
+```
+
+Point it at a deployment whose validation has stopped running and it prints
+green, because the deployment answers. Point it at one with a 2.4 s cold start
+and it prints green, with no number attached. It has one bit of output and it
+spends that bit on the thing least likely to be wrong.
+
+## The report
+
+`ch14-e3` asks for four fields instead:
+
+```python
+{"cold_start_ms": 2400, "malformed_rejected": True, "healthy": True,
+ "rollback": "..."}
+```
+
+| Field | True when | What a wrong value hides |
+|---|---|---|
+| `cold_start_ms` | it is the `elapsed_ms` of your **first** call | the 2.4 s every first caller pays, reported as 38 ms |
+| `malformed_rejected` | the malformed body came back 4xx | a deployment inventing answers for garbage, printed as green |
+| `healthy` | `/health` answered 200, a good question answered 200 with all four answer fields, and the malformed body was refused | the difference between "it is serving" and "it is serving correctly" |
+| `rollback` | it names an action, with a number and a unit | that nobody has decided what to do at 16:40 |
+
+Three rules hold the report up.
+
+**It measures what it reports.** You cannot report `malformed_rejected` without
+sending a malformed body. A field you did not probe is a claim, and the check
+looks at the calls your function actually made before it reads your answer.
+
+**It survives the broken one.** The killed deployment returns
+`{"error": "..."}` with no `answer` key. Code that reaches into the body raises,
+and a smoke test that raises has produced no report at exactly the moment the
+report was the point. Read `status` first, always.
+
+**It separates slow from wrong.** `cold_start_ms: 2400, healthy: True` is a
+correct report about a deployment that honours its contract and takes 2.4
+seconds to start. One number for a human to judge against a budget, one verdict
+about the contract. Collapsing them into a single green light loses both.
+
+## Same function, two transports
+
+The smoke test takes `request` as an argument, so the transport is the caller's
+problem:
+
+```python
+smoke(local_service)   # in-process, your capstone, no network
+smoke(http_request)    # the same function over a port you are serving
+```
+
+That is session 2's adapter seam, pointed at a service instead of a model
+provider. The test does not know whether it is talking to a function, a port or
+a platform, which is what makes the report from all three comparable.
+
+## The rollback you write before you need it
+
+The last field is the one people leave blank, because it is not a measurement.
+Write it anyway, and write it today: the moment you need a rollback is the
+moment you cannot think, and a sentence composed under pressure is a guess with
+consequences.
+
+The standard is the one `d3-e1` puts on an architecture decision's reversal
+trigger, and `ch14-e3` reads the same unit vocabulary from the same module that
+session 10's decision record does, so a checkable condition has one standard in
+this course rather than two. A number, a unit, and something somebody can do:
+
+| Written | Verdict |
+|---|---|
+| "We would probably roll back if things look bad." | an intention, and no action in it |
+| "Back to the last good state as fast as possible." | names a state, not a way to reach it |
+| "Redeploy the previous release." | an action, no number: which release, and how long? |
+| "Stop the service and restart it from the previous tag: `git checkout v0.3.1 && uv run python serve.py`; answering again inside 2 minutes." | an action, a version, a duration |
+
+The last one is boring, and boring is the property you want. Somebody who did
+not build this can run it.
+
+## What this session does not cover
+
+The optional depth track's [production module](../../tracks/depth/introduction.mdx) takes
+the next layer: one log line worth keeping at 3am (`d5-e1`), p50 and p95
+measured on your own machine and labelled `measured` rather than `target`
+(`d5-e2`), and the four-line runbook a stranger reads while something is broken
+(`d5-e3`). This session's rollback sentence is that runbook's third line, and
+writing it here means the runbook is already a quarter done.
+
+Operating is also where a number stops being a hope. Everything you measured
+today came from a fake that reports its own timings, so it is a number about the
+test, not about your service. The first real one comes from the port you serve
+it on.

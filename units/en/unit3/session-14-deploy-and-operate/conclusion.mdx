@@ -1,0 +1,43 @@
+# Conclusion
+
+You drew a boundary around the capstone — two routes, a body that validates or is
+refused — and ran it as a service you start yourself.
+
+## What you did
+
+- You wrote `smoke(request)`, which sends three probes and returns a report that
+  is allowed to say the deployment is bad.
+- Four deployments answered it: one warm, one that takes 2.4 seconds on its first
+  call, one that returns 200 for a body with a typo in a field name, and one
+  killed for exceeding its memory limit.
+- The rollback sentence is written, with an action, a version and a duration —
+  the same standard an architecture decision's reversal trigger has to meet, and
+  now it is in your README instead of in your head.
+
+## The failure you handled
+
+A deployment that answers everything. The lax one invents a confident sentence
+with no citations, status 200, and `rosy` — the smoke test everybody writes first
+— reports it healthy.
+
+`cold_start_ms: 2400, healthy: true` is a coherent report, and keeping those two
+facts apart is most of what the report is for.
+
+You also learned what a broken deployment does to a naive reader: the killed one
+returns a body you did not write, so code that reaches for `body["answer"]`
+raises and produces no report at all.
+
+## What to carry forward
+
+The limit is written down too: every number here came from a fake that reports
+its own timings, so it is a measurement about the test. The first real one comes
+from the port you serve it on.
+
+The hosted path stays a plan. It is not merged and not deployed, nothing you were
+graded on touched it, and the local path teaches every failure it would.
+
+## Into session 15
+
+Session 15 assumes your capstone runs, that you can point a smoke test at it, and
+that you can say in one sentence what you would do if the demo went wrong in
+front of the room.

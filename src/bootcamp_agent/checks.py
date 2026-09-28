@@ -595,14 +595,14 @@ def _ch11_e1(memory: object) -> str | None:
     if "(answer briefly)" not in probe.calls[-1][1]:
         return "(a) the 'short' preference did not reach the prompt the model saw"
     if not hasattr(state, "reset"):
-        return "(b) SessionState needs a reset() method"
+        return "SessionState needs its reset() method back: it ships written, so do not remove it"
     state.reset()
     if state.preferences or state.episodes:
-        return "(b) reset() left something behind"
+        return "reset() left something behind: it must clear both preferences and episodes"
     for index in range(7):
         answer_fn(f"question number {index} about chunking", state, FakeLLM())
     if len(state.episodes) != 5:
-        return f"(c) episodes should cap at 5, got {len(state.episodes)} after 7 questions"
+        return f"(b) episodes should cap at 5, got {len(state.episodes)} after 7 questions"
     return None
 
 

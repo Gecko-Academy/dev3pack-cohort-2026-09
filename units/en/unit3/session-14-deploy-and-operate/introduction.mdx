@@ -1,0 +1,74 @@
+# Deploy and operate the capstone
+
+**Thursday, October 1, 2026 · 2h · Thread: harness engineering**
+
+## Outcome
+
+You put the capstone behind a request boundary and run it as a service you start
+yourself. Then you write the test that decides whether a deployment is worth
+keeping: `smoke(request)` sends three probes, measures the first call, sends a
+malformed body on purpose, and returns a report that is allowed to say the
+deployment is bad. You also write the rollback sentence today, while nothing is
+broken and you can still think.
+
+The required path is local. Nothing here needs a hosting account, a card, or a
+public URL.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | Your capstone with two routes drawn around it — `/health` and `/answer` — in one process you start. Plus four deployments the check supplies: one warm, one that takes 2.4 s on its first call, one that answers a malformed body with 200, and one killed for exceeding its memory limit. |
+| Output | `smoke(request) -> dict`, returning `{"cold_start_ms": int, "malformed_rejected": bool, "healthy": bool, "rollback": str}`. Four fields, and every one of them can come back bad. |
+| Budget | No network and no hosting account. `request` is handed to your function, so nothing is fetched, and a delay is a number in the response rather than a wait — the notebook runs in the same second on every machine. One check, deterministic and model-free. |
+| Failures this session must handle | **A cold start.** The first call pays for the process starting, and the number the first caller sees is not the number you measured on the second call. **A resource limit.** The container is killed over its memory ceiling; the platform answers 503 and your code never ran. **A malformed request.** A body with a typo for a field name gets a 4xx — and a deployment that answers it 200 with an invented sentence has to be reported as such, not smoothed over. **No way back.** A fix that makes it worse, and nothing written down that says how to undo it. |
+
+The threat here is not an attacker. It is a smoke test that agrees with you. It
+sends one request, gets a 200, prints green, and is now evidence that the
+deployment is fine — which is exactly what a deployment inventing answers for
+garbage also prints. A test that can only pass has measured nothing.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. One
+   sentence: the last time something worked on your machine and not on somebody
+   else's, and what the difference turned out to be.
+2. **Contract and threat boundary (15m).** The report's four fields, read aloud.
+   For each one, say what a wrong value would hide. Then the table above.
+3. **Concept and live implementation (30m).** `local_service` in the notebook:
+   the capstone with a boundary around it, two routes, a body that validates or
+   is refused. Then the four deployments, and what each looks like from outside
+   — status, latency, body.
+4. **Guided lab (35m).** `notebook.ipynb`, section 3: write `smoke` and run it
+   against all four (`ch14-e3`). Then point the same function at
+   `local_service`, which is your own code, and read that report.
+5. **Failure injection (15m).** Section 5: `rosy`, the smoke test everybody
+   writes first. It reports the lax deployment healthy. Say out loud how long
+   that report would have stayed believed.
+6. **Evaluation and artifact receipt (10m).** `check("ch14-e3", smoke)`, then
+   `review("ch14")`. Read your rollback sentence out; it goes into the README
+   today, not tomorrow.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: run `smoke` against your own capstone and bring the
+   one deployment failure you cannot yet handle.
+
+## Evidence
+
+This session runs unattended. The check is deterministic and model-free:
+
+```bash
+uv run bootcamp check ch14                    # runs your notebook, prints its scorecard
+uv run bootcamp submit ch14 --github <you>    # hands in the notebook as it stands
+```
+
+`ch14-e3` drives your `smoke` with four deployments of its own, and judges the
+report against what the service actually did on that run: the cold start has to
+be your first call's own number, a 200 for a malformed body has to come back as
+`malformed_rejected: false`, the killed deployment has to be reported rather
+than crashed on, and the rollback sentence has to name an action with a number
+and a unit — the standard an architecture decision's reversal trigger already
+has to meet.
+
+<!-- navigation:start -->
+[Previous: Build and secure an MCP server](../session-13-secure-mcp-server/introduction.mdx) · [Next: Defend the capstone](../session-15-defend-the-capstone/introduction.mdx)
+<!-- navigation:end -->

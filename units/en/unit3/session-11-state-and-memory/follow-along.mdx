@@ -1,0 +1,227 @@
+# Follow along: today's class
+
+Keep this page open during the session. Every step says what to open and what to
+run, in the order we run it in class.
+
+| Part | What | Time |
+|---|---|---|
+| [0](#0-before-we-start) | Before we start: pull, sync, preflight green | 5 min |
+| [1](#1-where-we-are-going) | Where we are going: week 3, and a skill is a memory | 5 min |
+| [2](#2-four-kinds-and-four-questions) | Four kinds of memory, and four questions | 15 min |
+| [3](#3-the-state-wrapper-live-then-a-second-user) | The state wrapper, live, then a second user | 30 min |
+| [4](#4-your-exercise) | Your exercise: a preference, a policy, and a store with owners | 35 min |
+| [5](#5-break-it-on-purpose) | Break it on purpose: memory that was true once | 15 min |
+| [6](#6-check-and-read-two-refusal-lists) | Check, and read two refusal lists | 10 min |
+| [7](#7-hand-it-in) | Hand it in, and the exit ticket | 5 min |
+
+## 0. Before we start
+
+From your course folder:
+
+```bash
+git stash push -m "my work before today's update"
+git pull
+uv sync --extra projects --extra agents
+uv run jupyter lab
+```
+
+**Why the stash first.** `git pull` stops when you have typed into a notebook it
+wants to update, and it says "your local changes would be overwritten". `git
+stash` puts your changes on a shelf and deletes nothing. To take one notebook
+back as you left it, see [when `git pull` stops](../../unit0/get-settled.mdx).
+
+**Name both extras, or you lose ChromaDB.** `uv sync` makes the environment match
+exactly what you asked for. Ask for `agents` on its own and it uninstalls the
+`projects` extra, ChromaDB goes with it, and project 02's index stops building.
+Today's notebook needs neither.
+
+**Today needs no model and no key.** Every cell runs on `FakeLLM`, in memory, with
+no database and no network.
+
+**A check that says it never ran means you did not save.** `bootcamp check` reads
+the file on disk, not the kernel in your browser.
+
+Open one file:
+
+- `units/en/unit3/session-11-state-and-memory/notebook.ipynb`
+
+Run the first cell, the preflight, and wait until it is green. It never raises: if
+something is missing, it prints the command that fixes it.
+
+**No setup on your laptop?** Open it in Colab. The first cell fetches the course
+for you.
+
+## 1. Where we are going
+
+Week 3 starts today. Last week your assistant learned to answer. This week it
+learns to hold things, serve things and ship. Today is the first of those: what it
+holds, and for how long.
+
+| You have | You can say | You cannot yet say |
+|---|---|---|
+| a dict that holds a preference | it remembers | whether the model ever saw it |
+| a preference in the prompt, a cap of 5 | it remembers, and forgets on schedule | whose memory it is |
+| a store keyed on the owner | ana gets ana's, bruno gets bruno's | nothing; that is the claim |
+
+**Start with something you already built.** Open the skill you wrote on Friday.
+It is a stored pattern your assistant applies without being told again. That is
+memory: procedural memory. It can go stale the same way a preference can. If the
+API it describes changes tomorrow, the skill keeps running, and it is now wrong.
+
+## 2. Four kinds and four questions
+
+| Kind | Holds | Example | Lives |
+|---|---|---|---|
+| Conversation state | this exchange | "answer briefly" | one session |
+| Semantic memory | facts | "this user reads Portuguese docs" | until corrected |
+| Episodic memory | past interactions | the last five questions | until it rotates out |
+| Procedural memory | how-to patterns | your skill from session 10 | until the procedure changes |
+
+Every item answers four questions before it is stored:
+
+1. **Why is it useful?** Name the answer it improves.
+2. **Who owns it?** A memory with no owner is everybody's memory.
+3. **How is it corrected?** Overwrite, reset or delete, and the user can reach it.
+4. **When does it stop being true?** A date, a count, or the end of the session.
+
+**Fill the four answers for one thing your capstone wants to remember.** Write
+them on paper or in a scratch cell. An item with no answer to question 4 does not
+go in.
+
+## 3. The state wrapper, live, then a second user
+
+Open the notebook and run sections 1 to 3 from the top. Three beats.
+
+| Section | What happens |
+|---|---|
+| **2. The wrapper** | `SessionState`: one `preferences` dict, one `episodes` list, one `reset()`. Written for you. What the application does with it is the exercise. |
+| **3. The preference** | The cell sets `answer_style = "short"`, asks one question through a `FakeLLM`, and prints the end of the prompt the model received. |
+| **5. The second user** | `MemoryStore` takes a `user_id` and never uses it. Ana and bruno both store `locale`. Read what ana gets back. |
+
+As shipped, section 3 prints:
+
+```
+prompt the model saw: Question: How does chunking work in RAG?
+episodes: ['Q: How does chunking work in RAG?']
+```
+
+The preference is set. The prompt does not carry it. That is a stored value the
+model never saw, and nothing raised to tell you.
+
+As shipped, section 5 prints:
+
+```
+ana asked for her locale -> en-GB
+bruno asked for his      -> en-GB
+```
+
+Ana asked for her locale and got bruno's. A test written for one user cannot fail
+on this, because one user cannot read anybody else.
+
+**The question for the room:** how many stores have you written that take a
+`user_id` argument and never read it?
+
+## 4. Your exercise
+
+In the session notebook. **300 marks, three exercises, in notebook order:**
+
+| Challenge | What you write | Marks |
+|---|---|---|
+| `ch11-e1` | in `answer_with_state`: the preference reaches the prompt, and the episodes cap at 5 | 100 |
+| `ch11-e2` | your storage policy: five lines, each answered, the refusal list last | 100 |
+| `ch11-e3` | `MemoryStore`: four fixes, so two users never share a memory | 100 |
+
+```bash
+uv run bootcamp check ch11
+```
+
+As shipped it prints:
+
+```
+running ch11 (State and memory)…
+ch11: 0/3 passed
+❌ ch11-e1: (a) the 'short' preference did not reach the prompt the model saw
+❌ ch11-e2: the policy needs every line filled, not just the labels
+❌ ch11-e3: two users, one key: ana stored 'pt-BR' and bruno stored 'en-GB' under the same key; recall('ana', 'locale') returned 'en-GB' and must return 'pt-BR'; hint: the owner is part of the key — store on (user_id, key), never on key alone
+```
+
+That is where you start. `check` runs the whole notebook, so it takes a few
+seconds longer than the check cell in Jupyter.
+
+**The two that catch people:**
+
+- **`ch11-e2` counts characters.** Under 120 characters for the whole policy, and
+  it refuses before it reads a line. Each line needs at least 12 characters after
+  its colon. `n/a`, `none`, `tbd` and `-` count as blank.
+- **`ch11-e3` reports one scenario at a time.** It runs four, in this order: two
+  users, a key nobody stored, a missing `user_id`, a list edited after storing. It
+  stops at the first one that breaks. Fix the key and the next message can be
+  about a different scenario. That is progress, not a new bug. Read each message
+  before you change anything.
+
+## 5. Break it on purpose
+
+Notebook section 6. Two memories, read on 1 November 2026:
+
+```
+locale  pt-BR      expires 2026-10-28 -> read it again from the source
+plan    free tier  expires None       -> read it again from the source
+```
+
+Same verdict, two reasons. The locale expired, and you can see that it did. The
+plan never said when it stops being true.
+
+**Now change `today` to `date(2026, 10, 1)` and run the cell again:**
+
+```
+locale  pt-BR      expires 2026-10-28 -> quote it
+plan    free tier  expires None       -> read it again from the source
+```
+
+The locale became quotable. The plan did not, and no date you pick will change
+that. A memory with no expiry is not fresh. It is unaudited, forever.
+
+**Then break your policy.** Replace your `EXPIRES:` answer with `n/a`, run the
+check cell, and read the refusal. Put your answer back before you move on.
+
+**The question for the room:** which item in your capstone is the `plan` row?
+
+## 6. Check, and read two refusal lists
+
+```bash
+uv run bootcamp check ch11
+```
+
+Or `review("ch11")`, the last cell in the notebook. Aim for `ch11: 3/3 passed`.
+
+Then two volunteers read their `WE REFUSE TO REMEMBER:` line out loud. Everybody
+else takes one item they had not thought of and adds it to their own.
+
+**For your capstone:** the five lines go into `docs/RETENTION.md` in your
+repository, in the same words the check reads. See
+[the capstone guide](../../unit2/capstone/guide.mdx), row 11.
+
+## 7. Hand it in
+
+When the check is green:
+
+```bash
+uv run bootcamp submit ch11 --github <your-github-name> --push
+```
+
+**Save the notebook first.** `submit` reads the file on disk.
+
+It goes to **dev3pack-submissions**, never to the course repository. No `gh` on
+your machine? The command prints the browser route, and
+[how to submit](../../unit0/how-to-submit.mdx) has the rest.
+
+**Exit ticket.** One thing that works now, one thing that is still unclear, your
+next action.
+
+**Homework.** Add a "what we refuse to remember" section to your project README,
+and delete one field you are storing without a reason.
+
+## Tomorrow
+
+Session 12, MCP architecture and primitives. Everything you decided to store
+today becomes something a tool could return.

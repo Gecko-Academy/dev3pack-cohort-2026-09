@@ -1,0 +1,189 @@
+# The fetch guard, and why a check after the request is not a guard [[fetch-guard]]
+
+## The decision happens on the string
+
+There is a version of this tool that fetches first and inspects afterwards. It
+looks careful — it reads the response, notices the address was internal, throws
+the body away, and returns a refusal. It is not a guard, and the reason is that
+the damage is the *request*, not the reply.
+
+By the time there is a reply:
+
+- the internal service has already answered, and if the URL was a `POST` in
+  disguise or a queue endpoint that acts on a `GET`, it has already acted;
+- the metadata service has already handed over a credential, and it is now in
+  the memory of a process that is about to write logs;
+- the answer is already in the transcript, because whatever fetched it did so
+  inside the call the model is waiting on;
+- and even a refusal leaks: "that host answered in 3 ms" and "that host did not
+  answer at all" is a port scan of a private network, one URL at a time.
+
+So the guard runs on the string, before the socket opens, and it returns a
+verdict rather than doing anything.
+
+```python
+verdict = fetch_guard(url)      # no I/O in here at all
+if not verdict["allowed"]:
+    return {"ok": False, "refusal": verdict["reason"]}
+```
+
+That is also why this exercise can be graded on a laptop with the network
+unplugged. A guard made of parsing and arithmetic gives the same verdict on
+every machine, which is exactly the property you want in the thing that decides
+whether a request is allowed to happen.
+
+## Three rules, in this order
+
+| # | Rule | Refuses | Code |
+|---|---|---|---|
+| 1 | scheme | anything that is not `http` or `https` | `scheme` |
+| 2 | address | a host that IS an address, unless the address is public | `not-public` |
+| 3 | allowlist | a host that is not a declared domain or a subdomain of one | `not-allowlisted` |
+
+The first rule that fires decides, and its code is the reason. The order is not
+cosmetic. Rule 3 would refuse `http://127.0.0.1/` too — no bare address is ever
+on an allowlist — so a guard that consults the list first is safe *today*. Two
+things make the order worth keeping anyway:
+
+- **The allowlist gets widened.** It always does: a second caller, a staging
+  host, a wildcard somebody adds at 6pm. Rule 2 is the rule that still holds
+  the morning after.
+- **The reason is what the next person acts on.** `not-allowlisted` on
+  `http://127.0.0.1:8000/` sends a reader to add an entry, when the true answer
+  was that the URL pointed at the machine the server runs on.
+
+## Rule 1: the scheme
+
+`http` and `https` pass. Everything else is refused, including on a host that
+*is* on the allowlist — `gopher://example.com:70/_` is refused by rule 1, and
+that ordering is the point of rule 1 existing separately. `file:///etc/passwd`
+has no host at all, and a guard that starts by looking at the host never gets a
+chance to refuse it.
+
+## Rule 2: an address is an address, however it is written
+
+A host that names an address must name a public one. The table is the whole
+rule, and the right-hand column is how each row gets past a guard somebody
+wrote in a hurry:
+
+| Host | What it is | How it gets through |
+|---|---|---|
+| `10.0.0.7`, `192.168.1.10` | private space | nothing — these are the ones people remember |
+| `172.20.10.4` | private space | a prefix test on `"172."` over-blocks; a test on `"172.16."` under-blocks. The range is 172.16.0.0/12, which ends at 172.31.255.255 |
+| `127.0.0.1` | this machine | — |
+| `127.5.5.5` | this machine | loopback is the whole of 127.0.0.0/8, not the address people memorise |
+| `localhost` | this machine | it is a *name*, so a guard that only inspects IP literals never sees it |
+| `::1` | this machine, IPv6 | half a guard is no guard: the same host answers on both stacks |
+| `169.254.169.254` | the cloud metadata service | it is inside link-local, which is the range people leave out |
+| `0.0.0.0` | unspecified | most clients read it as this host |
+| `2130706433` | `127.0.0.1` as one 32-bit number | `ip_address()` raises `ValueError`, the guard shrugs, and the HTTP client dials it anyway |
+| `0x7f000001` | the same in hexadecimal | same shrug |
+| `::ffff:127.0.0.1` | IPv4 mapped into IPv6 | the v6 checks are asked about a v4 address |
+
+Two lines of standard library do most of it:
+
+```python
+from ipaddress import ip_address
+
+address = ip_address(host)                 # raises ValueError if host is a name
+address.is_private                         # knows exactly where 172.16.0.0/12 ends
+```
+
+`is_loopback`, `is_private`, `is_link_local`, `is_multicast`, `is_reserved` and
+`is_unspecified` between them cover every row above that is written the ordinary
+way. Ask all six; a host is fetchable only if the answer to all six is no.
+
+The rows `ip_address` will not answer are the encoded ones, and they need four
+lines you write yourself: if the host is all digits, read it as a 32-bit number;
+if it starts with `0x`, read it as hexadecimal; then judge the address that
+comes out. No real hostname is a bare number, so nothing legitimate is lost.
+`localhost` is the same kind of gap in the other direction — a name that means
+this machine — and it is one comparison.
+
+`::ffff:127.0.0.1` is handled for you by `ipaddress` on the Python this course
+runs on. Unwrapping `address.ipv4_mapped` yourself makes the answer stop
+depending on that.
+
+## Rule 3: whole labels, and the host a parser says
+
+```python
+def allowlisted(host: str) -> bool:
+    return any(host == domain or host.endswith(f".{domain}") for domain in ALLOWED_DOMAINS)
+```
+
+The `==` half and the `.` in the second half are both load-bearing.
+
+| URL | Naive `endswith` | Correct | Why |
+|---|---|---|---|
+| `https://api.example.com/` | allowed | allowed | a subdomain of an allowed domain |
+| `https://evil-example.com/` | **allowed** | refused | ends with the allowed string, and is a different domain somebody else registered |
+| `https://example.com.attacker.net/` | refused | refused | the allowed name is at the front; the labels at the **end** decide who owns a name |
+
+And the host is whatever a URL parser says it is, never what the string looks
+like:
+
+```python
+urlsplit("https://example.com@evil-example.net/spec.json").hostname
+# 'evil-example.net'
+```
+
+Everything before the `@` is userinfo. A guard that reads the host by splitting
+the string is reading a field the caller controls, and there are more of these
+than anyone can enumerate — a backslash, a tab inside the authority, a trailing
+dot. Use the parser your HTTP client uses, so the host you judge is the host
+that gets dialled.
+
+## Redirects: the guard runs on every hop
+
+The first URL can be perfect. The server answers `302 Location:
+http://169.254.169.254/latest/meta-data/`, the client follows it because
+following redirects is the default everywhere, and the guard never sees the hop
+that mattered.
+
+```python
+for hop in chain:                  # capped, and every hop goes through the guard
+    verdict = fetch_guard(hop)
+    if not verdict["allowed"]:
+        stop(verdict["reason"])
+```
+
+Three rules, and they are cheap:
+
+1. Turn off automatic redirect following, and follow them yourself.
+2. Run the guard on every hop, including the first.
+3. Cap the number of hops, so a redirect loop is a refusal and not a hang.
+
+The notebook walks a recorded chain: two hops on allowed hosts, then one to the
+metadata address. Guard the first URL only and it is allowed. Guard every hop
+and the run stops at hop 3 with a reason.
+
+## What this guard does not do
+
+Be honest about the edge, because the edge is where the next incident is.
+
+**It does not resolve DNS.** `internal.example.com` is on the allowlist and can
+resolve to `10.0.0.7`. A production guard resolves the host, checks **every**
+address that comes back, and then pins the socket to the address it checked —
+because between "resolve and check" and "connect" the name can be re-answered
+with a different address, which is the DNS rebinding attack. Our session runs
+offline, so the guard here stops at the parse layer. Session 14 is where a
+deployed version has to close it.
+
+**It does not stop a fetch it allowed from being enormous, slow, or a
+redirect loop.** Size, timeout and hop caps sit next to the guard and are not
+part of it.
+
+**And an allowlist is a decision, not a technique.** The hard part of shipping
+this is not `ipaddress`. It is answering "which hosts does this tool need", in
+writing, and then holding that line when somebody wants one more.
+
+## What `ch13-e4` judges
+
+| Property | Fails when |
+|---|---|
+| the shape | it returns something other than `{"allowed": bool, "reason": str}`, or `allowed` is truthy rather than `True` |
+| it always answers | any string makes it raise |
+| it allows what it should | a plain `https` URL on an allowed host, a subdomain, an uppercase scheme, or plain `http` is refused |
+| the address rule | a private, loopback, link-local, metadata, unspecified, or encoded address is allowed, or refused with the wrong code |
+| the allowlist rule | `evil-example.com` passes, or the host is read off the string |
+| the reason | a refusal carries no code, or carries the code of a rule that was not the one that should have fired |

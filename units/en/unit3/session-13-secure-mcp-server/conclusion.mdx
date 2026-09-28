@@ -1,0 +1,44 @@
+# Conclusion
+
+You built the part of an MCP server that says no: one read-only tool, one narrow
+argument, an allowlist a caller cannot widen, and `fetch_guard(url)` consulted
+before any socket opens.
+
+## What you did
+
+- Three rules in order — scheme, address, allowlist — and the first one that
+  fires names the reason, so `not-public` and `not-allowlisted` send the next
+  reader to two different places.
+- The address rule uses `ipaddress` rather than string prefixes, because
+  `172.16.0.0/12` ends at `172.31.255.255` and a prefix test gets that wrong in
+  both directions.
+- The allowlist matches whole labels, and the host comes from a URL parser, so
+  `evil-example.com` and `https://example.com@evil-example.net/` are both
+  refused.
+- `ch13-e4` drove your guard with thirty-one URLs and graded the reason as well
+  as the verdict; refused for the wrong reason fails, because a guard that names
+  the wrong rule is a guard nobody can maintain.
+- On the applied surface you read dated recordings of a comprehended Solana
+  catalogue, placed five activities in the lowest lane that can do them
+  (`ch13-e2`), and signed a checklist where the honest `False` is the point
+  (`ch13-e1`).
+
+## The failures you handled
+
+A URL that points inside. `169.254.169.254` hands out the instance's credentials,
+`2130706433` and `0x7f000001` are `127.0.0.1` written so that `ip_address()`
+shrugs, and all three are refused on the string.
+
+And a redirect. Two allowed hops and then a `302` to the metadata address — the
+guard runs on every hop, or it ran on a URL that was never fetched.
+
+## Into session 14
+
+Session 14 assumes this guard exists and asks the question this session left
+open: what it takes to deploy it, where DNS resolution and the rebinding window
+get closed, and what the caps around the fetch have to be.
+
+## Homework
+
+Add an **external tools** section to your project instructions — allowed hosts,
+data handling, who approves what. Then say what your guard does on a redirect.

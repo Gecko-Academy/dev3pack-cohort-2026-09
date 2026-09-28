@@ -1,0 +1,111 @@
+# Host, client, server, and which one you are writing [[host-client-server]]
+
+## Three parts, and the one everybody skips
+
+Week 0 gave you the shape: a **host** is the application a person uses, a
+**client** is one connection inside it, a **server** is a set of capabilities.
+The host starts the client, the client starts the server, the server starts
+nothing.
+
+That is the plumbing. Here is the part the diagram leaves out.
+
+| Part | Owns | Cannot do |
+|---|---|---|
+| Host | the model, the system prompt, the conversation, the person | see inside a server |
+| Client | one connection: the handshake, the listings, every call and result | decide what a server offers |
+| Server | its tools, resources and prompts, and the code behind them | reach the model, except by being read |
+
+Read the third column again. The server cannot reach the model. It can only
+**be read** by the model — and everything it publishes is read. That single
+asymmetry is the whole security story of this session, and it is why a
+description is not documentation.
+
+## One client per server
+
+A client is a connection, not a component you write once. Three servers means
+three clients inside the same host, each with its own handshake, its own
+listings, its own lifetime.
+
+```
+        host (your assistant)
+          |            |            |
+      client A     client B     client C
+          |            |            |
+      server A     server B     server C
+      16 tools     30 tools      4 tools
+```
+
+The model does not see three servers. It sees one list of fifty tools, flattened,
+with no visual break between the one you wrote and the one you installed from a
+README last Tuesday. Every tool description on that list occupies the same
+context, at the same trust level, in front of the same model.
+
+That is why the tool count is the number worth writing down. Week 0's third
+question about a third-party server — *surface area* — has an answer that is a
+number, and this is the number.
+
+## Which one you are writing today
+
+You have written a server. Unit 9 was forty lines to a running one; unit 11
+put a database and a credential behind it. Session 13 goes back to the server
+side and secures one.
+
+Today you write neither the host nor the server. You write **the code a client
+runs at its boundary**: read the handshake, read the listings, decide what this
+surface is, decide what is safe to put in front of the model. No transport, no
+`async with`, no process to start — that part you already did, and repeating it
+would hide the part you have not done.
+
+| Session | You write | The boundary sits |
+|---|---|---|
+| w09 to w11 | a server, and a client that talks to it | inside your own code |
+| **12** | **the judgement a client makes about a server** | **between you and a stranger** |
+| 13 | a server other people connect to | between you and your callers |
+
+## The decision the protocol does not make for you
+
+MCP standardises how a server describes itself. It does not standardise whether
+you should believe it. There is no signature on a tool description, no
+provenance field, no authority that vouches for `read_only: true`. The spec's
+own annotations are documented as hints.
+
+So the protocol hands your client a list and stops. What happens next is
+application code, and if you do not write it, the default is to trust
+everything:
+
+```python
+tools = await session.list_tools()
+# and straight into the model's context, all of it, exactly as received
+```
+
+That line is the default in nearly every MCP client in existence, and for a
+server you wrote it is fine. For one you did not, it is the decision to trust a
+stranger, made by not making it.
+
+## Where each failure lands
+
+The two failures this session handles land in different places, and neither of
+them lands on the server.
+
+| Failure | The server did | Your client should |
+|---|---|---|
+| a capability announced with nothing behind it | answer the handshake honestly and the listing emptily | notice the two disagree, and say so |
+| a description carrying an instruction | publish text, which is all it can do | read it as data, and refuse to pass it on |
+
+In both cases the server is behaving exactly as the protocol allows. Nothing is
+malformed. Nothing raises. The failure only exists at the client, because the
+client is the only part that sees both the claim and the evidence.
+
+## What a client actually learns on connect
+
+Four things, and it is worth being precise about how thin that is:
+
+- **The protocol version**, agreed in the handshake.
+- **The capabilities**: which primitives this server says it supports.
+- **The collections**: the tools, resources and prompts it lists when asked.
+- **Nothing else.** No source, no version history, no author, no way to ask a
+  question.
+
+You will spend the rest of this session working with those four things, because
+they are all there is. Session 13 has more to work with — it runs the server —
+and that difference is exactly why the two sessions are separate.

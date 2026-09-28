@@ -1,0 +1,32 @@
+# Reading your own trace under pressure [[reading-traces]]
+
+## Why the trace is the whole defence
+
+Six minutes is not long enough to reason from first principles about what just
+went wrong. It is long enough to read a trace out loud, if the trace says
+anything.
+
+That is what session 9 was for. An event carries what was attempted, with what
+arguments, what came back, and how long it took. A trace with a gap where a
+tool call should be is worse than no trace: it reads as though nothing happened
+there, and you will say so, and you will be wrong.
+
+## The diagnosis, in order
+
+When the injected failure lands, resist explaining. Read instead.
+
+1. **Where did it stop?** The last event, and whether it is an ending the
+   system chose or one it fell into.
+2. **What was the last thing it believed?** The retrieved documents, the
+   arguments to the last tool call.
+3. **Which contract broke?** Every session gave you one: a schema that rejects,
+   a tool that refuses, a budget that ends a loop, a transition that is not
+   declared. Name the one that should have caught it.
+4. **Did it fail safely?** A readable refusal is a pass. A traceback on screen
+   is a finding, and saying so plainly is better than talking over it.
+
+## Rehearse the failure, not the demo
+
+Run your own agent against the six conditions in the introduction before Friday.
+You will find at least one you cannot yet handle. That is the point of doing it
+on Thursday rather than on stage.

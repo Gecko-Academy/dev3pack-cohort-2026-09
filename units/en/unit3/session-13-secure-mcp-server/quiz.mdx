@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: A tool fetches the URL, sees that the address was internal, discards the body and returns a refusal. Why is that not a guard?
+
+<Question
+  choices={[
+    { text: "It is a guard, just a slow one", explain: "The cost is not latency. The request already happened, and the request was the thing to prevent." },
+    { text: "The request already reached the internal service, and its answer is already inside the call the model is waiting on", explain: "Correct. The damage is the request. By the time there is a reply, the service has acted and the credential, if there was one, has been handed over.", correct: true },
+    { text: "Because discarding the body loses evidence for the incident report", explain: "Keeping the body would be worse, not better. The problem is upstream of what you do with it." },
+  ]}
+/>
+
+### Q2: The allowlist is `("example.com", "docs.python.org")`. What must `https://evil-example.com/spec.json` get?
+
+<Question
+  choices={[
+    { text: "Allowed — it ends with example.com", explain: "That is the bug. `endswith` on a bare domain matches any name somebody registers with the allowed one as a suffix." },
+    { text: "Refused — a host matches only if it equals an allowed domain or ends with a dot and that domain", explain: "Correct. Whole labels. `evil-example.com` is a different domain, registered by somebody else, and `api.example.com` is not.", correct: true },
+    { text: "Refused — the guard should reject any host containing a hyphen", explain: "Hyphens are legal and common. The rule is about label boundaries, not characters." },
+  ]}
+/>
+
+### Q3: A guard refuses `http://2130706433/` with the reason `not-allowlisted`. The URL was refused. Why does the check still fail it?
+
+<Question
+  choices={[
+    { text: "It does not matter; refused is refused", explain: "It is safe today and it names the wrong rule, which is what the next person acts on — and the allowlist is the rule that gets widened." },
+    { text: "The guard did not recognise 2130706433 as 127.0.0.1, so the address rule never ran; only the allowlist happened to catch it", explain: "Correct. Remove or widen the allowlist and that URL walks through. The reason says which protection was actually holding.", correct: true },
+    { text: "Because a numeric host is always malformed and should raise", explain: "It is not malformed — an HTTP client will dial it. And a guard that raises hands the decision to a caller with no rules to make it." },
+  ]}
+/>
+
+### Q4: The first URL is on the allowlist. The host answers `302` with `Location: http://169.254.169.254/latest/meta-data/`. What does a correct tool do?
+
+<Question
+  choices={[
+    { text: "Follows the redirect: the original URL passed the guard", explain: "The guard ran on a URL that was never the one fetched. This is the standard way past an allowlist." },
+    { text: "Follows redirects itself, runs the guard on every hop, and caps the number of hops", explain: "Correct. Automatic redirect following hands the destination to whoever answers first, and the cap turns a redirect loop into a refusal instead of a hang.", correct: true },
+    { text: "Refuses every response with a 3xx status", explain: "Workable, and stricter than most APIs allow. The rule that scales is to follow them yourself and guard each hop." },
+  ]}
+/>
+
+### Q5: Which lane can tell you what a store charges today?
+
+<Question
+  choices={[
+    { text: "Recorded — the fixture has the price in it", explain: "The fixture has a price from 19 August 2026. A recording is teaching evidence, never a claim about today." },
+    { text: "Public read-only — it is a fact about today, and a recording goes stale", explain: "Correct. Reading the live surface needs no credential and no fork, and it is the lowest lane that can answer a question about now.", correct: true },
+    { text: "Fork — anything touching a real price needs the instructor's surface", explain: "The fork is for signing. Reading a price signs nothing and needs nobody's permission." },
+  ]}
+/>

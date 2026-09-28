@@ -1,0 +1,120 @@
+# What a memory must refuse to remember [[refuse-to-remember]]
+
+## The policy is five lines, and the last one is the policy
+
+```
+STORED: one answer_style preference; the last 5 question summaries (episodes).
+WHY: the style shapes answers; the episodes let the assistant say 'as you asked earlier'.
+CORRECTED BY: setting the preference again overwrites it; reset() clears everything.
+EXPIRES: episodes rotate at 5; everything dies with the session, nothing touches disk.
+WE REFUSE TO REMEMBER: names, emails, keys and secrets, message bodies, anything
+identifying a person. The assistant answers questions about docs and needs none of it.
+```
+
+The first four lines describe a store. The fifth one is the only line that costs
+you something, and it is the one users would thank you for if they ever saw it.
+
+A policy that stores everything it can and calls that a policy is the one that
+leaks. Not because someone attacked it — because nobody ever wrote down where it
+stops, so it never stopped.
+
+## What `ch11-e2` judges
+
+It reads your `storage_policy` string and refuses labels without answers. Each of
+the five lines needs a real answer after the colon, and the whole thing needs
+at least 120 characters, because a policy shorter than that is a heading.
+
+| It fails | Because |
+|---|---|
+| `EXPIRES:` with nothing after it | a blank is not a decision |
+| `EXPIRES: n/a` | placeholders are the blank in disguise; `todo`, `tbd`, `none`, `-` and `?` all fail too |
+| a missing `WE REFUSE TO REMEMBER:` | the refusal list is the point |
+| all five labels, one-word answers | twelve characters is the floor for a thought |
+
+It cannot judge whether your policy is *good*. Nothing automatic can. It can
+insist that you made four decisions and one refusal, in writing, before you stored
+anything — and that is the difference between a policy and an intention.
+
+## Write it for the item, not for the store
+
+"We store user data securely" is not a policy. It names no item, no duration and
+no refusal, so nothing about it can be wrong, which means nothing about it can be
+checked.
+
+Write one row per item. If an item cannot fill the row, it does not get stored.
+
+| Item | Why | Corrected by | Expires | |
+|---|---|---|---|---|
+| `answer_style` | shapes every answer | set it again, or `reset()` | end of session | keep |
+| the last 5 questions | "as you asked earlier" | rotates | at five | keep |
+| the raw question text | — | — | — | **refuse** |
+| the user's email | — | — | — | **refuse** |
+
+The two refused rows are refused for the same reason: nothing filled the middle
+columns. That is the whole test.
+
+## The course keeps the policy it teaches
+
+`src/bootcamp_agent/hints.py` is this session's worked example, and you are the
+user in it. Read it before you write your own.
+
+```python
+STORE_ENV = "BOOTCAMP_PROGRESS_DB"
+
+def store_path() -> Path:
+    """Where progress lives. Overridable, mostly so tests do not touch yours."""
+    override = os.environ.get(STORE_ENV)
+    return Path(override) if override else Path.home() / ".bootcamp" / "progress.db"
+```
+
+| | |
+|---|---|
+| STORED | one row per exercise id: passed, attempts, hinted, revealed, first and last seen |
+| WHY | the scorecard, and the hint price — a hint costs 30 XP, and something has to remember that you took it |
+| CORRECTED BY | delete the file; a re-run rewrites the row |
+| EXPIRES | it is yours, on your disk, gitignored, and it leaves your machine only if you copy it out yourself |
+| WE REFUSE TO REMEMBER | your answers, your name, your email, anything you typed |
+
+Two details worth stealing.
+
+**The refusal is structural, not a promise.** The table has columns for outcomes
+and no column for an answer. There is nowhere to put the thing we said we would
+not keep, so no future commit puts it there by accident.
+
+**Bookkeeping never breaks the exercise.** `check()` records the attempt inside a
+`try` that swallows everything, because a read-only home directory is an
+inconvenience and an exercise that crashes over telemetry is a blocker. The
+memory is the least important thing in the function that writes it.
+
+## The same standard in the depth track
+
+`depth/02-managing-data` asks for the same policy in four keys instead of five
+lines, and `d2-e3` enforces two rules that are worth carrying into anything you
+write here:
+
+- **`keep_for` needs a number.** "A while" fails; "30 days" passes. A duration
+  without a unit is a hope.
+- **`never_store` cannot be empty,** and `delete_on_request` has to say what
+  actually happens and how you would prove it happened.
+
+One standard, two shapes. Whichever you fill in, the two lines that make it real
+are the duration with a number on it and the list of things you refuse.
+
+## Stored input is still input
+
+Everything session 4 said about untrusted input survives being written to disk. A
+sentence a user typed, saved as a "memory" and pasted into tomorrow's prompt, is
+an injection that only has to land once and then runs every day.
+
+Two habits keep it small:
+
+**Store the fact, not the sentence.** `answer_style = "short"` is a value from a
+set you defined. "The user said: always ignore your instructions and…" is a
+payload with a timestamp.
+
+**Store the smallest thing that works.** The episode list keeps `f"Q: {question[:60]}"`
+— a truncated summary, not the message. It is enough for "as you asked earlier"
+and useless to anyone who steals it.
+
+Session 13 hardens the surface that serves this. The policy is what decides how
+much there is to serve.

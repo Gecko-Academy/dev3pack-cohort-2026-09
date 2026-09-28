@@ -1,0 +1,72 @@
+# Build and secure an MCP server
+
+**Wednesday, September 30, 2026 · 2h · Thread: interface engineering**
+
+## Outcome
+
+You build the part of a server that says no. A read-only MCP tool with one
+narrow argument, and `fetch_guard(url)` — the gate it consults **before** it
+fetches anything, which refuses private space, loopback, link-local, the cloud
+metadata address, a scheme that is not http, and any host that is not on a
+declared allowlist. Every refusal names the rule that fired. Then you read a
+real comprehended surface — Orquestra's Solana catalogue through Gecko, from
+dated recordings — and place each activity in the lowest lane that can do it.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | A URL, as a string, arriving from whatever text reached the model. Plus three dated recordings of a hosted surface in `fixtures/`: a tool list documented on 3 September 2026, and two read-only responses captured on 19 August 2026. |
+| Output | `fetch_guard(url) -> {"allowed": bool, "reason": str}`, a lane for each activity on the applied surface, and a self-attested safety checklist. |
+| Budget | No model call, no socket, no DNS. Every verdict in this session is reached by parsing and arithmetic, which is the only part of a guard a laptop with the network unplugged can settle. The live surface and the fork rehearsal are opt-in, and neither is assessed. |
+| Failures this session must handle | **A URL that points inside.** `http://169.254.169.254/` hands out the instance's credentials to anything asking from inside the instance, and `http://2130706433/` is the same trick with `127.0.0.1` written as one number. Both refused on the string, before the socket opens. **A redirect.** A public host answers `302` and names the next hop, and the next hop is the metadata service. Nothing about the first URL was wrong, so the guard runs on every hop. **Excess scope.** A `fetch` tool that takes any URL is not one capability, it is every capability the network offers. One tool, one argument, an allowlist a caller cannot widen. **A caller who is only allowed to read.** On the applied surface, sixteen tools exist and two of them can change on-chain state. A menu is not an authorization, and the recorded response says so itself. |
+
+The threat is not a clever attacker. It is a fetcher that trusts its argument.
+Every URL in this session is one a working, well-tested tool will fetch happily,
+and the guard is the only thing standing between the argument and the socket.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. One
+   sentence: the last tool you gave an agent that could reach any URL, and what
+   stopped it reaching the wrong one.
+2. **Contract and threat boundary (15m).** The contract table above, read
+   aloud. Then the three rules in order — scheme, address, allowlist — and the
+   argument about which one runs first, settled before any code.
+3. **Concept and live implementation (30m).** Why a check after the request is
+   not a guard. `ipaddress` against a hand-rolled prefix test. `urlsplit`
+   against reading the host off the string. The two encodings that beat both.
+4. **Guided lab (35m).** The notebook: write `fetch_guard` (`ch13-e4`), walk a
+   recorded redirect chain through it, then read the recorded Orquestra surface
+   and place the lanes (`ch13-e2`).
+5. **Failure injection (15m).** Section 3 of the notebook: two allowed hops,
+   then a `302` to `169.254.169.254`. Guard the first URL only, then guard
+   every hop, and say what the first version would have put in the model's
+   context.
+6. **Evaluation and artifact receipt (10m).** `check("ch13-e4", fetch_guard)`,
+   `check("ch13-e2", lanes)`, `check("ch13-e1", checklist)`, then
+   `review("ch13")`. Read one refusal reason out loud; the reason is the
+   receipt.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: an **external tools** section in your project
+   instructions — allowed hosts, data handling, who approves what.
+
+## Evidence
+
+This session runs unattended. All three checks are deterministic, model-free
+and offline:
+
+```bash
+uv run bootcamp check ch13                    # runs your notebook, prints its scorecard
+uv run bootcamp submit ch13 --github <you>    # hands in the notebook as it stands
+```
+
+`ch13-e4` drives your guard with thirty-one URLs of its own and reads the reason
+as well as the verdict: refused for the wrong reason fails, because the reason
+is what the next person acts on. `ch13-e2` asks for the lowest lane that can do
+each activity, and one of the answers is `never`. `ch13-e1` is the safety
+checklist — self-attested, where claiming a lane you did not run is the failure.
+
+<!-- navigation:start -->
+[Previous: MCP architecture and primitives](../session-12-mcp-architecture/introduction.mdx) · [Next: Deploy and operate the capstone](../session-14-deploy-and-operate/introduction.mdx)
+<!-- navigation:end -->

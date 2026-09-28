@@ -1,0 +1,212 @@
+# Isolation, and memory that went stale [[isolation-and-staleness]]
+
+## The second user is the test
+
+Here is a store that passes every test you would write for it on your own machine:
+
+```python
+class MemoryStore:
+    def __init__(self):
+        self._values = {}
+
+    def remember(self, user_id, key, value):
+        self._values[key] = value
+
+    def recall(self, user_id, key):
+        return self._values[key]
+```
+
+It takes a `user_id`. It never uses it. Store a locale, read it back, and it
+answers correctly every time — because there is only ever one of you.
+
+```python
+store.remember("ana", "locale", "pt-BR")
+store.remember("bruno", "locale", "en-GB")
+store.recall("ana", "locale")     # 'en-GB'
+```
+
+Ana asked for her locale and got bruno's. Nothing raised. Nothing logged. The
+next answer is in the wrong language, or the wrong currency, or about the wrong
+account, and it is delivered with total confidence.
+
+An argument you accept and ignore is worse than one you never took, because it
+tells every reader of the signature that the store is per-user. Isolation is not
+a feature you add later; it is a shape the key has or does not have.
+
+## The owner is part of the key
+
+```python
+self._values[(self._owner(user_id), key)] = value
+```
+
+One tuple. `('ana', 'locale')` and `('bruno', 'locale')` are two memories that
+cannot collide, and there is no lookup anywhere in the class that can reach a row
+without naming its owner.
+
+Do this at the storage layer, not in a filter over the results. A filter is a
+line someone can forget, or reorder, or skip in the fast path. A key is a
+property of the data.
+
+## A miss is an answer
+
+```python
+return self._values[(owner, key)]      # KeyError, sooner or later
+```
+
+A key nobody stored is not an exception. It is the normal case on the first day
+of every user's life, and it happens on the read path, where an unhandled raise
+takes the whole answer down.
+
+Return `None`, and mean it:
+
+```python
+return self._values.get((owner, key))
+```
+
+Watch the fix that looks helpful and is the leak again. A store that falls back to
+"the last value anybody stored", or to a module-level default that some earlier
+user populated, answers every miss — with somebody else's data, and it never
+raises to tell you. `ch11-e3` asks two users for keys they never stored, and any
+answer that is not `None` fails.
+
+| The read | The right answer |
+|---|---|
+| a key this user stored | the value this user stored |
+| a key this user never stored | `None` |
+| a key another user stored under the same name | `None` |
+| any key, with no user id | refuse |
+
+## No owner, no write
+
+```python
+@staticmethod
+def _owner(user_id):
+    if not isinstance(user_id, str) or not user_id.strip():
+        raise ValueError("user_id is required; a memory with no owner is everybody's memory")
+    return user_id
+```
+
+An empty string is a valid dict key. `None` is a valid dict key. Neither is a
+valid owner, and a store that accepts them does not crash — it quietly opens one
+bucket that every caller with a missing id reads and writes. That bucket is the
+bug this exercise exists for. It appears wherever an id arrives from somewhere
+that might not have it: an unauthenticated request, a background job, a test
+fixture, a tool call the model made up.
+
+Refuse it in **both** functions. Validating only the write is a real answer to
+half the problem: nothing gets stored under `""`, and then `recall("", "locale")`
+happily reads whatever else is there. The read path is the way into the bucket the
+write path refused to build.
+
+Refuse it **before** touching the store, so the refusal cannot half-write.
+
+## A returned reference is a second writer
+
+```python
+tags = ["retrieval"]
+store.remember("erin", "tags", tags)
+tags.append("edited by the writer")     # the store now holds two tags
+got = store.recall("erin", "tags")
+got.append("edited by the reader")      # so does the next reader
+```
+
+Neither line went through `remember`. Both changed what the store returns. Python
+handed out a reference, and a reference is write access that never appears in the
+API.
+
+```python
+def remember(self, user_id, key, value):
+    self._values[(self._owner(user_id), key)] = copy.deepcopy(value)
+
+def recall(self, user_id, key):
+    return copy.deepcopy(self._values.get((self._owner(user_id), key)))
+```
+
+Copy on the way in, copy on the way out. `copy.deepcopy` rather than `list(...)`
+or `dict(...)`, because a shallow copy of `{"tags": ["a"]}` shares the inner list
+and the bug comes back one level down.
+
+The cost is real and it is a decision like the others: deep-copying a large value
+on every read is work, and a store that holds large values probably wants an
+immutable type instead. What is not a decision is handing out a live reference by
+accident and finding out from a user.
+
+## What `ch11-e3` judges
+
+| Scenario | It drives | It fails when |
+|---|---|---|
+| two users, one key | ana and bruno both store `locale` | either read returns the other's value |
+| a key never stored | a user with other keys, and a user with none | a raise, a default, or a neighbour's value |
+| a missing user id | `remember` and `recall` with `""` and `None` | either one is accepted |
+| a mutable value | a list edited after storing, and after reading | the store changed both times |
+
+It calls your two functions and reads what comes back. It never looks inside your
+store: no attribute, no dict, no private field. That is deliberate — a store that
+keeps its rows in SQLite, in a dict, or in a file passes on the same evidence,
+which is the only evidence the next caller has either.
+
+Pass the class itself, so each scenario gets a fresh store:
+
+```python
+check("ch11-e3", MemoryStore)
+```
+
+A pair of module-level functions works too:
+`check("ch11-e3", {"remember": remember, "recall": recall})`.
+
+## Memory that was true once
+
+Isolation decides who may read a memory. Staleness decides whether it is worth
+reading. A stored fact does not decay, does not warn, and does not know that the
+world moved: the user upgraded, moved country, changed teams, corrected you once
+and gave up when it did not take.
+
+```python
+today = date(2026, 11, 1)
+memories = [
+    {"key": "locale", "value": "pt-BR", "expires": date(2026, 10, 28)},
+    {"key": "plan", "value": "free tier", "expires": None},
+]
+```
+
+```
+locale  pt-BR      expires 2026-10-28 -> read it again from the source
+plan    free tier  expires None       -> read it again from the source
+```
+
+Same verdict, two different reasons, and the difference is the whole lesson. The
+locale expired, and you can *prove* it expired. The plan never recorded when it
+stops being true, so nothing in your code can tell you whether it is fresh — and
+a memory nobody can check is not fresh, it is unaudited.
+
+That is why `EXPIRES:` is a line in the policy and not an afterthought. It is not
+there to delete data. It is there to make "quote it" a claim you can defend.
+
+## The two honest ways to handle a stale memory
+
+**Give it an expiry and drop it.** The episode cap in `ch11-e1` is this, at its
+smallest: after five questions the sixth-oldest stops existing, with no cleanup
+job to forget to run.
+
+**Give it a correction path and use it.** `reset()`, an overwrite, a re-read from
+the source. A preference that was inferred and can be overwritten by the user is a
+memory that repairs itself. One that can only be replaced by deleting your account
+is a trap.
+
+What is not honest is the third option, which is what happens by default: keep it
+forever, quote it as current, and let the user work out that the assistant is
+describing a life they no longer have.
+
+## Recap
+
+| Lesson | One line |
+|---|---|
+| Ephemeral or persisted | start ephemeral; move one item when it can answer all four questions |
+| The preference | it is decoration until it reaches the prompt the model saw |
+| The cap | a ceiling is the smallest honest expiry, and it is two lines |
+| The policy | four decisions and one refusal, in writing, before anything is stored |
+| Isolation | the owner is part of the key; a `user_id` you accept and ignore is a lie |
+| The miss | `None`, never a raise, never a default that belongs to somebody else |
+| No owner | refuse `""` and `None`, on both paths, before touching the store |
+| The copy | in and out, or the caller edits your store from outside |
+| Staleness | an item with no expiry cannot be checked, only quoted |

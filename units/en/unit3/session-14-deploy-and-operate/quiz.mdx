@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: Your smoke test calls `/health` twice and reports the second duration as the cold start. What has it hidden?
+
+<Question
+  choices={[
+    { text: "Nothing; the second call is the more stable measurement", explain: "It is stable and it is about a warm process. The question was what the first caller pays." },
+    { text: "The 2.4 seconds the first caller waits, every time the process has to start", explain: "Correct. The first call pays for the process starting. Report the first call, and keep it separate from the verdict.", correct: true },
+    { text: "The p95, which needs at least twenty runs", explain: "A percentile is a different measurement with a different method. The cold start is one number: the first one." },
+  ]}
+/>
+
+### Q2: A deployment answers `{"quesiton": 12}` with `200 {"answer": "Yes, that is correct.", "citations": []}`. What should the report say?
+
+<Question
+  choices={[
+    { text: "malformed_rejected: true — it handled the request without crashing", explain: "It handled nothing. It answered a body it could not have understood, which is the failure, not the recovery." },
+    { text: "malformed_rejected: false, and healthy: false", explain: "Correct. Validation has stopped running. A 200 for garbage is indistinguishable from working at every level except the content, so the report is the only place it can surface.", correct: true },
+    { text: "Nothing; the smoke test should skip malformed inputs and measure the happy path", explain: "A boundary you never probe is a boundary you are assuming. Send the garbage on purpose." },
+  ]}
+/>
+
+### Q3: The killed deployment returns `503 {"error": "memory limit exceeded"}`. Your smoke test raises `KeyError: 'answer'`. Why is that worse than a wrong answer?
+
+<Question
+  choices={[
+    { text: "It is not worse; a crash is loud and somebody will notice", explain: "Somebody notices the crash and still has no report about the deployment, which is what they came for." },
+    { text: "The report never gets produced, at the one moment it mattered", explain: "Correct. A smoke test that dies on a broken deployment tells you nothing about it. Read the status first, and never reach into a body you have not checked.", correct: true },
+    { text: "It hides the cold start", explain: "The cold start is measured before that, on the first call. The loss here is the whole report." },
+  ]}
+/>
+
+### Q4: Which rollback sentence passes `ch14-e3`?
+
+<Question
+  choices={[
+    { text: "We would roll back quickly if the error rate looks bad.", explain: "An intention with no action anybody can run, and no number. 'Looks bad' is a feeling." },
+    { text: "Return the service to the last good state as soon as possible.", explain: "It names a state, not a way to reach it, and 'as soon as possible' is not a duration." },
+    { text: "Stop the service and restart it from the previous tag: `git checkout v0.3.1 && uv run python serve.py`; answering again inside 2 minutes.", explain: "Correct. A named action, a version, and a duration — the same standard an architecture decision's reversal trigger has to meet.", correct: true },
+  ]}
+/>
+
+### Q5: This session's required work is local. What can you honestly say about the hosted path?
+
+<Question
+  choices={[
+    { text: "That it works, since the concept page describes it", explain: "A description is not a deployment. The page states in its own words that the flow is not merged and not deployed." },
+    { text: "That it is planned, that nothing here depends on it, and that it is a claim to check rather than a step to follow", explain: "Correct. Same standard as a recorded fixture in session 13: evidence of what existed when it was recorded, and of nothing else.", correct: true },
+    { text: "That local deployment is a workaround for it", explain: "The local path is the real one. Every failure this session teaches — cold start, resource limit, malformed request, rollback — is visible on a port on your own machine." },
+  ]}
+/>

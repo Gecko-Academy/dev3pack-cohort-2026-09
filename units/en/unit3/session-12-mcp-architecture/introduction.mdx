@@ -1,0 +1,81 @@
+# MCP architecture and primitives
+
+**Tuesday, September 29, 2026 · 2h**
+
+## Outcome
+
+Draw the host, client and server responsibilities of the Model Context Protocol,
+discover what a server offers, and tell a tool that reads from one that mutates
+before anything is called. You leave with two functions and one habit. The
+functions: `describe_surface(listing)`, which turns a server's handshake and its
+listings into a map of what it offers and what it claimed and cannot serve, and
+`review_tool(tool)`, which reads one tool definition and returns a verdict a
+caller can branch on. The habit is reading a surface as claims rather than as
+facts — a name is a claim, an annotation is a claim, and a description is
+somebody else's text sitting in your model's context.
+
+## Contract and threat boundary
+
+| | |
+|---|---|
+| Input | Three recorded listings. Sixteen tool names read off a hosted MCP surface on 2026-09-03, and two servers written out on the page: one whose handshake and collections agree, one whose handshake announces more than it serves. Plus four tool definitions, one of them written to steer whoever reads it. |
+| Output | `describe_surface(listing) -> dict` — names and counts per primitive, plus `advertised_but_empty`. `review_tool(tool) -> dict` — `{"name", "safe_to_expose", "reasons"}`, with reason **codes** rather than prose. And the classification of the sixteen: which two can change state, which four only build unsigned bytes. |
+| Budget | No model call, no network, no server process. Every listing is on the page or inside the check. All three checks are deterministic, so the same notebook gives the same verdict on every machine. No new dependency: `re` and `textwrap` ship with Python. |
+| Failures this session must handle | **A server that advertises a capability it cannot serve.** `resources: {}` in the handshake, `[]` on the wire. Counted as zero it disappears; named as advertised-but-empty, somebody can go and ask why. **An untrusted description.** A tool annotated read-only whose description tells the model to call `transfer_funds` first. It gets flagged, not followed — and the benign tools beside it, which carry every word the flag looks for, do not. |
+
+The threat is not that a server is hostile. It is that a client believes a server
+about itself. Everything you learn on connect — the tool's name, the `read_only`
+flag, the sentence describing what it does — was written by whoever runs the
+server, and the protocol marks none of it as less trusted than your own system
+prompt. The boundary sits at the client. This session is what a client does at
+it.
+
+## Session flow
+
+1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. From
+   week 0: name the three parts and say which one starts which. Then the harder
+   one — which part decides that a tool is safe to call, and which part has no
+   say in it at all.
+2. **Contract and threat boundary (15m).** The contract table above, read aloud.
+   Then list the MCP servers your own assistant is configured with, and for each
+   one write down the tool count and who runs it. Most people cannot finish the
+   second column.
+3. **Concept and live implementation (30m).** Host, client, server, and which of
+   the three you are writing today. The four primitives and the one that points
+   back at you. Then capabilities against collections, live, on a listing that
+   announces more than it has.
+4. **Guided lab (35m).** The notebook: `describe_surface` over a listing with an
+   announced empty drawer (`ch12-e2`), then the sixteen tools split into what can
+   change state and what only builds bytes (`ch12-e1`).
+5. **Failure injection (15m).** Section 4. Print four tool descriptions as the
+   model receives them and read the third one out loud. Then write `review_tool`
+   (`ch12-e3`) and run it over all four. The one that gets refused is not the one
+   that writes.
+6. **Evaluation and artifact receipt (10m).** `check("ch12-e2", ...)`,
+   `check("ch12-e1", ...)`, `check("ch12-e3", ...)`, then `review("ch12")`. The
+   artifact is the capability map and the refusal list. Read one refusal reason
+   out loud and say what you would do about it.
+7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
+   next action. Homework: finish the server inventory from the warm-up — every
+   server your assistant can reach, its tool count, and who runs it.
+
+## Evidence
+
+This session runs unattended. All three checks are deterministic and model-free:
+
+```bash
+uv run bootcamp check ch12                    # runs your notebook, prints its scorecard
+uv run bootcamp submit ch12 --github <you>    # hands in the notebook as it stands
+```
+
+`ch12-e2` drives your `describe_surface` with four listings of its own — a full
+surface, a server with an announced empty drawer, a quiet one that lists
+resources it never announced, and one whose printed totals disagree with what it
+listed. `ch12-e1` reads which two of the sixteen tools can change state, and says
+why `prepare_purchase` is not one of them. `ch12-e3` drives your `review_tool`
+with eight tool definitions, five of them safe and four of those written to fail
+a word search.
+
+<!-- navigation:start -->
+[Previous: State and memory](../session-11-state-and-memory/introduction.mdx) · [Next: Build and secure an MCP server](../session-13-secure-mcp-server/introduction.mdx)
+<!-- navigation:end -->

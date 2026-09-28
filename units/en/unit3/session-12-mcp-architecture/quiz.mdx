@@ -1,0 +1,51 @@
+# Quick quiz (ungraded)
+
+### Q1: A server's handshake announces `resources: {}` and `list_resources()` returns `[]`. What should the capability map say?
+
+<Question
+  choices={[
+    { text: "`resources: 0`, like any other server with no resources", explain: "That makes a broken claim indistinguishable from a server that never claimed anything. Two different states, one line of output." },
+    { text: "Advertised, and empty — a claim with nothing behind it", explain: "Correct. It announced a capability and serves none of it: a wrong catalogue row, a half-finished deployment, or a permission you were not granted. Naming it is what lets somebody go and ask.", correct: true },
+    { text: "Drop the `resources` capability, since it turned out to be false", explain: "Then the map agrees with the collections and the disagreement disappears. The disagreement is the finding." },
+  ]}
+/>
+
+### Q2: A server lists two resources and never announced a `resources` capability. Is that the same defect?
+
+<Question
+  choices={[
+    { text: "Yes — the handshake and the listing disagree either way", explain: "They disagree in the harmless direction. Nothing was promised, and the resources are there to use." },
+    { text: "No. Nothing was claimed, so nothing is broken; count the resources and move on", explain: "Correct. Advertised-but-empty is a promise with nothing behind it. Unannounced-but-present is an untidy handshake and two usable resources.", correct: true },
+    { text: "No, and the resources should be ignored because they were not announced", explain: "Ignoring a capability the server actually serves throws away working tools to punish a formatting slip." },
+  ]}
+/>
+
+### Q3: Of the sixteen recorded tools, why is `prepare_purchase` not one of the two that change state?
+
+<Question
+  choices={[
+    { text: "It returns unsigned bytes; nothing moves until something else signs them and submits them", explain: "Correct. It is the tool that looks most dangerous and is not, which is the point of reading a surface instead of ranking it by name.", correct: true },
+    { text: "It is read-only, like the other ten", explain: "It is not read-only. It builds a transaction — it just cannot make one happen." },
+    { text: "Its annotation says so", explain: "An annotation is a claim. The reason is what the tool returns: bytes that need a signature and a submission before anything changes." },
+  ]}
+/>
+
+### Q4: A tool called `create_invoice` is described as "Creates an invoice for a customer and returns its id." Your reviewer flags it. What went wrong?
+
+<Question
+  choices={[
+    { text: "Nothing. A tool that writes should be flagged", explain: "Then every write tool on every server is flagged, and the list of refusals stops being read. This one is honest: its name says write and it writes." },
+    { text: "The rule matched a word instead of a disagreement", explain: "Correct. 'Creates' only matters against a claim to only read. Without the claim there is no conflict, and a benign tool refused is a capability lost and a rule somebody switches off.", correct: true },
+    { text: "The description should not name what the tool does", explain: "Describing what a tool does is a description doing its job. The problem is a description that gives orders, not one that is specific." },
+  ]}
+/>
+
+### Q5: Why does `review_tool` return reason codes rather than a sentence?
+
+<Question
+  choices={[
+    { text: "So a caller can count, filter and diff the verdicts without reading prose", explain: "Correct. Same argument as `stopped_because` in session 5 and the failure buckets in session 9: a verdict a caller can branch on, one that survives being run over fifty tools.", correct: true },
+    { text: "Because a sentence would be too long to log", explain: "Length is not the issue. A short sentence is still something only a human can act on." },
+    { text: "Because the model reads the reasons and needs them short", explain: "The reasons are for your application, not for the model. The model never sees the tool this refused." },
+  ]}
+/>

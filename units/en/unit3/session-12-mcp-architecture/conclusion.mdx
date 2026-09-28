@@ -1,0 +1,47 @@
+# Conclusion
+
+You wrote two functions that read a server you did not write:
+`describe_surface(listing)`, which turns a handshake and three listings into
+names, counts and a list of claims with nothing behind them, and
+`review_tool(tool)`, which returns a verdict a caller can branch on.
+
+## What you did
+
+- The map records what a call needs — a tool by name, a resource by URI, a prompt
+  by name — in the order the server listed them, and counts what is there rather
+  than what the server says it has.
+- `ch12-e2` drove it with a full surface, an announced empty drawer, a quiet
+  server that lists resources it never announced, and a boastful one whose
+  printed totals say sixteen and whose listing says two.
+- `ch12-e1` split sixteen recorded tools into ten that read, four that build
+  unsigned bytes and two that can change state, and `prepare_purchase` is in the
+  middle group — the one that sounds most dangerous and moves nothing.
+- `ch12-e3` drove your reviewer with five safe tools written to fail a word
+  search, so a benign tool you flag fails the check — a false positive is a
+  capability lost and a rule somebody switches off.
+
+## The failures you handled
+
+A capability advertised with nothing behind it. Counted as zero it is
+indistinguishable from a server that never claimed it; named as
+advertised-but-empty, somebody can go and ask why.
+
+And an untrusted description. A tool annotated read-only whose description tells
+the model to call `transfer_funds` first gets flagged, not followed, because a
+description is data about a tool and never an instruction to follow.
+
+## What to carry forward
+
+Each of the three rules compares a claim against something else on the same page,
+which is why `create_invoice` passes: it says it creates an invoice, and it never
+claimed to read.
+
+The limit is written down rather than hidden: this catches the plain cases, not a
+phrasing you never named, not an instruction in a tool result, and not a server
+that changes after you approved it.
+
+## Into session 13
+
+Session 13 assumes you can read a surface and say what it offers, what it claims,
+and which of its tools is worth refusing — because it puts you on the other side,
+building and securing a server other people will read exactly this way.

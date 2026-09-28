@@ -1,0 +1,129 @@
+# The four primitives, and what each one is for [[the-four-primitives]]
+
+## Three the server offers, one it asks for
+
+Week 0 named three: tools, resources, prompts. There is a fourth, and it runs the
+other way.
+
+| Primitive | Offered by | Chosen by | It is for |
+|---|---|---|---|
+| **Tool** | the server | the model | doing something, or computing something |
+| **Resource** | the server | the application, or the person | read-only context, addressed by URI |
+| **Prompt** | the server | the person | a task's instructions, written once |
+| **Sampling** | **the client** | the server asks, the host decides | the server needs a completion and has no model |
+
+The first three you have served. The fourth is the one that changes how you
+think about the boundary, so it gets its own section below.
+
+Those four are not the whole protocol. A server can also announce `completions`
+and `logging`; a client can also announce `roots` and `elicitation`. They are
+announced the same way and they matter, but none of them is a thing you
+*discover a list of*, which is what this session is about.
+
+## Which one to reach for
+
+The mistake is almost always the same: everything becomes a tool. A tool is the
+one primitive the model can invoke on its own, so making everything a tool feels
+like making everything available. What it actually does is put every decision in
+the least predictable place.
+
+| You want | Use | Because |
+|---|---|---|
+| the model to act, or compute | a tool | the model chooses, and the choice is the point |
+| the model to have some text in front of it | a resource | the application chooses, so it is not a coin flip |
+| a task's instructions reused across runs | a prompt | the person chooses, and the wording stops drifting |
+
+A resource is not a weaker tool. It is a different control point. `get_locations`
+as a tool means the model decides whether to look; `file://locations.txt` as a
+resource means your application decided, and the text is simply there. When a
+run must not depend on a model remembering to look something up, that is a
+resource.
+
+## Sampling: the arrow reverses
+
+Every other primitive points one way — you ask, the server answers. Sampling
+points back. The server says "I need a completion for this", and the request
+arrives at your client.
+
+```
+normal:    host -> client -> server        "call this tool"
+sampling:  host <- client <- server        "run this through your model"
+```
+
+Three things are true at once about that, and they are worth saying plainly:
+
+1. It is genuinely useful. A server can be intelligent without shipping a model,
+   a key, or a bill.
+2. It spends **your** tokens, through **your** model, under **your** system
+   prompt.
+3. The text it asks you to complete was written by the server.
+
+Which is why a host that supports sampling asks a human, and why the spec is
+explicit that the human is in the loop. It is the same asymmetry as concepts-1,
+made concrete: the server cannot reach your model, so it asks you to do it.
+
+Nothing in this session implements sampling. It is here because "the server can
+only be read" stops being obvious the moment you meet the one message that goes
+the other way, and because a client that supports it has widened its boundary a
+long way.
+
+## Capabilities are not collections
+
+Two different answers to two different questions, and the exercise turns on
+keeping them apart.
+
+```python
+# the handshake: what this server CLAIMS it supports
+{"tools": {"listChanged": True}, "resources": {}, "prompts": {}}
+
+# the listings: what it actually HAS
+list_tools()      -> [search_docs, read_page]
+list_resources()  -> [docs://index]
+list_prompts()    -> []
+```
+
+`prompts` is announced and empty. Three readings of that, only one of them
+right:
+
+| Reading | What it produces |
+|---|---|
+| "prompts: 0" | true, useless — indistinguishable from a server that never claimed any |
+| "no prompts capability" | false — it announced one |
+| "prompts: advertised, and empty" | a claim with nothing behind it, which somebody can act on |
+
+The third is what `describe_surface` returns, and the reason is not tidiness. A
+server that advertises what it cannot serve is a real state with real causes: a
+catalogue row copied from a template, a deployment half rolled out, a permission
+your credential does not carry. All three are somebody's bug, and all three are
+invisible the moment you count `len(collection)` and move on.
+
+The inverse case is not a defect and must not be reported as one. A server that
+lists two resources and never announced a `resources` capability has an untidy
+handshake, and the resources are there. Nothing was claimed, so nothing is
+broken. `ch12-e2`'s third listing is exactly that, and a describer that walks the
+collections instead of the capabilities fails on it.
+
+## Read the field a client can use
+
+Each primitive carries more than one label, and only one of them is the one you
+ask for.
+
+| Primitive | Read | Not |
+|---|---|---|
+| tool | `name` | its description |
+| resource | `uri` | its `name`, which is a display name |
+| prompt | `name` | its `title`, which is for a menu |
+
+Unit 10 had this as a trap: the prompt whose name equals its title fails, because
+`get_prompt()` takes the name and the title is what a person reads. It is the
+same distinction here, three times over. A map of a surface is for calling
+things, so it records what a call needs.
+
+## The count is a claim too
+
+A server can print a total. It can say sixteen and list two. When it does, the
+listing wins — not because servers lie on purpose, but because a total is
+maintained by hand and a listing is generated.
+
+That is the general rule this session keeps returning to, and `ch12-e2`'s fourth
+listing exists to enforce it: **count what is there, not what it says**.

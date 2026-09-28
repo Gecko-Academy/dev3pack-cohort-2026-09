@@ -1,0 +1,67 @@
+{
+  "_provenance": {
+    "recorded": "2026-08-19",
+    "surface": "https://mcp.geckovision.tech/orquestra/mcp",
+    "lane": "recorded",
+    "is_evidence_of": "the shape of a read-only response, and the public data it returned that day",
+    "is_not_evidence_of": "any signing, preparation, submission or spend, and not of what the surface returns today. Prices and stores change; re-record rather than trust this.",
+    "tool": "find_start"
+  },
+  "note": "ranked start points \u2014 provenance-tagged derive plans; FLAGGED gaps are honest, never dropped. Gecko plans and points; Orquestra builds; nothing here signs or broadcasts.",
+  "no_start": false,
+  "starts": [
+    {
+      "chain": {
+        "links": [],
+        "name": "",
+        "note": "no lifecycle chain is DECLARED for this program \u2014 this start is a single instruction, so the chain axis was not evaluated (it is not a chain that passed)",
+        "status": "not_evaluated",
+        "steps": [],
+        "unresolved": [],
+        "verdict": "NOT_EVALUATED"
+      },
+      "derive_plan": [
+        {
+          "account": "receipts",
+          "note": "",
+          "provenance": "extracted",
+          "resolver": null
+        },
+        {
+          "account": "sender_token_account",
+          "note": "",
+          "provenance": "extracted",
+          "resolver": null
+        },
+        {
+          "account": "recipient_token_account",
+          "note": "",
+          "provenance": "extracted",
+          "resolver": null
+        }
+      ],
+      "execute": {
+        "builder": "orquestra",
+        "url": "https://api.orquestra.dev/api/p7o7nf4pucllzadrmiqhf"
+      },
+      "gaps": [],
+      "inputs": [],
+      "instruction": null,
+      "kind": "surface",
+      "next_tool": null,
+      "note": "this program's start points (initialize, add_product, make_purchase, mark_as_delivered) are separate entries; this entry is its raw surface (get_program_graph / derive_pda). let_me_buy (letmebuy.app) \u2014 a storefront program: a merchant stands up a store, lists products, and buyers pay in an SPL token by scanning a QR code",
+      "preludes": [],
+      "program": "let_me_buy",
+      "program_id": "BUYuxRfhCMWavaUWxhGtPP3ksKEDZxCD5gzknk3JfAya",
+      "score": 8,
+      "serve": "gecko-orquestra --program let_me_buy --stdio",
+      "why": [
+        "1",
+        "buy",
+        "jonasbar",
+        "store",
+        "table"
+      ]
+    }
+  ]
+}
