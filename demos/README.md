@@ -19,6 +19,7 @@ intent.
 | [8 — The weekly challenge](08_the_weekly_challenge.ipynb) | Ana's expense bot: three tools that refuse by name, a page that talks to the model, and the week-1 challenge scored 300/500 |
 | [9 — RAG on your laptop](09_rag_on_your_laptop.ipynb) | Today's retriever plus a model on your laptop. Alone, the model invents. With the right pages it answers and cites them. An empty search refuses before the model runs, and the wrong pages still come back with confidence 1.0 |
 | [10 · Your store, and a buyer](10_your_store_and_buyer.ipynb) | Weekly challenge 2 and step 1 of the final project: the store rules refusing a store that looks fine, then your store and your buyer to write. Scores 0/500 as shipped, and says why |
+| [11 · Memory at scale](11_memory_at_scale.ipynb) | Session 11's store at 20,000 memories. Exact search against HNSW: how much faster, and how many of the right memories it misses. A setting the index reports and does not use. The owner as a filter, so ana never gets bruno's |
 
 ## They run offline
 

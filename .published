@@ -73,6 +73,7 @@ demos/07_the_coach_in_a_chat.ipynb
 demos/08_the_weekly_challenge.ipynb
 demos/09_rag_on_your_laptop.ipynb
 demos/10_your_store_and_buyer.ipynb
+demos/11_memory_at_scale.ipynb
 demos/README.md
 demos/fixtures/rag-recorded.json
 demos/fixtures/telegram-getupdates.json
@@ -184,6 +185,7 @@ scripts/diagrams/session_07.py
 scripts/diagrams/session_08.py
 scripts/diagrams/session_09.py
 scripts/diagrams/session_10.py
+scripts/diagrams/session_11.py
 scripts/diagrams/slide.py
 scripts/diagrams/terminal.py
 scripts/diagrams/theme.py

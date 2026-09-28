@@ -30,6 +30,7 @@ DECK_06 = "docs/instructor/sessions/session-06-retrieval-baseline/img"
 DECK_07 = "docs/instructor/sessions/session-07-grounding-metrics/img"
 DECK_09 = "docs/instructor/sessions/session-09-trace-and-evaluate/img"
 DECK_10 = "docs/instructor/sessions/session-10-skills-and-adr/img"
+DECK_11 = "docs/instructor/sessions/session-11-state-and-memory/img"
 
 
 @dataclass(frozen=True)

@@ -42,14 +42,15 @@ course that taught a retention policy it did not keep would be teaching nothing.
    questions every stored item answers. Fill the table for one thing your capstone
    wants to remember. An item with no answer to "when does it expire" does not go
    in.
-3. **Concept and live implementation (30m).** `SessionState` written live: one
+3. **Concept and live implementation (35m).** `SessionState` written live: one
    preference, one rotating episode list, one `reset`. Then the same store with a
-   second user in it, and the line where it breaks.
+   second user in it, and the line where it breaks. Then demo 11: the same store at
+   20,000 memories, what a fast index misses, and the owner as a filter.
 4. **Guided lab (35m).** The notebook. Sections 1 to 3: the preference reaches the
    prompt and the episodes cap (`ch11-e1`). Section 4: your retention policy,
    refusal list last (`ch11-e2`). Section 5: `MemoryStore`, four fixes
    (`ch11-e3`).
-5. **Failure injection (15m).** Section 6. Two memories, one with an expiry and
+5. **Failure injection (10m).** Section 6. Two memories, one with an expiry and
    one without, read on a date after both were written. Say which one you can
    prove is stale, and what the other one leaves you able to say.
 6. **Evaluation and artifact receipt (10m).** `review("ch11")` in Jupyter, or
@@ -57,7 +58,8 @@ course that taught a retention policy it did not keep would be teaching nothing.
    the room and take the item you had not thought of.
 7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
    next action. Homework: add a "what we refuse to remember" section to your
-   project README, and delete one field you are storing without a reason.
+   project README, and delete one field you are storing without a reason. Rerun
+   section 6 with another date, and demo 11 with one thing changed.
 
 ## Evidence
 

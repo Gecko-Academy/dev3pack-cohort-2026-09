@@ -9,9 +9,10 @@ run, in the order we run it in class.
 | [A](#ask-the-course) | Ask the course: connect the course MCP, three questions, one empty answer | 5 min |
 | [1](#1-where-we-are-going) | Where we are going: week 3, and a skill is a memory | 5 min |
 | [2](#2-four-kinds-and-four-questions) | Four kinds of memory, and four questions | 10 min |
-| [3](#3-the-state-wrapper-live-then-a-second-user) | The state wrapper, live, then a second user | 30 min |
+| [3](#3-the-state-wrapper-live-then-a-second-user) | The state wrapper, live, then a second user | 25 min |
+| [D](#demo-11-memory-at-scale) | Demo 11: memory at scale, 20,000 memories, one index, one owner filter | 10 min |
 | [4](#4-your-exercise) | Your exercise: a preference, a policy, and a store with owners | 35 min |
-| [5](#5-break-it-on-purpose) | Break it on purpose: memory that was true once | 15 min |
+| [5](#5-break-it-on-purpose) | Break it on purpose: memory that was true once | 10 min |
 | [6](#6-check-and-read-two-refusal-lists) | Check, and read two refusal lists | 10 min |
 | [7](#7-hand-it-in) | Hand it in, and the exit ticket | 5 min |
 
@@ -183,6 +184,31 @@ on this, because one user cannot read anybody else.
 **The question for the room:** how many stores have you written that take a
 `user_id` argument and never read it?
 
+## Demo 11: memory at scale
+
+Ana just got bruno's locale from a store with two people in it. Now the same
+problem with 20,000 memories, in the kind of index most assistants use.
+
+Open [`demos/11_memory_at_scale.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/11_memory_at_scale.ipynb)
+and run it from the top. It takes about ten seconds: no key, no account, no model
+download. It uses ChromaDB, which `uv sync --extra projects --extra agents`
+installed in part 0. Your exercise stays in memory with no database; this demo
+shows what that store turns into when it grows.
+
+| Section | What you see |
+|---|---|
+| **2. The exact answer** | Comparing a question with every memory is always right, and five times the memories costs about five times the time. |
+| **3. HNSW** | The index answers several times faster by walking a graph instead of scanning a list. With few links and few candidates it finds only 3 or 4 of the true 10. |
+| **4. The setting that lies** | Raise `ef_search` after the index is built: the collection reports 200, and the recall does not move. |
+| **5. Whose memory is it?** | Without an owner filter, ana gets bruno's memories. With one, she asks for 10 and gets her 5. A filter is still the weaker form: the key is where the owner belongs. |
+
+**The question for the room:** section 4 and part 3 are the same bug. What is it?
+(A value was stored and the thing that should use it never did. Both are caught
+only by checking the result, never by reading what you set.)
+
+**For your capstone:** every read names the owner, fewer results is a result, and
+the owner, the correction and the expiry go in `docs/RETENTION.md`.
+
 ## 4. Your exercise
 
 In the session notebook. **300 marks, three exercises, in notebook order:**
@@ -233,7 +259,7 @@ plan    free tier  expires None       -> read it again from the source
 Same verdict, two reasons. The locale expired, and you can see that it did. The
 plan never said when it stops being true.
 
-**Now change `today` to `date(2026, 10, 1)` and run the cell again:**
+**After class, change `today` to `date(2026, 10, 1)` and run the cell again:**
 
 ```
 locale  pt-BR      expires 2026-10-28 -> quote it
@@ -281,7 +307,9 @@ your machine? The command prints the browser route, and
 next action.
 
 **Homework.** Add a "what we refuse to remember" section to your project README,
-and delete one field you are storing without a reason.
+and delete one field you are storing without a reason. Rerun notebook section 6
+with `date(2026, 10, 1)` (part 5), and run demo 11 again with one thing changed:
+32 links, 50,000 memories, or no `where=` on the last query.
 
 ## Tomorrow
 
