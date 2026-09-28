@@ -16,6 +16,10 @@ from pathlib import Path
 
 COURSE_PACKAGE = "dev3pack-bootcamp-ai-engineering"
 
+#: The course's GitHub organisation. A student's capstone never lives under it: the
+#: capstone template is cloned from here, and "make it yours" moves `origin` away.
+COURSE_ORG = "gecko-academy"
+
 _FULL_SHA = re.compile(r"[0-9a-f]{40}")
 _GITHUB_REMOTE = re.compile(
     r"^(?:https://github\.com/|git@github\.com:|ssh://git@github\.com/)"
@@ -53,8 +57,9 @@ def check_repo(repo: Path) -> RepoState:
     head = _git(repo, "rev-parse", "--verify", "HEAD")
     if head.returncode != 0 or not _FULL_SHA.fullmatch(head.stdout.strip()):
         raise SubmitError(
-            "this is not a capstone repository with a commit in it. Run this inside the "
-            "folder `uv run bootcamp capstone new` made, after your first commit."
+            "this is not a capstone repository with a commit in it. Run this inside your "
+            "capstone repository (your clone of the capstone template, or the folder "
+            "`uv run bootcamp capstone new` made), after your first commit."
         )
     commit = head.stdout.strip()
     status = _git(repo, "status", "--porcelain")
@@ -83,6 +88,16 @@ def check_repo(repo: Path) -> RepoState:
             "submission links to your code on GitHub. Point origin there:\n"
             "    git remote set-url origin https://github.com/<you>/<name>.git\n"
             "    git push -u origin main"
+        )
+    # A clone of the capstone template that skipped "make it yours" passes every
+    # other check: clean, pushed (the template's own commits are on its origin), a
+    # GitHub URL. It would hand in a link to the course's code instead of theirs.
+    if url.split("/")[3].lower() == COURSE_ORG:
+        raise SubmitError(
+            f"`origin` is the course's template repository ({url}), not yours. The "
+            "submission links to your code. Make it yours first:\n"
+            "    git remote rename origin upstream\n"
+            "    gh repo create my-capstone --public --source . --remote origin --push"
         )
     pushed = _git(
         repo, "for-each-ref", "--contains", commit, "--format=%(refname)", "refs/remotes/origin"

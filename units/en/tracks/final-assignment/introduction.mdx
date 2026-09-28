@@ -2,22 +2,20 @@
 
 A template agent you make your own, graded against a question set, with a
 certificate when you pass. **It lives in its own repository, not in the course
-folder.** The [capstone guide](../../unit2/capstone/guide.mdx) has every step; this
-is the short version.
-
-Building it as your capstone? [The capstone tutorial](../../unit2/capstone/tutorial.mdx)
-has every command, from `capstone new` to your score.
+folder.** The complete tutorial is [`CAPSTONE.md`](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project/blob/main/CAPSTONE.md), in the capstone
+repository; this is the short version.
 
 ## What happens
 
-1. **Create your repository**, from your course folder. It goes next to the course,
-   never inside it, and the command refuses a folder inside the course clone:
+1. **Clone the capstone repository and make it yours**, next to your course folder,
+   never inside it:
 
    ```bash
-   git pull && uv sync
-   uv run bootcamp capstone new ../my-capstone
-   cd ../my-capstone
-   gh repo create my-capstone --public --source . --push
+   git clone https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project.git my-capstone
+   cd my-capstone
+   git remote rename origin upstream
+   gh repo create my-capstone --public --source . --remote origin --push
+   uv sync
    ```
 
 2. **Improve the agent** in `agent.py`. As shipped it scores 30% on the offline

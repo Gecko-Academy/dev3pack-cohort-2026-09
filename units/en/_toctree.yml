@@ -244,7 +244,7 @@
     - local: unit2/capstone/road
       title: "The road to the capstone"
     - local: unit2/capstone/tutorial
-      title: "Capstone tutorial: from an empty folder to a score"
+      title: "Capstone tutorial"
     - local: unit2/capstone/quiz
       title: "Quick quiz (ungraded)"
     - local: unit2/capstone/conclusion

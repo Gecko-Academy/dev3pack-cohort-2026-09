@@ -1,6 +1,6 @@
 ---
 name: ship-my-capstone
-description: Use when a learner wants to create, grade, hand in, or check the score of their capstone (the final assignment). Walks capstone new, grade, submit and the score file with the exact commands, including the uv.lock refusal. Never writes the learner's agent for them.
+description: Use when a learner wants to start, grade, hand in, or check the score of their capstone (the final assignment). Walks clone and make it yours, grade, submit and the score file with the exact commands. Never writes the learner's agent for them.
 ---
 
 # Create, grade, submit, and read the score
@@ -9,48 +9,41 @@ description: Use when a learner wants to create, grade, hand in, or check the sc
 
 The learner says "start my capstone", "grade my capstone", "submit the final",
 "where is my score", or pastes an error from `bootcamp capstone`. The full
-tutorial, with every step explained, is `units/en/unit2/capstone/tutorial.mdx`.
+tutorial, with every step explained, is `CAPSTONE.md` in the learner's capstone
+repository (https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project/blob/main/CAPSTONE.md).
 Read it before you start, and send the learner to it.
 
-## Three repositories, and they are easy to mix up
+## Two repositories, and they are easy to mix up
 
 | Repository | What it is | How it is handed in |
 |---|---|---|
 | the course clone, `dev3pack-cohort-2026-09` | lessons and session notebooks | `uv run bootcamp submit chNN --github LOGIN --push`, from the course clone |
 | `my-capstone` | the learner's own public repository with their agent | `uv run bootcamp capstone submit --github LOGIN`, from inside `my-capstone` |
-| `my-final-project` | the daily projects from week 3 | not handed in, not scored |
 
 Ask which one the learner is in before running anything. `pwd` and
 `git remote -v` answer it.
 
-## 1. Create it (from the course clone)
+## 1. Clone it and make it yours
+
+Beside the course clone, never inside it:
 
 ```bash
-git pull && uv sync
-uv run bootcamp capstone new ../my-capstone
-cd ../my-capstone
-```
-
-`capstone new` refuses a folder inside the course clone, pins the course commit,
-makes one commit on `main`, and never pushes.
-
-## 2. Lock, commit, publish (inside my-capstone)
-
-```bash
+git clone https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project.git my-capstone
+cd my-capstone
+git remote rename origin upstream
+gh repo create my-capstone --public --source . --remote origin --push
 uv sync
-git add uv.lock
-git commit -m "Lock dependencies"
-gh repo create my-capstone --public --source . --push
 ```
 
-**Do not skip the `uv.lock` commit.** `uv sync` creates `uv.lock`, and
-`capstone new` did not commit it. Left alone, `submit` later refuses with
-`your repository has changes that are not committed:` followed by
-`?? uv.lock`. The fix at any time is the same: commit it and push.
+`uv.lock` is already committed, so `uv sync` leaves nothing to commit. If
+`git remote -v` shows `origin` at `Gecko-Academy/...`, the learner skipped "make it
+yours" and `capstone submit` refuses. No `gh`? Create an empty public repository at
+https://github.com/new, then `git remote add origin ...` and `git push -u origin main`.
 
-No `gh`? `capstone new` printed the browser route: create an empty public
-repository at https://github.com/new, then `git remote add origin ...` and
-`git push -u origin main`.
+## 2. An older repository
+
+A repository made earlier with `uv run bootcamp capstone new` still works. If
+`submit` refuses with `?? uv.lock`, commit `uv.lock` and push.
 
 ## 3. Practise
 

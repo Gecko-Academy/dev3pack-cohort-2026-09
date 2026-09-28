@@ -18,7 +18,7 @@ the defence.
 | Piece | What it is | Where it lives | Who writes it | What it proves | When it counts |
 |---|---|---|---|---|---|
 | **Your agent** | The class `YourAgent`. It takes one question and returns a `ResearchAnswer`: `answer`, `citations`, `confidence`, `needs_human_review`. | `agent.py` in your repository, copied from [`final_assignment/agent.py`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/final_assignment/agent.py) | You | Nothing on its own. The grader and the defence judge it. | Every grader run, the private set, and the defence |
-| **Your repository** | A public GitHub repository made by `uv run bootcamp capstone new <folder>`: your agent, contract tests, `docs/`, a README, and a CI workflow | `github.com/<you>/<folder>` | You | That you can ship and explain a system. It is your showcase. | The defence, and after the course |
+| **Your repository** | Your own public copy of [the capstone repository](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project): your agent, contract tests, `docs/`, a README, CI, and the complete tutorial, `CAPSTONE.md` | `github.com/<you>/my-capstone` | You | That you can ship and explain a system. It is your showcase. | The defence, and after the course |
 | **The capstone notebook** | Five checks, `cap01-e1` to `cap01-e5` | [`units/en/unit2/capstone/notebook.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/capstone/notebook.ipynb), in your course folder | The course writes `e1` to `e4`. You write `e5`, the ranked issue list. | `e1` to `e4`: the course's reference pipeline meets the contract. `e5`: you ranked what your capstone does badly. | Its five checks are marks on the leaderboard, like a session's. Hand it in with `uv run bootcamp submit cap01 --github <you>`. |
 | **The practice grader** | 10 practice questions, 5 of them critical, judged gate by gate | [`final_assignment/grade.py`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/final_assignment/grade.py) and the practice set in the course package. Your repository runs it with `uv run bootcamp capstone grade`. | The course | How your agent does on each gate. It says "practice only: this report is not credential evidence". | Never. It is for you. |
 | **The private grader and the certificate** | The same grader on a private set: same shape, unseen questions | The course app. The answer keys never leave it. Your repository answers the set with `uv run bootcamp capstone submit`. | The course | That your agent works on questions it was never tuned on. A pass gets a certificate signed with Ed25519, which anyone can verify. | At the end. It needs the 30% bar **and** every critical case. |
@@ -78,46 +78,32 @@ The full list of what each session gives you is on
 ## Start today, in 15 minutes
 
 From nothing to a first green in your own repository.
-[The capstone tutorial](tutorial.mdx) has every step in more detail, the
-submission, where your score appears, and a troubleshooting table.
+[`CAPSTONE.md`](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project/blob/main/CAPSTONE.md), in the capstone repository, is the complete tutorial: every
+step in more detail, the submission, where your score appears, and troubleshooting.
 
 1. **Update your course folder.** In your course folder, run `git pull`, then
    `uv sync`.
-2. **Create your repository.** Put it next to the course folder, never inside it:
+2. **Clone the capstone repository, next to the course folder.**
 
    ```bash
-   uv run bootcamp capstone new ../my-capstone
-   cd ../my-capstone
+   git clone https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project.git my-capstone
+   cd my-capstone
    ```
 
-3. **Put it on GitHub, as a public repository.**
-
-   With the GitHub CLI (`gh auth login` once, as in
-   [handing work in](../../unit0/how-to-submit.mdx)):
+3. **Make it yours, as a public repository.** With the GitHub CLI
+   (`gh auth login` once, as in [handing work in](../../unit0/how-to-submit.mdx)):
 
    ```bash
-   gh repo create my-capstone --public --source . --push
+   git remote rename origin upstream
+   gh repo create my-capstone --public --source . --remote origin --push
+   uv sync
    ```
 
-   Without `gh`, in your browser:
-
-   1. Open <https://github.com/new>.
-   2. Name it `my-capstone`. Choose **Public**. Leave "Add a README file"
-      unticked, because your repository already has one.
-   3. Click **Create repository**. Then, in your terminal:
-
-   ```bash
-   git remote add origin https://github.com/<you>/my-capstone.git
-   git push -u origin main
-   ```
-
-   Do not drag the folder into GitHub's "upload files" page. That route ignores
-   `.gitignore`, so it can upload your `.env`.
-
-   Then run `uv sync` once and commit the `uv.lock` it creates:
-   `git add uv.lock && git commit -m "Lock dependencies" && git push`.
-   Without it, `capstone submit` later refuses with
-   `your repository has changes that are not committed: ?? uv.lock`.
+   Without `gh`: create an empty public repository named `my-capstone` at
+   <https://github.com/new>, then `git remote rename origin upstream`,
+   `git remote add origin https://github.com/<you>/my-capstone.git` and
+   `git push -u origin main`. `uv.lock` is already committed, so `uv sync` leaves
+   nothing to commit. `capstone submit` refuses while `origin` is still ours.
 
 4. **Run the tests.** `uv run pytest` prints `4 passed, 2 skipped, 3 xfailed`.
    That is your first green. The 3 `xfailed` are behaviours the starter agent

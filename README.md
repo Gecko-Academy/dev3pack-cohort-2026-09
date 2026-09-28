@@ -412,7 +412,7 @@ Session 13 uses an instructor-hosted Gecko MCP surface; the URL is handed out in
 
 ## Capstone and certificate
 
-A **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. You rebuild `src/bootcamp_agent/` in the session notebooks, then compare against the shipped package. Brief: [units/en/unit2/capstone/](units/en/unit2/capstone/). Every command from `capstone new` to your final score: [the capstone tutorial](units/en/unit2/capstone/tutorial.mdx).
+A **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. You rebuild `src/bootcamp_agent/` in the session notebooks, then compare against the shipped package. Brief: [units/en/unit2/capstone/](units/en/unit2/capstone/). You build it in your own copy of [the capstone repository](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project); its [`CAPSTONE.md`](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project/blob/main/CAPSTONE.md) has every command, from the clone to your final score.
 
 [`final_assignment/`](final_assignment/) is a template that scores 30% as shipped — it refuses correctly and answers nothing. Pass both gates (aggregate bar and every **critical** question) and the course issues an Ed25519-signed certificate anyone can verify. Details: [`final_assignment/README.md`](final_assignment/README.md).
 
