@@ -13,6 +13,8 @@
     title: "A local model, before you need one"
   - local: unit0/ask-your-assistant
     title: "Give the course to your assistant"
+  - local: unit0/course-mcp
+    title: "Search the course from your assistant"
   - local: unit0/how-to-submit
     title: "Handing work in"
   - local: unit0/week0
@@ -241,6 +243,8 @@
       title: "The capstone guide"
     - local: unit2/capstone/road
       title: "The road to the capstone"
+    - local: unit2/capstone/tutorial
+      title: "Capstone tutorial: from an empty folder to a score"
     - local: unit2/capstone/quiz
       title: "Quick quiz (ungraded)"
     - local: unit2/capstone/conclusion

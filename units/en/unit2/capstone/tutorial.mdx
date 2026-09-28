@@ -1,0 +1,340 @@
+# Capstone tutorial: from an empty folder to a score
+
+Every command, in order, from creating your capstone repository to reading your
+final score. [The capstone guide](guide.mdx) says what each piece is for. This
+page says what to type.
+
+## The whole path
+
+- Pull the course and sync it, in your course clone.
+- Create your capstone repository beside the course: `uv run bootcamp capstone new ../my-capstone`.
+- Inside it, run `uv sync` once, then **commit `uv.lock`**.
+- Publish it as a public GitHub repository.
+- Check the contract tests and the practice grader run.
+- Put a real model in `.env`, so your agent can do more than refuse.
+- Work in `agent.py`. Grade, commit, push, repeat.
+- Commit and push everything, then submit: `uv run bootcamp capstone submit --github <you>`.
+- Wait for the pull request to merge, then read `finals/<you>/result.json` in the submissions repository.
+
+## Which repository is which
+
+You have up to three. They are handed in differently, and mixing them up is the
+most common capstone mistake.
+
+| Repository | What it holds | How it is handed in | Scored |
+|---|---|---|---|
+| **The course clone**, `dev3pack-cohort-2026-09` | Lessons, session notebooks, and the capstone notebook | From the course clone, as [How to submit](../../unit0/how-to-submit.mdx) shows (sessions and the `cap01` notebook) | Yes, as marks on the track |
+| **Your capstone**, `my-capstone` | Your agent, its tests, `docs/`, your README. Public. | From inside it: `uv run bootcamp capstone submit --github <you>` | Yes, the final score, below |
+| **Your final project**, `my-final-project` | The daily projects of week 3, from [session 10](../session-10-skills-and-adr/follow-along.mdx) | Not handed in | No |
+
+Everything on this page happens in the first two. Each step says which one you
+are in.
+
+## 1. Update the course clone
+
+**In the course clone:**
+
+```bash
+git pull
+uv sync
+```
+
+If you use the `projects` or `agents` extras, name them as in today's class,
+for example `uv sync --extra projects --extra agents`. A bare `uv sync` removes
+extras you did not name.
+
+## 2. Create your capstone repository
+
+**Still in the course clone:**
+
+```bash
+uv run bootcamp capstone new ../my-capstone
+cd ../my-capstone
+```
+
+What it does:
+
+- It creates `../my-capstone` **beside** the course clone. Give it a folder
+  inside the clone and it refuses.
+- It copies the template and the six documents in `data/corpus/`.
+- It pins the course package to the exact course commit your clone holds, so
+  your agent always runs on the same course code.
+- It makes one commit on `main`. It never pushes.
+
+It prints the next commands. You can name the GitHub repository now with
+`--github my-capstone`, or later.
+
+## 3. Sync once, and commit uv.lock
+
+**In `my-capstone`:**
+
+```bash
+uv sync
+git add uv.lock
+git commit -m "Lock dependencies"
+```
+
+**Do this now, not later.** `uv sync` creates `uv.lock`, and `capstone new` did
+not commit it, because it did not exist yet. `submit` reads `uv.lock` to record
+which course commit your agent ran on, and it refuses a repository with
+anything uncommitted. Skip this and the day you submit, you get:
+
+```
+your repository has changes that are not committed:
+    ?? uv.lock
+```
+
+The fix is the same whenever it happens: `git add uv.lock`, commit, push.
+
+## 4. Publish it on GitHub
+
+**In `my-capstone`**, with the GitHub CLI (`gh auth login` once, as in
+[handing work in](../../unit0/how-to-submit.mdx)):
+
+```bash
+gh repo create my-capstone --public --source . --push
+```
+
+This creates the public repository, sets it as `origin`, and pushes both
+commits.
+
+Without `gh`, in your browser:
+
+1. Open [github.com/new](https://github.com/new).
+2. Name it `my-capstone`. Choose **Public**. Add no README, no licence and no
+   `.gitignore`: your repository already has them.
+3. Click **Create repository**. Then, in your terminal:
+
+   ```bash
+   git remote add origin https://github.com/<you>/my-capstone.git
+   git push -u origin main
+   ```
+
+Do not drag the folder into GitHub's upload page. That route ignores
+`.gitignore`, so it can upload your `.env`.
+
+Open the **Actions** tab on GitHub. CI runs the tests and the practice grader on
+every push, on the fake model, with no key.
+
+## 5. Run the contract tests and the practice grader
+
+**In `my-capstone`:**
+
+```bash
+uv run pytest
+uv run bootcamp capstone grade
+```
+
+`uv run pytest` prints `4 passed, 2 skipped, 3 xfailed` as shipped. The
+`xfailed` ones are behaviours the starter agent does not have yet, each marked
+with the session that teaches it. [The guide](guide.mdx) explains all three
+numbers.
+
+`uv run bootcamp capstone grade` runs your agent on the 10 practice questions.
+With no `.env` it runs on the offline fake model and ends with:
+
+- `score: 3/10 (30%)`
+- `NOT YET`
+- `critical safety gate failed`
+
+That is the starting line. The fake model can only refuse, so the three refusal
+questions pass and nothing else can. The report is written to
+`score_report.json`, which is gitignored, so grading never leaves anything to
+commit.
+
+Useful options:
+
+| Command | What it does |
+|---|---|
+| `uv run bootcamp capstone grade --random 5 --seed 7` | A sample of 5 questions, the same 5 each time |
+| `uv run bootcamp capstone grade --name "Your Name"` | Puts your name in the report |
+| `uv run bootcamp capstone trace "your question"` | One question through your agent, with every step it took |
+
+Reading the grader — opens with week 2 explains every gate that can
+fail.
+
+## 6. Give your agent a real model
+
+A real score needs a real model. **In `my-capstone`:**
+
+```bash
+cp .env.example .env
+```
+
+Then fill in `.env`. It is gitignored. Never commit it and never paste it into a
+chat.
+
+| Variable | What to put there |
+|---|---|
+| `BOOTCAMP_PROVIDER` | `anthropic`, `openai` or `ollama`. Empty means the fake model. |
+| `BOOTCAMP_MODEL` | The model name your provider uses |
+| `ANTHROPIC_API_KEY` | Your key, when the provider is `anthropic` |
+| `OPENAI_API_KEY` | Your key, when the provider is `openai` |
+| `OPENAI_BASE_URL` | Only for an OpenAI-compatible service such as OpenRouter |
+
+`ollama` needs no key. It uses `http://localhost:11434/v1` unless you set
+`OLLAMA_BASE_URL`. See [a local model](../../unit0/local-model.mdx).
+
+Run `uv run bootcamp capstone grade` again. The first line names the model lane
+it used. Your score can change between two runs of the same code on a real
+model, so write down which model produced each number.
+
+## 7. Work on your agent
+
+Your agent is `YourAgent` in `agent.py`. The guide — opens with week 2
+lists what each session adds.
+
+The loop, **in `my-capstone`**:
+
+```bash
+uv run pytest
+uv run bootcamp capstone grade
+git add -A
+git commit -m "what you changed"
+git push
+```
+
+Read `git status` before `git add -A`. It should never list `.env`.
+
+## 8. Submit the final assignment
+
+The final questions are open. **In `my-capstone`**, finish the step 7 loop first:
+`git status` must say "nothing to commit, working tree clean", and your last
+commit must be on GitHub.
+
+Then:
+
+```bash
+export DEV3PACK_API_BASE=https://app.geckovision.tech
+uv run bootcamp capstone submit --github <you> --dry-run
+uv run bootcamp capstone submit --github <you>
+```
+
+`<you>` is your GitHub login, the one in your profile URL.
+
+**Before anything runs, it checks your repository.** It must have a commit,
+nothing uncommitted, an `origin` on GitHub, and your last commit pushed. Your
+submission links to that commit, so the code on GitHub has to be the code that
+answers.
+
+**Then it runs three steps:**
+
+1. `1/3  the practice set, locally`. Your practice score and the model it ran
+   on. Nothing leaves your machine. **Read this line.** If it says
+   `WARNING: this run uses the fake model`, your final score will be about 30%
+   with the critical gate failed. Stop, set up `.env` (step 6), and run it
+   again.
+2. `2/3  the final questions`. They come from the course app, with no answer
+   keys. Your agent answers each one. A question that crashes or takes more
+   than 120 seconds becomes a flagged refusal, and the run goes on.
+3. `3/3  the bundle`. It writes `answers.json` and `submission.json`, then opens
+   a pull request to `Gecko-Academy/dev3pack-submissions`, under
+   `submissions/<you>/final/`.
+
+**`--dry-run`** does every check and both runs, writes the bundle to a
+temporary folder, prints both files, and opens no pull request. It still asks
+your model every final question, so it costs what a real run costs.
+
+Other options:
+
+| Option | What it does |
+|---|---|
+| `--timeout 120` | Seconds per question before it becomes a flagged refusal (default 120) |
+| `--budget 1800` | Seconds for the whole run (default 1800) |
+| `--agent agent.py` | Which file and class to run, as `FILE[:CLASS]` (default `agent.py`) |
+| `--into DIR` | Where to write the bundle (default `~/.bootcamp/final`) |
+| `--api URL` | The course app's address, instead of `DEV3PACK_API_BASE` |
+
+**No `gh`?** The command says so, keeps the bundle, and prints the steps to
+open the pull request in your browser.
+
+You can submit again. Each new submission replaces the previous one.
+
+## 9. Read your score
+
+`submit` does not print your final score. The answer keys never leave the course
+app, so nothing on your machine can compute it.
+
+What happens after you submit:
+
+1. The pull request's check reads your bundle.
+2. When the check passes, the submissions repository merges the pull request.
+3. A workflow in that repository sends your answers to the course app, and
+   commits what comes back to `finals/<you>/result.json`.
+
+Open it at:
+
+```
+https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/finals/<you>/result.json
+```
+
+| Field | What it tells you |
+|---|---|
+| `score` | Questions passed, and the percentage |
+| `gates` | The two gates: the 30% bar, and every critical question passed |
+| `passed` | `true` only when both gates pass |
+| `certificate_eligible` | Whether this result qualifies for the certificate |
+| `results` | A verdict per question. It does not repeat your answers. |
+
+A new submission overwrites this file with the new result.
+
+If your pull request shows **Merged** and the file is still not there, tell the
+instructor. Submitting again will not make it appear sooner.
+
+**The certificate** is issued by the course, signed, and separately from this
+file. [The final assignment page](../../tracks/final-assignment/introduction.mdx)
+shows how anyone can verify one.
+
+**Your course grade** is not this file either. It comes from the rubric at the
+defence in session 15. See what counts, and for what — opens with week 2.
+
+## Troubleshooting
+
+Every refusal below is a message the command prints. Each one means nothing was
+handed in.
+
+**Creating the repository**
+
+| You see | Do this |
+|---|---|
+| `... is inside the course clone. Your capstone is its own repository, so it lives beside the course, not in it` | Use a folder beside the clone: `uv run bootcamp capstone new ../my-capstone` |
+| `... already exists and is not empty; nothing was overwritten` | Pick a new folder name, or delete the old folder yourself if you meant to start again |
+| `no capstone-template/ and data/corpus/ here` | Run it from your course clone, after `git pull` |
+| `this checkout is not a clone of ...` | Run it from your clone of the cohort repository, not a copy of its files |
+| `The files are written, but git could not commit them` | Usually git does not know your name yet. Run `git config --global user.name "Your Name"` and `git config --global user.email "you@example.com"`, then the commit command it printed |
+| `git is not installed` | Install git, then run it again |
+
+**Grading and the model**
+
+| You see | Do this |
+|---|---|
+| `Unknown BOOTCAMP_PROVIDER ...` | Set `BOOTCAMP_PROVIDER` in `.env` to `fake`, `ollama`, `anthropic` or `openai` |
+| `score: 3/10 (30%)` with `critical safety gate failed` | You are on the fake model. Step 6. |
+| `... Run this inside your capstone repository, or pass --agent FILE[:CLASS].` | `cd` into `my-capstone` first |
+
+**Submitting**
+
+After any fix that changes a file, commit it and push it before you submit again:
+submit hands in the code that is on GitHub.
+
+| You see | Do this |
+|---|---|
+| `your repository has changes that are not committed:` then `?? uv.lock` | Commit `uv.lock` |
+| `your repository has changes that are not committed:` with other files | Read `git status` and commit what belongs in your repository |
+| ``your repository has no `origin` on GitHub yet`` | Step 4 |
+| ``` `origin` is ..., which is not a GitHub repository ``` | `git remote set-url origin https://github.com/<you>/my-capstone.git`, then `git push -u origin main` |
+| `your last commit (...) is not on GitHub yet` | `git push`. If you pushed from another machine, `git fetch` first. |
+| `this is not a capstone repository with a commit in it` | Run it inside the folder `capstone new` made |
+| `no API address. Pass --api <address>, or set DEV3PACK_API_BASE.` | `export DEV3PACK_API_BASE=https://app.geckovision.tech` in the same terminal |
+| `the API address must start with https://` | Check the address you exported, character by character |
+| `could not read which course commit this repository runs on` | Run `uv lock` and commit `uv.lock` |
+| `uv.lock pins the course at ..., but ... is installed.` | `uv sync`, then submit again |
+| `The final questions are not open yet. They open at ...` | Nothing is wrong. Run it again after that time. |
+| `The final questions are not published yet.` | Nothing is wrong. Run it again later. |
+| `--github ... is not a GitHub username` | Use your login from your profile URL, not your display name |
+| `some answers are larger than the app accepts` | Your agent wrote an answer that is too long. Shorten it in your agent. |
+| `gh is installed but not signed in. Run: gh auth login` | `gh auth login`, then submit again |
+| `needs the GitHub CLI, which is not installed` | Follow the browser steps it prints, or install `gh` from [cli.github.com](https://cli.github.com) |
+
+**Stuck on something not here?** Ask the course from your assistant. See
+[search the course from your assistant](../../unit0/course-mcp.mdx).

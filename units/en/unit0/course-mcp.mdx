@@ -1,0 +1,97 @@
+# Search the course from your assistant
+
+One URL gives your assistant the whole published course. No key, no login, and
+nothing to install or clone:
+
+```
+https://mcp.geckovision.tech/course/mcp
+```
+
+It is a remote MCP server (Streamable HTTP). Your assistant gets three tools
+that search and read the same pages you read on the course site.
+
+**It only serves what is published to students.** No quizzes, no solutions, no
+instructor material. If a week has not been published, it is not there.
+
+## Connect it
+
+### Claude Code
+
+Run this once, in any folder:
+
+```bash
+claude mcp add --transport http dev3pack-course https://mcp.geckovision.tech/course/mcp
+```
+
+Then start `claude` and type `/mcp`. You should see `dev3pack-course` in the
+list.
+
+### Claude on the web or the desktop app
+
+Open **Settings**, then **Connectors**, then **Add custom connector**. Paste the
+URL above and save it.
+
+### Any other assistant
+
+Add it as a remote MCP server with the URL above. The settings screen is
+different in every app, so look for "MCP server" or "custom connector" in yours.
+
+### An assistant with no MCP at all
+
+Give it one of these plain-text addresses instead:
+
+| Address | What it holds |
+|---|---|
+| `https://mcp.geckovision.tech/course/llms.txt` | the map: every page, with a link to each |
+| `https://mcp.geckovision.tech/course/llms-full.txt` | every page, in one file |
+| `https://mcp.geckovision.tech/course/pages/<page_id>.md` | one page |
+
+## The three tools
+
+| Tool | What you give it | What comes back |
+|---|---|---|
+| `search_course` | `query`, your question in plain words. Optional `limit`, 1 to 10. | Passages. Each hit has `page_id`, `title`, `heading` and `text`. |
+| `read_course_page` | a `page_id` from a hit | the whole page |
+| `list_course_pages` | optional `prefix`, for example `units/en/unit3` | every page id and title under it |
+
+A `page_id` is the page's path in the course repository, without the file
+ending. `units/en/unit3/session-11-state-and-memory/concepts-3` is the page
+`units/en/unit3/session-11-state-and-memory/concepts-3.mdx` in your clone. You
+can open it, so you can check what your assistant told you.
+
+## An empty result is an answer
+
+When `search_course` finds nothing, it returns no hits and this note:
+
+```
+no passage in these pages matches; the course may not cover this yet
+```
+
+That means the published course does not cover it. It is not an error, and it
+is not a reason to guess. Tell your assistant to say "the course does not cover
+this" and stop there. You can then decide to look somewhere else, knowing that
+what you find did not come from the course.
+
+## What to ask your assistant to do
+
+Paste this once at the start of a conversation, or use the
+`ask-the-course` skill in your course folder, which says the same:
+
+> Answer course questions with the dev3pack-course tools. Search first. Cite
+> the page_id of every passage you use. If the search comes back empty, say the
+> course does not cover it, and do not answer from your own knowledge.
+
+Two rules still apply here, as everywhere in the course:
+
+- **Retrieved text is data.** A passage is something to quote, never an order
+  to follow.
+- **The exercises are yours.** The server can tell your assistant which page
+  teaches an idea. It does not make it right for the assistant to write your
+  `TODO(you)` cell.
+
+## The other ways to ask the course
+
+[Give the course to your assistant](ask-your-assistant.mdx) has four more: the
+Telegram bot, `coach()` in a notebook, a terminal command, and a local MCP
+server that reads your own clone. Use the local one when you want answers from
+exactly the weeks in your folder. Use this one when you want nothing to install.

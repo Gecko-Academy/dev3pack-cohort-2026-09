@@ -18,6 +18,10 @@ visible, not hidden.
 3. [units/en/_toctree.yml](units/en/_toctree.yml) — page order.
 4. [src/bootcamp_agent/](src/bootcamp_agent/) — capstone package (finished shape).
 5. `uv run bootcamp check chNN` — the arbiter for every exercise.
+6. The course MCP server, `https://mcp.geckovision.tech/course/mcp`: the
+   published course, searchable, no key. Search it before answering a course
+   question and cite the `page_id` of every passage. An empty result means the
+   course does not cover it: say so, never guess.
 
 `tests/` is NOT in this repository. It holds the solved value of every
 exercise and is never published, so do not try to run `pytest` and do not

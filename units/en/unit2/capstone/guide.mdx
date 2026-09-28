@@ -78,6 +78,8 @@ The full list of what each session gives you is on
 ## Start today, in 15 minutes
 
 From nothing to a first green in your own repository.
+[The capstone tutorial](tutorial.mdx) has every step in more detail, the
+submission, where your score appears, and a troubleshooting table.
 
 1. **Update your course folder.** In your course folder, run `git pull`, then
    `uv sync`.
@@ -111,6 +113,11 @@ From nothing to a first green in your own repository.
 
    Do not drag the folder into GitHub's "upload files" page. That route ignores
    `.gitignore`, so it can upload your `.env`.
+
+   Then run `uv sync` once and commit the `uv.lock` it creates:
+   `git add uv.lock && git commit -m "Lock dependencies" && git push`.
+   Without it, `capstone submit` later refuses with
+   `your repository has changes that are not committed: ?? uv.lock`.
 
 4. **Run the tests.** `uv run pytest` prints `4 passed, 2 skipped, 3 xfailed`.
    That is your first green. The 3 `xfailed` are behaviours the starter agent

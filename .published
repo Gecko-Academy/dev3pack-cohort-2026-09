@@ -2,10 +2,12 @@
 .claude/agents/exercise-coach.md
 .claude/agents/session-tutor.md
 .claude/agents/setup-doctor.md
+.claude/skills/ask-the-course/SKILL.md
 .claude/skills/check-my-exercise/SKILL.md
 .claude/skills/fix-my-setup/SKILL.md
 .claude/skills/hand-my-work-in/SKILL.md
 .claude/skills/run-a-project/SKILL.md
+.claude/skills/ship-my-capstone/SKILL.md
 .claude/skills/study-a-session/SKILL.md
 .cursor/rules/bootcamp.mdc
 .env.example
@@ -281,6 +283,7 @@ units/en/tracks/projects/introduction.mdx
 units/en/tracks/ship-it/introduction.mdx
 units/en/tracks/workspaces/introduction.mdx
 units/en/unit0/ask-your-assistant.mdx
+units/en/unit0/course-mcp.mdx
 units/en/unit0/get-settled.mdx
 units/en/unit0/how-to-submit.mdx
 units/en/unit0/introduction.mdx
@@ -401,6 +404,7 @@ units/en/unit2/capstone/introduction.mdx
 units/en/unit2/capstone/notebook.ipynb
 units/en/unit2/capstone/quiz.mdx
 units/en/unit2/capstone/road.mdx
+units/en/unit2/capstone/tutorial.mdx
 units/en/unit2/session-06-retrieval-baseline/concepts-1.mdx
 units/en/unit2/session-06-retrieval-baseline/concepts-2.mdx
 units/en/unit2/session-06-retrieval-baseline/concepts-3.mdx

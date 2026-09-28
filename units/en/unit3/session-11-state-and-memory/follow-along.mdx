@@ -6,8 +6,9 @@ run, in the order we run it in class.
 | Part | What | Time |
 |---|---|---|
 | [0](#0-before-we-start) | Before we start: pull, sync, preflight green | 5 min |
+| [A](#ask-the-course) | Ask the course: connect the course MCP, three questions, one empty answer | 5 min |
 | [1](#1-where-we-are-going) | Where we are going: week 3, and a skill is a memory | 5 min |
-| [2](#2-four-kinds-and-four-questions) | Four kinds of memory, and four questions | 15 min |
+| [2](#2-four-kinds-and-four-questions) | Four kinds of memory, and four questions | 10 min |
 | [3](#3-the-state-wrapper-live-then-a-second-user) | The state wrapper, live, then a second user | 30 min |
 | [4](#4-your-exercise) | Your exercise: a preference, a policy, and a store with owners | 35 min |
 | [5](#5-break-it-on-purpose) | Break it on purpose: memory that was true once | 15 min |
@@ -50,6 +51,67 @@ something is missing, it prints the command that fixes it.
 
 **No setup on your laptop?** Open it in Colab. The first cell fetches the course
 for you.
+
+## Ask the course
+
+A tool for the whole lab, and for every session after it. One URL gives your
+assistant the published course, so it answers from the pages instead of from
+memory. No key, no login, nothing to install.
+
+**Connect it.** In Claude Code, run this once, in any folder:
+
+```bash
+claude mcp add --transport http dev3pack-course https://mcp.geckovision.tech/course/mcp
+```
+
+Then start `claude` and type `/mcp`. `dev3pack-course` is in the list. On Claude
+web or desktop: **Settings**, **Connectors**, **Add custom connector**, and paste
+the same URL. Any other app, and what to do with no MCP at all:
+[search the course from your assistant](../../unit0/course-mcp.mdx).
+
+**Ask it three questions about today.** Type each one to your assistant and ask
+it to use the course tools:
+
+1. "Why is the owner part of the key in a memory store?"
+2. "What does ch11-e2 check in my storage policy?"
+3. "When does a memory stop being true?"
+
+Each answer should come from today's pages, for example
+`units/en/unit3/session-11-state-and-memory/concepts-3` for the first. A hit
+looks like this, shortened:
+
+```json
+{
+  "page_id": "units/en/unit3/session-11-state-and-memory/concepts-3",
+  "title": "Isolation, and memory that went stale [[isolation-and-staleness]]",
+  "heading": "...",
+  "text": "... are two memories that cannot collide, and there is no lookup anywhere in the class that can reach a row without naming its owner. ..."
+}
+```
+
+**What to do with `page_id`.** It is the page's path in your clone, without
+`.mdx`. Open `units/en/unit3/session-11-state-and-memory/concepts-3.mdx` and
+check the answer against it. If your assistant did not name a page, ask it which
+one. An answer with no page is an answer you cannot check.
+
+**Now ask it something the course does not teach:**
+
+> How do I bake sourdough bread at home?
+
+The search comes back with no hits and this note:
+
+```
+no passage in these pages matches; the course may not cover this yet
+```
+
+**An empty result is an answer.** It means the course does not cover it. Your
+assistant should say so, not fill the gap with a paragraph from its own memory.
+If it guesses anyway, tell it: "if the course search is empty, say the course
+does not cover it." In your course folder, the `ask-the-course` skill already
+says that.
+
+**What it serves.** Only what is published to students: the lesson pages,
+projects and guides. No quizzes, no solutions, no instructor material.
 
 ## 1. Where we are going
 

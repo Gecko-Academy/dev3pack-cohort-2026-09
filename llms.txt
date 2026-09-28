@@ -19,6 +19,7 @@ You are most likely reading this because a LEARNER asked you to help them with i
 - [SETUP](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/SETUP.md): install to a green doctor.
 - [Read it in a browser](https://gecko-academy.github.io/dev3pack-cohort-2026-09/): the whole course as pages, with the quizzes working.
 - [AGENTS.md](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/AGENTS.md): the full assistant policy for this repository.
+- [The course MCP server](https://mcp.geckovision.tech/course/mcp): the published course, searchable, no key. Cite the `page_id` of every passage you use. An empty result means the course does not cover it: say so, and do not answer from memory.
 
 ## Commands
 
@@ -39,6 +40,7 @@ uv run bootcamp submit chNN --github YOU  # build the hand-in bundle
 - [Runtime lanes](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/runtime-lanes.html)
 - [A local model, before you need one](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/local-model.html)
 - [Give the course to your assistant](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/ask-your-assistant.html)
+- [Search the course from your assistant](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/course-mcp.html)
 - [Handing work in](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/how-to-submit.html)
 - [Week 0 — the prerequisite](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/week0.html)
 - [Week 1 — Contracts, adapters, tools, and a first agent](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/week1.html)

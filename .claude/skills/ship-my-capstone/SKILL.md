@@ -1,0 +1,121 @@
+---
+name: ship-my-capstone
+description: Use when a learner wants to create, grade, hand in, or check the score of their capstone (the final assignment). Walks capstone new, grade, submit and the score file with the exact commands, including the uv.lock refusal. Never writes the learner's agent for them.
+---
+
+# Create, grade, submit, and read the score
+
+## When to use
+
+The learner says "start my capstone", "grade my capstone", "submit the final",
+"where is my score", or pastes an error from `bootcamp capstone`. The full
+tutorial, with every step explained, is `units/en/unit2/capstone/tutorial.mdx`.
+Read it before you start, and send the learner to it.
+
+## Three repositories, and they are easy to mix up
+
+| Repository | What it is | How it is handed in |
+|---|---|---|
+| the course clone, `dev3pack-cohort-2026-09` | lessons and session notebooks | `uv run bootcamp submit chNN --github LOGIN --push`, from the course clone |
+| `my-capstone` | the learner's own public repository with their agent | `uv run bootcamp capstone submit --github LOGIN`, from inside `my-capstone` |
+| `my-final-project` | the daily projects from week 3 | not handed in, not scored |
+
+Ask which one the learner is in before running anything. `pwd` and
+`git remote -v` answer it.
+
+## 1. Create it (from the course clone)
+
+```bash
+git pull && uv sync
+uv run bootcamp capstone new ../my-capstone
+cd ../my-capstone
+```
+
+`capstone new` refuses a folder inside the course clone, pins the course commit,
+makes one commit on `main`, and never pushes.
+
+## 2. Lock, commit, publish (inside my-capstone)
+
+```bash
+uv sync
+git add uv.lock
+git commit -m "Lock dependencies"
+gh repo create my-capstone --public --source . --push
+```
+
+**Do not skip the `uv.lock` commit.** `uv sync` creates `uv.lock`, and
+`capstone new` did not commit it. Left alone, `submit` later refuses with
+`your repository has changes that are not committed:` followed by
+`?? uv.lock`. The fix at any time is the same: commit it and push.
+
+No `gh`? `capstone new` printed the browser route: create an empty public
+repository at https://github.com/new, then `git remote add origin ...` and
+`git push -u origin main`.
+
+## 3. Practise
+
+- The contract tests: the command is in step 5 of the tutorial. They live in
+  the capstone repository, not in the course clone.
+- The practice grader: `uv run bootcamp capstone grade`. Its report goes to
+  `score_report.json`, which is gitignored, so it never dirties the tree.
+- One question, every step: `uv run bootcamp capstone trace "the question"`.
+
+With no `.env`, the agent runs on the offline fake model: about 30%, `NOT YET`,
+and `critical safety gate failed`. That is the starting line, not a bug. A real
+score needs a real model in `.env` inside `my-capstone`: `BOOTCAMP_PROVIDER`
+(`anthropic`, `openai` or `ollama`), `BOOTCAMP_MODEL`, and the key the provider
+needs (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`; `OPENAI_BASE_URL` for an
+OpenAI-compatible service; Ollama needs no key). Never read, print or paste the
+learner's `.env`. Ask them to edit it.
+
+## 4. Submit (inside my-capstone)
+
+Commit and push first. Then:
+
+```bash
+export DEV3PACK_API_BASE=https://app.geckovision.tech
+uv run bootcamp capstone submit --github LOGIN --dry-run
+uv run bootcamp capstone submit --github LOGIN
+```
+
+`LOGIN` is the GitHub login from the profile URL. Before anything runs,
+`submit` checks that the repository has a commit, nothing uncommitted, an
+`origin` on GitHub, and that the last commit is pushed. Then three steps:
+`1/3` the practice set locally, `2/3` the final questions, `3/3` the bundle and
+the pull request to `Gecko-Academy/dev3pack-submissions`, under
+`submissions/LOGIN/final/`. `--dry-run` does everything except the pull
+request, and writes the bundle to a temporary folder.
+
+Read the `1/3` lines with the learner. If they say `WARNING: this run uses the
+fake model`, stop and ask whether they meant that.
+
+## 5. Read the score
+
+The score is not printed by `submit`. After the pull request merges, a workflow
+in the submissions repository scores the answers and commits
+`finals/LOGIN/result.json`:
+
+```
+https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/finals/LOGIN/result.json
+```
+
+Read `score`, `passed` and `certificate_eligible` with the learner, and the
+per-question verdicts in `results`. A new submission replaces the file. If the
+pull request shows merged and the file is not there, tell the learner to
+report it to the instructor rather than resubmit.
+
+## When a command refuses
+
+Every refusal says what to run next. Read it out, then do that. The common ones
+are in the troubleshooting table at the end of the tutorial.
+
+## Never
+
+- Never write the learner's `agent.py`, and never write into a `TODO(you)` cell
+  in the capstone notebook. Explain the idea, name the session page that teaches
+  it, and let the learner write it. The defence is six minutes of explaining
+  their own code.
+- Never run `submit` without the learner reading the `1/3` output first.
+- Never commit for the learner without showing them the diff.
+- Never read, print or commit `.env`.
+- Never open a `solutions/` directory.

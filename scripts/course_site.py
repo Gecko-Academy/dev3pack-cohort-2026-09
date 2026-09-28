@@ -167,7 +167,8 @@ REPO_MAP: tuple[tuple[str, str], ...] = (
     (
         ".claude/",
         "Skills and subagents for Claude Code, already in the clone rather than installed. They "
-        "teach a session, read a failing check and fix a setup; none writes an exercise answer.",
+        "teach a session, read a failing check, fix a setup, answer from the course and walk "
+        "the capstone hand-in; none writes an exercise answer.",
     ),
     (".cursor/", "Cursor rules, pointing at `AGENTS.md`."),
     (".env.example", "Every variable the course reads, with empty values."),
@@ -184,6 +185,7 @@ UNIT0_ORDER = (
     "runtime-lanes",
     "local-model",
     "ask-your-assistant",
+    "course-mcp",
     "how-to-submit",
     "week0",
     "week1",
@@ -1022,6 +1024,10 @@ def render_llms(units: Path | None = None) -> str:
         "the quizzes working.",
         f"- [AGENTS.md]({COHORT_URL}/blob/main/AGENTS.md): the full assistant "
         "policy for this repository.",
+        "- [The course MCP server](https://mcp.geckovision.tech/course/mcp): the "
+        "published course, searchable, no key. Cite the `page_id` of every passage "
+        "you use. An empty result means the course does not cover it: say so, and "
+        "do not answer from memory.",
         "",
         "## Commands",
         "",
