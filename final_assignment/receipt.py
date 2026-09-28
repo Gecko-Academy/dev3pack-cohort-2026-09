@@ -222,6 +222,12 @@ def verify(receipt: object, public_key: Ed25519PublicKey) -> tuple[bool, str]:
         return False, "signature does not verify"
     if not all(value is True for value in receipt.get("gates", {}).values()):
         return False, "a signed hard gate is false"
+    # The practice answer keys are public, so passing them proves nothing. Until
+    # 28 September 2026 the platform signed those too; a valid signature over a
+    # practice set is therefore not a credential, and must not verify as one.
+    question_set = receipt.get("question_set_id")
+    if isinstance(question_set, str) and question_set.startswith("public-practice"):
+        return False, f"this receipt is for the public practice set ({question_set}), not the final"
 
     # TWO KINDS OF RECEIPT, and conflating them was a real interoperability bug.
     #
