@@ -13,7 +13,7 @@ names the notebook section it lives in. Stuck on one? Ask the course MCP first
 |---|---|---|
 | [0](#0-before-we-start) | Before we start: pull, sync, preflight green | 3 min |
 | [1](#1-host-client-and-server-and-the-four-primitives) | Host, client and server, and the four primitives | 10 min |
-| [2](#2-live-a-surface-you-did-not-write) | Live: a surface you did not write | 7 min |
+| [2](#2-live-a-surface-you-did-not-write) | Live: demo 12, a server that lies a little, then the course; and a surface you did not write | 7 min |
 | [3](#3-the-lab-what-a-server-offers-and-which-tools-can-change-anything) | The lab: `ch12-e2`, then `ch12-e1` | 20 min |
 | [4](#4-break-it-on-purpose-the-description-that-gives-orders) | Break it on purpose: the description that gives orders, and `review_tool` | 10 min |
 | [5](#5-the-final-assignment-from-your-repo-to-a-certificate) | The final assignment: from your repo to a certificate | 7 min |
@@ -105,7 +105,18 @@ can give you one without the other.
 
 ## 2. Live: a surface you did not write
 
-Notebook section 1. Run the cell. It prints:
+**The demo first: [demo 12, meet a stranger](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/12_meet_a_stranger.ipynb).** Your instructor runs it; you
+can too, it takes five minutes and needs no key.
+
+| Step | What you see |
+|---|---|
+| **Build** | a 25-line MCP server with `MCPServer` (the class tutorials still call `FastMCP`): `get_weather`, honest, and `summarize_notes`, marked read-only, whose description tells the model to delete notes |
+| **Connect** | the handshake announces `tools`, `resources` and `prompts`; the listings hold 2, 0 and 0. Announced and empty, with nobody writing it: `MCPServer` does it by default |
+| **Read** | the two descriptions exactly as a model receives them, and a three-line review that refuses `summarize_notes` for the order in its description |
+| **Ask the course** | the course MCP answers a real question with pages you can open, and a made-up one with an honest empty result |
+| **In your assistant** | `claude mcp add tiny-notes -- uv run python demos/12_tiny_server.py`, then ask it to summarize your notes and watch what it does with the order |
+
+Then the recorded surface this session is built on. Notebook section 1. Run the cell. It prints:
 
 ```
 16 tools, recorded 2026-09-03, protocol 2025-11-25
