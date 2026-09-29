@@ -15,7 +15,15 @@ nothing; that pair is what makes this file safe to keep.
 THE LAYOUT, in the order the account is written:
 
     8   discriminator          sha256("account:Receipts")[:8]
-    4   receipts vec length    always 0 here -- a receipt names a real buyer
+    4   receipts vec length    u32; ``encode_store`` always writes 0
+        per receipt (the IDL's ``Receipt``, in this order):
+    8       receipt_id         u64
+    32      buyer              raw pubkey bytes
+    1       was_delivered      bool, one byte
+    8       price              u64, smallest unit, what this sale charged
+    8       timestamp          i64, unix seconds
+    1       table_number       u8
+    ..      product_name       u32 length prefix, then utf-8
     8   total_purchases        u64, little endian
     ..  store_name             u32 length prefix, then utf-8
     32  authority              raw pubkey bytes
@@ -121,12 +129,28 @@ class Product:
 
 
 @dataclass(frozen=True)
+class Receipt:
+    """One sale, as the program recorded it. Public chain state, read not invented."""
+
+    receipt_id: int
+    buyer: str
+    was_delivered: bool
+    price: int
+    timestamp: int
+    table_number: int
+    product_name: str
+
+
+@dataclass(frozen=True)
 class Store:
     store_name: str
     authority: str
     products: tuple[Product, ...] = ()
     telegram_channel_id: str = ""
     total_purchases: int = 0
+    #: Last, and defaulted, so every store built by hand before this existed
+    #: still constructs and still compares equal to one that has sold nothing.
+    receipts: tuple[Receipt, ...] = ()
 
 
 @dataclass
@@ -153,6 +177,17 @@ class _Cursor:
 
     def u64(self) -> int:
         return int.from_bytes(self.take(8), "little")
+
+    def i64(self) -> int:
+        return int.from_bytes(self.take(8), "little", signed=True)
+
+    def boolean(self) -> bool:
+        value = self.u8()
+        if value > 1:
+            raise StoreBytesError(
+                f"byte {value} at offset {self.at - 1} is not a bool -- these are not a store"
+            )
+        return value == 1
 
     def string(self) -> str:
         return self.take(self.u32()).decode("utf-8")
@@ -192,14 +227,26 @@ def encode_store(store: Store) -> bytes:
 def decode_store(raw: bytes) -> Store:
     """Account bytes back into a :class:`Store`.
 
-    The receipts vec is walked past without being returned. Those rows carry real
-    buyers, and a teaching exercise has no business holding them.
+    The receipts come back too. They sit before everything else, so a decoder
+    that reads them wrong cannot read the store at all: an earlier version
+    skipped each one as ``pubkey + u64 + string`` and every store that had made
+    a sale failed on its first receipt. They are public chain state, and a buyer
+    reading them is how it confirms its purchase landed.
     """
     cursor = _Cursor(raw, at=8)
+    receipts = []
     for _ in range(cursor.u32()):
-        cursor.take(PUBKEY_BYTES)
-        cursor.u64()
-        cursor.string()
+        receipts.append(
+            Receipt(
+                receipt_id=cursor.u64(),
+                buyer=cursor.pubkey(),
+                was_delivered=cursor.boolean(),
+                price=cursor.u64(),
+                timestamp=cursor.i64(),
+                table_number=cursor.u8(),
+                product_name=cursor.string(),
+            )
+        )
     total_purchases = cursor.u64()
     store_name = cursor.string()
     authority = cursor.pubkey()
@@ -223,4 +270,5 @@ def decode_store(raw: bytes) -> Store:
         products=tuple(products),
         telegram_channel_id=telegram_channel_id,
         total_purchases=total_purchases,
+        receipts=tuple(receipts),
     )

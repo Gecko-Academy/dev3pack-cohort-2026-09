@@ -23,3 +23,15 @@ nothing, which is why one test would not have been enough.
 
 The store is real in shape and fictional in content: the authority is a public
 address, the mint is mainnet USDC, and nobody has ever bought anything from it.
+
+## `gspike2038-store.b64`
+
+The whole `Receipts` account of devnet store `gspike2038` (PDA
+`4kp1ocBmy7a4NZpV6B6hzHSbcpF43izAAumRiFJHnZZC`), fetched read-only with
+`getAccountInfo` from `https://api.devnet.solana.com` after two purchases.
+
+Every fixture before it had sold nothing, so the receipt layout was never read,
+and the decoder had it wrong: any store with one sale failed to decode. This one
+has two receipts, so a wrong receipt layout turns `tests/test_shipit_borsh.py`
+red. It is public account data: a store name, a public authority, a devnet mint
+and one public buyer address.

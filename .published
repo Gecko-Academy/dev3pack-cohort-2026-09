@@ -201,6 +201,7 @@ scripts/verify_submission.py
 ship-it/README.md
 ship-it/fixtures/README.md
 ship-it/fixtures/geckocoffee-store.b64
+ship-it/fixtures/gspike2038-store.b64
 ship-it/notebook.ipynb
 ship-it/seed/RUNBOOK.md
 src/bootcamp_agent/__init__.py
