@@ -185,14 +185,33 @@ UNIT0_ORDER = (
     "runtime-lanes",
     "local-model",
     "ask-your-assistant",
-    "course-mcp",
-    "connect-your-assistant",
     "how-to-submit",
     "week0",
     "week1",
     "week2",
-    "week3",
 )
+
+#: What week 3 needs, listed at the top of unit 3 so nobody jumps back to unit 0 or unit 2
+#: (founder, 29 Sep 2026). Paths under units/en without suffix: the unit-0 pages keep
+#: their files and their URLs; only where they are LISTED moves.
+WEEK3_START = (
+    "unit3/start-here",
+    "unit0/week3",
+    "unit3/gecko-capstone",
+    "unit0/connect-your-assistant",
+    "unit0/course-mcp",
+)
+START_WEEK = 3
+
+#: The week-0 MCP course (topics 9 to 11) is the background sessions 12 and 13 build on.
+#: Listed in unit 0, its "Topic 11" read as session 11's assignment; it is listed in
+#: unit 3 instead, as one group, so the three topics stay together.
+MOVED_TO_WEEK3 = "Course B — MCP: AI apps as easy as 1, 2, 3"
+MOVED_TO_WEEK3_NAV = "Background for sessions 12 and 13: the MCP course (topics 9 to 11)"
+
+#: The nav label for unit 2's capstone section. It is the final assignment (the research
+#: agent and its certificate); the Gecko capstone is its own page in unit 3.
+FINAL_ASSIGNMENT_NAV = "Final assignment: the source-grounded research assistant"
 
 #: One-page groups after the sessions, present only when the page exists.
 TRAILING = (
@@ -288,12 +307,15 @@ def groups() -> list[dict[str, object]]:
     # "Topic", not "Unit": the prerequisite material was numbered Unit 1 … Unit
     # 12 while the teaching weeks are unit1 … unit3 on disk, so the word meant
     # two things at once.
+    moved: list[dict[str, str]] = []
     for course in WEEK0_COURSES:
         sections: list[dict[str, str]] = []
         for unit in WEEK0_UNITS:
             if unit.course == course:
                 sections += _sections(unit.directory, f"Topic {unit.number}. {unit.title}")
-        if sections:
+        if sections and course == MOVED_TO_WEEK3:
+            moved = sections
+        elif sections:
             unit0_children.append({"title": course, "sections": sections})
 
     if own or unit0_children:
@@ -301,6 +323,16 @@ def groups() -> list[dict[str, object]]:
 
     for week in sorted({chapter.module for chapter in CHAPTERS}):
         sessions: list[dict[str, object]] = []
+        if week == START_WEEK:
+            start = [
+                {"local": local, "title": page_title(UNITS_ROOT / f"{local}.mdx")}
+                for local in WEEK3_START
+                if (UNITS_ROOT / f"{local}.mdx").is_file()
+            ]
+            if start:
+                sessions.append({"title": "Start here: this week", "sections": start})
+            if moved:
+                sessions.append({"title": MOVED_TO_WEEK3_NAV, "sections": moved})
         for chapter in CHAPTERS:
             if chapter.module != week:
                 continue
@@ -316,7 +348,7 @@ def groups() -> list[dict[str, object]]:
             if chapter is last_of_week and chapter.module == CAPSTONE.opens_in_week:
                 sessions.append(
                     {
-                        "title": CAPSTONE.title,
+                        "title": FINAL_ASSIGNMENT_NAV,
                         "sections": _sections(CAPSTONE.directory, "Introduction"),
                     }
                 )
@@ -686,6 +718,8 @@ def validate() -> list[str]:
         (UNITS_ROOT / UNIT0).resolve(),
         *((UNITS_ROOT / name).resolve() for name in BONUS_DIRS),
         *((UNITS_ROOT / TRACKS_ROOT / name).resolve() for name, _ in TRAILING),
+        # The week-3 start pages sit directly in their unit folder, like unit 0's.
+        *((UNITS_ROOT / local).parent.resolve() for local in WEEK3_START),
     }
     for directory, _title in _ordered_units():
         known.add(directory.resolve())

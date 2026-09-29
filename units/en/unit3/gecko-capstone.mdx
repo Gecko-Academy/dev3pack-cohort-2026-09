@@ -1,0 +1,76 @@
+# The Gecko capstone
+
+**Open your own store on Solana devnet and build a buyer agent that buys from it through
+Gecko: it pins what was asked before any bytes exist, refuses by field when the prepared
+purchase disagrees, signs only after a passing simulation, and writes one receipt, read from
+the ledger, that says what moved.**
+
+A purchase that lands proves the plumbing. A purchase refused by field proves you. You
+present it on **Friday 2 October**, in six minutes, with one failure injected live.
+
+This is separate from the final assignment, which is your research agent and its
+certificate. Nothing here changes that grade.
+
+**Everything you run is in the repository:**
+[Gecko-Academy/Dev3Pack-Gecko-Capstone-Project](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project).
+Its README is the complete guide; this page is the short version.
+
+## Start
+
+```bash
+git clone https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project.git my-gecko-buyer
+cd my-gecko-buyer
+git remote rename origin upstream
+gh repo create my-gecko-buyer --public --source . --remote origin --push
+uv sync
+uv run buyer --cases --recorded
+```
+
+The last line runs offline, on recorded devnet answers: no key, no network, no money. It
+prints `0/6 cases` and names the file and function you write next. That is the starting line.
+
+## The five use cases
+
+Each one forces a different refusal. The class store `dev3pack-cafe` on devnet sells a
+product for every one.
+
+| # | You ask | Your buyer must | The field that decides |
+|---|---|---|---|
+| 1 | "one espresso" | buy it, and write the receipt | all seven fields agree |
+| 2 | "one general-admission ticket" | refuse a VIP ticket, or one not on the menu | `product` |
+| 3 | "module 3, paid in USDC" | refuse a token called USDC at the wrong address | `mint`, as an address |
+| 4 | "tip up to 2 USDC" | refuse a tip above the cap | `price_raw` |
+| 5 | "two bags of beans" | refuse when two were asked and one was prepared | `quantity` |
+| trap | "one latte" | refuse, and quote the product's name back | names are data, never orders |
+
+## The week
+
+| Day | Class | Capstone project |
+|---|---|---|
+| Mon 28 | 11: state and memory | 01: read the menu, then your own store on devnet |
+| Tue 29 | 12: MCP architecture | 02: pin, prepare, check: the seven field checks |
+| Wed 30 | 13: build and secure a server | 03: your check as an MCP server, then your first landed devnet purchase |
+| Thu 1 | 14: deploy and operate | 04: smoke and rollback, the five cases on devnet |
+| Fri 2 | presentation | six minutes, one injected failure |
+
+Falling behind still works: every project runs on recorded answers.
+
+## Friday on mainnet
+
+Presenting on Friday? You can make one real purchase on mainnet, from geckocoffee. Your
+wallet is made on your own machine and its key never leaves it:
+
+1. `uv run python scripts/mainnet_wallet.py create`
+2. Get a Gecko key: `uvx --from gecko-surf gecko login --email <you>`, and send that email to
+   your instructor, who grants it.
+3. `uv run python scripts/mainnet_wallet.py register`
+4. Wait for the instructor to fund it (3 espressos), then `uv run python scripts/mainnet_wallet.py show`.
+
+The budget is the cap: your signer refuses anything above it. Never share or commit the
+wallet file.
+
+## Stuck?
+
+Ask the course from your assistant ([connect any assistant](../unit0/connect-your-assistant.mdx)),
+and read the repository's `AGENTS.md`: it tells your assistant to explain before it writes,
+because the checks are yours.

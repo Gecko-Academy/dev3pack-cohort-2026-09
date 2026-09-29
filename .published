@@ -461,6 +461,7 @@ units/en/unit2/session-10-skills-and-adr/introduction.mdx
 units/en/unit2/session-10-skills-and-adr/notebook.ipynb
 units/en/unit2/session-10-skills-and-adr/quiz.mdx
 units/en/unit2/session-10-skills-and-adr/weekly-challenge.mdx
+units/en/unit3/gecko-capstone.mdx
 units/en/unit3/session-11-state-and-memory/concepts-1.mdx
 units/en/unit3/session-11-state-and-memory/concepts-2.mdx
 units/en/unit3/session-11-state-and-memory/concepts-3.mdx
@@ -501,6 +502,7 @@ units/en/unit3/session-15-defend-the-capstone/concepts-2.mdx
 units/en/unit3/session-15-defend-the-capstone/conclusion.mdx
 units/en/unit3/session-15-defend-the-capstone/introduction.mdx
 units/en/unit3/session-15-defend-the-capstone/quiz.mdx
+units/en/unit3/start-here.mdx
 uv.lock
 workspaces/README.md
 workspaces/news-to-telegram/fixtures/hn-front-page.json

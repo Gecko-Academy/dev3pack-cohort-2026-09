@@ -13,10 +13,6 @@
     title: "A local model, before you need one"
   - local: unit0/ask-your-assistant
     title: "Give the course to your assistant"
-  - local: unit0/course-mcp
-    title: "Search the course from your assistant"
-  - local: unit0/connect-your-assistant
-    title: "Connect any assistant to the course and to Gecko"
   - local: unit0/how-to-submit
     title: "Handing work in"
   - local: unit0/week0
@@ -25,8 +21,6 @@
     title: "Week 1 — Contracts, adapters, tools, and a first agent"
   - local: unit0/week2
     title: "Week 2 — Retrieval, graphs, evaluation, skills"
-  - local: unit0/week3
-    title: "Week 3 — State, MCP, deployment, defense"
   - title: "The fast lane"
     sections:
     - local: unit0/w01-environment/introduction
@@ -47,14 +41,6 @@
       title: "Topic 7. Classes in a package"
     - local: unit0/w08-docs-tests-readability/introduction
       title: "Topic 8. Documentation, tests and readability"
-  - title: "Course B — MCP: AI apps as easy as 1, 2, 3"
-    sections:
-    - local: unit0/w09-mcp-first-server/introduction
-      title: "Topic 9. Your first MCP server"
-    - local: unit0/w10-mcp-resources-prompts-llms/introduction
-      title: "Topic 10. Resources, prompts, and the LLM"
-    - local: unit0/w11-mcp-data-apis-third-party/introduction
-      title: "Topic 11. Databases, APIs, and third-party servers"
   - title: "Course C — Data structures for agents"
     sections:
     - local: unit0/w12-dsa-for-agents/introduction
@@ -231,7 +217,7 @@
       title: "Quick quiz (ungraded)"
     - local: unit2/session-10-skills-and-adr/conclusion
       title: "Conclusion"
-  - title: "Capstone: the source-grounded research assistant"
+  - title: "Final assignment: the source-grounded research assistant"
     sections:
     - local: unit2/capstone/introduction
       title: "Introduction"
@@ -253,6 +239,26 @@
       title: "Conclusion"
 - title: "Unit 3. State, MCP, deployment, defense"
   sections:
+  - title: "Start here: this week"
+    sections:
+    - local: unit3/start-here
+      title: "Start here: this week"
+    - local: unit0/week3
+      title: "Week 3 — State, MCP, deployment, defense"
+    - local: unit3/gecko-capstone
+      title: "The Gecko capstone"
+    - local: unit0/connect-your-assistant
+      title: "Connect any assistant to the course and to Gecko"
+    - local: unit0/course-mcp
+      title: "Search the course from your assistant"
+  - title: "Background for sessions 12 and 13: the MCP course (topics 9 to 11)"
+    sections:
+    - local: unit0/w09-mcp-first-server/introduction
+      title: "Topic 9. Your first MCP server"
+    - local: unit0/w10-mcp-resources-prompts-llms/introduction
+      title: "Topic 10. Resources, prompts, and the LLM"
+    - local: unit0/w11-mcp-data-apis-third-party/introduction
+      title: "Topic 11. Databases, APIs, and third-party servers"
   - title: "Session 11. State and memory — Mon 28 Sep"
     sections:
     - local: unit3/session-11-state-and-memory/introduction
