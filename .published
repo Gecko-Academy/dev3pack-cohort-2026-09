@@ -186,6 +186,7 @@ scripts/diagrams/session_08.py
 scripts/diagrams/session_09.py
 scripts/diagrams/session_10.py
 scripts/diagrams/session_11.py
+scripts/diagrams/session_12.py
 scripts/diagrams/slide.py
 scripts/diagrams/terminal.py
 scripts/diagrams/theme.py
@@ -286,6 +287,7 @@ units/en/tracks/projects/introduction.mdx
 units/en/tracks/ship-it/introduction.mdx
 units/en/tracks/workspaces/introduction.mdx
 units/en/unit0/ask-your-assistant.mdx
+units/en/unit0/connect-your-assistant.mdx
 units/en/unit0/course-mcp.mdx
 units/en/unit0/get-settled.mdx
 units/en/unit0/how-to-submit.mdx
@@ -470,6 +472,8 @@ units/en/unit3/session-12-mcp-architecture/concepts-2.mdx
 units/en/unit3/session-12-mcp-architecture/concepts-3.mdx
 units/en/unit3/session-12-mcp-architecture/conclusion.mdx
 units/en/unit3/session-12-mcp-architecture/follow-along.mdx
+units/en/unit3/session-12-mcp-architecture/img/api-vs-mcp.png
+units/en/unit3/session-12-mcp-architecture/img/host-client-server.png
 units/en/unit3/session-12-mcp-architecture/introduction.mdx
 units/en/unit3/session-12-mcp-architecture/notebook.ipynb
 units/en/unit3/session-12-mcp-architecture/quiz.mdx

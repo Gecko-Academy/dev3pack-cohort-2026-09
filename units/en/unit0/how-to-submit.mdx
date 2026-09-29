@@ -115,6 +115,15 @@ on a quiet repository — runs have been two to five hours apart. Green means
 accepted; the score appearing on the track can take a few hours, and nobody
 needs to be asked.
 
+### My pull request has no checks, or never merges
+
+| What you see | Why | What to do |
+|---|---|---|
+| No checks at all, or "workflow awaiting approval" | GitHub holds the checks on the first pull request from a brand-new GitHub account until the course approves them | Tell the instructor. Nothing is wrong with your hand-in. |
+| A red check | the check refused the shape of your bundle | Open the check, read the first failing line, fix it, and run `submit` again. It updates the same pull request. |
+| Green, and not merged yet | merging runs on a schedule, and runs have been hours apart | Wait. Green means accepted. |
+| Merged, and no score on the track yet | the track is rebuilt after the merge | Wait a few hours. |
+
 Before you open the pull request you can run the same check CI will:
 
 ```bash

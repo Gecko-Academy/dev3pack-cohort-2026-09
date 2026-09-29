@@ -25,6 +25,7 @@ from .session_08 import loop_vs_graph, rag_family, vector_indexes
 from .session_09 import SESSION_09
 from .session_10 import SESSION_10
 from .session_11 import SESSION_11
+from .session_12 import SESSION_12
 from .slide import Slide
 from .terminal import Terminal
 from .theme import (
@@ -84,6 +85,7 @@ __all__ = [
     "SESSION_09",
     "SESSION_10",
     "SESSION_11",
+    "SESSION_12",
     "UNIT_08",
     "Canvas",
     "Slide",

@@ -15,9 +15,7 @@ instructor material. If a week has not been published, it is not there.
 
 ## Connect it
 
-### Claude Code
-
-Run this once, in any folder:
+In Claude Code, run this once, in any folder:
 
 ```bash
 claude mcp add --transport http dev3pack-course https://mcp.geckovision.tech/course/mcp
@@ -26,25 +24,10 @@ claude mcp add --transport http dev3pack-course https://mcp.geckovision.tech/cou
 Then start `claude` and type `/mcp`. You should see `dev3pack-course` in the
 list.
 
-### Claude on the web or the desktop app
-
-Open **Settings**, then **Connectors**, then **Add custom connector**. Paste the
-URL above and save it.
-
-### Any other assistant
-
-Add it as a remote MCP server with the URL above. The settings screen is
-different in every app, so look for "MCP server" or "custom connector" in yours.
-
-### An assistant with no MCP at all
-
-Give it one of these plain-text addresses instead:
-
-| Address | What it holds |
-|---|---|
-| `https://mcp.geckovision.tech/course/llms.txt` | the map: every page, with a link to each |
-| `https://mcp.geckovision.tech/course/llms-full.txt` | every page, in one file |
-| `https://mcp.geckovision.tech/course/pages/<page_id>.md` | one page |
+Using something else? [Connect any assistant](connect-your-assistant.mdx) has a
+copyable snippet for Claude on the web, ChatGPT, Cursor, Codex, VS Code,
+Windsurf, Gemini CLI and any client that only speaks stdio, plus the plain-text
+addresses for an assistant with no MCP at all.
 
 ## The three tools
 

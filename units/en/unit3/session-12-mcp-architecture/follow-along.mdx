@@ -55,7 +55,19 @@ for you.
 
 ## 1. Host, client and server, and the four primitives
 
+**First, what MCP is next to an API.** An API is read by a person, who then writes
+the call into code. An MCP server describes itself: the model reads its list of
+tools (a name, a schema, a description) and chooses one at run time. MCP does not
+replace the API. The server usually still calls one.
+
+![Two panels. An API: a developer reads the docs, hard-codes the call, and the code calls the API. MCP: the model reads the server's tool list and calls a tool, and the server calls the API. Below: the description is text somebody else wrote, and it goes straight into the model's context](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit3/session-12-mcp-architecture/img/api-vs-mcp.png)
+
+The catch is in the last line: a tool's description is text somebody else wrote,
+and it reaches your model word for word. Today is about reading it as data.
+
 Week 0 gave you the shape. Today adds the column the diagram leaves out.
+
+![The host, holding the model and the person, opens one client per server. Client A connects to the course server, client B to Gecko's store tools. A server cannot reach the model except by being read](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit3/session-12-mcp-architecture/img/host-client-server.png)
 
 | Part | Owns | Cannot do |
 |---|---|---|

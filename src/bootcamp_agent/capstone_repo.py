@@ -1,12 +1,13 @@
-"""The student's own capstone repository: create it, grade it, trace it.
+"""The student's own final assignment repository: create it, grade it, trace it.
 
-`bootcamp capstone new` runs in a clone of the course and writes a NEW
-repository outside it, from `capstone-template/`: the agent, the contract tests,
-the docs skeletons, a CI workflow, and a copy of the six-document corpus. It
-pins the course package to the exact commit the clone holds, makes one first
-commit, and pushes nothing. Publishing is the student's act, not ours.
+`bootcamp final new` (or `bootcamp capstone new`, its older name) runs in a
+clone of the course and writes a NEW repository outside it, from
+`capstone-template/`: the agent, the contract tests, the docs skeletons, a CI
+workflow, and a copy of the six-document corpus. It pins the course package to
+the exact commit the clone holds, makes one first commit, and pushes nothing.
+Publishing is the student's act, not ours.
 
-`bootcamp capstone grade` and `bootcamp capstone trace` run INSIDE that
+`bootcamp final grade` and `bootcamp final trace` run INSIDE that
 repository, from the installed package. They load the student's `agent.py` by
 path, so nothing about the course checkout is needed there.
 """
@@ -188,9 +189,9 @@ def create(
     target = folder.expanduser().resolve()
     if target == course_root.resolve() or target.is_relative_to(course_root.resolve()):
         raise CapstoneError(
-            f"{shown} is inside the course clone. Your capstone is its own repository, so "
-            "it lives beside the course, not in it:\n"
-            f"    uv run bootcamp capstone new ../{folder.name}"
+            f"{shown} is inside the course clone. Your final assignment is its own "
+            "repository, so it lives beside the course, not in it:\n"
+            f"    uv run bootcamp final new ../{folder.name}"
         )
     if target.exists() and (not target.is_dir() or any(target.iterdir())):
         raise CapstoneError(f"{shown} already exists and is not empty; nothing was overwritten")
@@ -252,7 +253,7 @@ def _first_commit(target: Path, name: str, ref: str) -> tuple[bool, str]:
 
 def next_steps(made: NewCapstone) -> str:
     lines = [
-        f"Created {made.shown_path}: your capstone repository.",
+        f"Created {made.shown_path}: your final assignment repository.",
         f"The course package is pinned to {made.course_ref} of {COURSE_REPO}.",
     ]
     if made.committed:
@@ -265,15 +266,17 @@ def next_steps(made: NewCapstone) -> str:
             "GitHub account), then commit:",
             '    git config --global user.name "Your Name"',
             '    git config --global user.email "<the email on your GitHub account>"',
-            f"    cd {made.shown_path} && git add -A && git commit -m 'Start my capstone'",
+            f"    cd {made.shown_path} && git add -A && git commit -m 'Start my final assignment'",
         ]
     lines += [
         "",
         "Next, inside it:",
         f"    cd {made.shown_path}",
         "    uv sync",
+        "    git add uv.lock && git commit -m 'Lock the course package'",
+        "                                     # submit refuses an uncommitted uv.lock",
         "    uv run pytest                    # the contract: passes, and xfails you earn later",
-        "    uv run bootcamp capstone grade   # the practice score, on the offline fake model",
+        "    uv run bootcamp final grade      # the practice score, on the offline fake model",
         "",
         "Publish it. It is public on purpose: it is your showcase.",
         "With the GitHub CLI (https://cli.github.com, then: gh auth login):",
@@ -300,7 +303,8 @@ def load_student_agent(repo: Path, spec: str) -> tuple[type, Path]:
         return final_grade.load_agent_class(path, class_name), path.resolve()
     except final_grade.AgentLoadError as error:
         raise CapstoneError(
-            f"{error}. Run this inside your capstone repository, or pass --agent FILE[:CLASS]."
+            f"{error}. Run this inside your final assignment repository, "
+            "or pass --agent FILE[:CLASS]."
         ) from error
 
 

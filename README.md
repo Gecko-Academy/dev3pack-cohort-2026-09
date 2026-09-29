@@ -28,7 +28,7 @@ Three weeks. **15 sessions**. One source-grounded research assistant you can tes
 - [What arrives, and when](#what-arrives-and-when)
 - [Week 0](#week-0)
 - [Weeks 1-3](#weeks-1-3)
-- [Capstone and certificate](#capstone-and-certificate)
+- [Final assignment and certificate](#final-assignment-and-certificate)
 - [Bonus and extras](#bonus-and-extras)
 - [Commands](#commands)
 - [Safety](#safety)
@@ -138,7 +138,7 @@ there. You write the exercise.
 | `hand-my-work-in` | You are ready to submit. Save, pull, check, submit, including the browser route if you have no `gh`. |
 | `run-a-project` | You are opening something in `projects/`. Both extras, the models to pull, and what `[live]` and `[recorded]` mean. |
 | `ask-the-course` | You have a question about the course. It searches the hosted course server, cites the page, and says so when the course does not cover it. |
-| `ship-my-capstone` | You are creating, grading or handing in your capstone, or looking for your final score. |
+| `ship-my-capstone` | You are creating, grading or handing in your final assignment, or looking for your final score. |
 
 **Subagents** (`.claude/agents/`):
 
@@ -183,7 +183,7 @@ folder. Every link below opens the file itself, not a folder to search.
 | **see the ideas visually** | [Demos and explainers](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/demos/introduction) — interactive pages, mapped to sessions |
 | **ask from your phone** | [**@gecko_coach_bot**](https://t.me/gecko_coach_bot) on Telegram — answers from the course pages, names the page, no install |
 | **get unstuck** | `coach("your question")` in any notebook — answers from the course pages, offline, no key. [Demo 5](demos/05_the_coach_up_close.ipynb) shows how to use it |
-| **give your assistant the whole course** | the course MCP server, `https://mcp.geckovision.tech/course/mcp`. No key, no install. [How to connect it](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/course-mcp) |
+| **give your assistant the whole course** | the course MCP server, `https://mcp.geckovision.tech/course/mcp`. No key, no install. [How to connect it](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/course-mcp) · [any assistant: ChatGPT, Cursor, Codex, VS Code…](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit0/connect-your-assistant) |
 | **contribute** | [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md) — add a question the coach gets wrong: ten minutes, no code |
 | **put an agent in a chat** | [`demos/07_the_coach_in_a_chat.ipynb`](demos/07_the_coach_in_a_chat.ipynb), then [the Telegram guide](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit1/session-05-deterministic-mini-agent/telegram-guide) |
 | **run RAG on your laptop** | [`demos/09_rag_on_your_laptop.ipynb`](demos/09_rag_on_your_laptop.ipynb) — today's retriever plus a local model, no key; a recorded run if you have no model |
@@ -321,7 +321,7 @@ Sent in part: `docs/`, `modules/`. Guides, the curriculum and the generated inde
 | [Week 1 — Sessions 1–5](#weeks-1-3) | Sep 14–18 | Assistants, adapters, structured outputs, tools, first loop |
 | [Week 2 — Sessions 6–10](#weeks-1-3) | Sep 21–25 | Retrieval, grounding, graphs, evals, skills |
 | [Week 3 — Sessions 11–15](#weeks-1-3) | Sep 28–Oct 2 | State, MCP, deploy, defend |
-| [Capstone + certificate](#capstone-and-certificate) | weeks 2–3 | Source-grounded research assistant |
+| [Final assignment + certificate](#final-assignment-and-certificate) | weeks 2–3 | Source-grounded research assistant |
 | [Bonus 1–5](#bonus-and-extras) | optional | Graph RAG, multimodal, multi-agent, memory, teardown |
 | [Depth / cookbook / workspaces](#bonus-and-extras) | optional | SE fundamentals, Gecko labs, **4 project workspaces** |
 
@@ -410,11 +410,13 @@ Each live session is one directory under `units/en/unit1/`, `unit2/` or `unit3/`
 
 Session 13 uses an instructor-hosted Gecko MCP surface; the URL is handed out in class.
 
-## Capstone and certificate
+## Final assignment and certificate
 
-A **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. You rebuild `src/bootcamp_agent/` in the session notebooks, then compare against the shipped package. Brief: [units/en/unit2/capstone/](units/en/unit2/capstone/). You build it in your own copy of [the capstone repository](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project); its [`CAPSTONE.md`](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project/blob/main/CAPSTONE.md) has every command, from the clone to your final score.
+**The final assignment** is a **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. It is graded privately and earns the certificate. You build it in your own public repository: from the course folder, `uv run bootcamp final new ../my-final-assignment`, then `cd ../my-final-assignment`, `uv sync`, commit `uv.lock`, and `gh repo create my-final-assignment --public --source . --push`. Practise with `uv run pytest` and `uv run bootcamp final grade`, and hand in with `uv run bootcamp final submit --github <you>`. Brief: [units/en/unit2/capstone/](units/en/unit2/capstone/). Every command, to your final score: [the final assignment tutorial](units/en/unit2/capstone/tutorial.mdx).
 
-[`final_assignment/`](final_assignment/) is a template that scores 30% as shipped — it refuses correctly and answers nothing. Pass both gates (aggregate bar and every **critical** question) and the course issues an Ed25519-signed certificate anyone can verify. Details: [`final_assignment/README.md`](final_assignment/README.md).
+It is separate from the Gecko capstone, the store project presented on Friday 2 October, which lives in [its own repository](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project).
+
+A pass needs a score of at least 30% **and** every **critical** question. The final set has 15 questions, 6 of them critical, so any pass is at least 6/15 (40%). The starter refuses correctly and answers nothing: 3/10 (30%) on the practice set and 4/15 (27%) on the final set, failing both gates. Your latest submission counts. A pass earns an Ed25519-signed certificate anyone can verify. Details: [`final_assignment/README.md`](final_assignment/README.md).
 
 ## Bonus and extras
 

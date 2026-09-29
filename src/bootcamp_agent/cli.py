@@ -675,14 +675,21 @@ def bootcamp(argv: list[str] | None = None) -> int:
         action="store_true",
         help="fork, commit and open the pull request for you (needs the gh CLI)",
     )
+    # "final" is the name the pages use for the final assignment; "capstone" is
+    # the older name and keeps working. One parser under two names, so the
+    # handlers and flags cannot drift apart.
     capstone = sub.add_parser(
-        "capstone", help="your own capstone repository: new, grade, trace, submit"
+        "final",
+        aliases=["capstone"],
+        help="your final assignment repository: new, grade, trace, submit",
     )
     capstone_sub = capstone.add_subparsers(dest="capstone_command")
     creator = capstone_sub.add_parser(
-        "new", help="create your capstone repository beside the course (never pushes)"
+        "new", help="create your final assignment repository beside the course (never pushes)"
     )
-    creator.add_argument("folder", help="where to create it, outside the course: ../my-capstone")
+    creator.add_argument(
+        "folder", help="where to create it, outside the course: ../my-final-assignment"
+    )
     creator.add_argument(
         "--github", help="the GitHub repository name to publish as (NAME or OWNER/NAME)"
     )
@@ -691,7 +698,7 @@ def bootcamp(argv: list[str] | None = None) -> int:
         help="the course commit to pin (default: the published commit this clone holds)",
     )
     grader = capstone_sub.add_parser(
-        "grade", help="inside your capstone: grade its agent on the practice set"
+        "grade", help="inside your final assignment: grade its agent on the practice set"
     )
     grader.add_argument("--agent", default="agent.py", help="FILE[:CLASS] (default agent.py)")
     grader.add_argument("--name", default="", help="your display name, for the report")
@@ -699,12 +706,13 @@ def bootcamp(argv: list[str] | None = None) -> int:
     grader.add_argument("--random", type=int, default=0, metavar="N", help="a sample of N")
     grader.add_argument("--seed", type=int, default=None, help="make --random repeatable")
     tracer = capstone_sub.add_parser(
-        "trace", help="inside your capstone: answer one question and print every step"
+        "trace", help="inside your final assignment: answer one question and print every step"
     )
     tracer.add_argument("question", help="the question, in quotes")
     tracer.add_argument("--agent", default="agent.py", help="FILE[:CLASS] (default agent.py)")
     final = capstone_sub.add_parser(
-        "submit", help="inside your capstone: answer the final questions and open the pull request"
+        "submit",
+        help="inside your final assignment: answer the final questions and open the pull request",
     )
     final.add_argument("--github", required=True, help="your GitHub username")
     final.add_argument(
@@ -739,7 +747,7 @@ def bootcamp(argv: list[str] | None = None) -> int:
         return _read(args.port, args.build_only)
     if args.command == "submit":
         return _submit(args.chapter, args.github, args.cohort, args.into, args.push)
-    if args.command == "capstone":
+    if args.command in ("final", "capstone"):
         if args.capstone_command == "new":
             return _capstone_new(args.folder, args.github, args.course_ref)
         if args.capstone_command == "grade":

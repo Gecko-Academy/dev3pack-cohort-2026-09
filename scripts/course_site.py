@@ -186,6 +186,7 @@ UNIT0_ORDER = (
     "local-model",
     "ask-your-assistant",
     "course-mcp",
+    "connect-your-assistant",
     "how-to-submit",
     "week0",
     "week1",
@@ -1028,6 +1029,9 @@ def render_llms(units: Path | None = None) -> str:
         "published course, searchable, no key. Cite the `page_id` of every passage "
         "you use. An empty result means the course does not cover it: say so, and "
         "do not answer from memory.",
+        f"- [Connect any assistant]({SITE_URL}/unit0/connect-your-assistant.html): "
+        "the course server and Gecko's store server, with a snippet for Claude, "
+        "ChatGPT, Cursor, Codex, VS Code, Windsurf, Gemini CLI and stdio-only clients.",
         "",
         "## Commands",
         "",

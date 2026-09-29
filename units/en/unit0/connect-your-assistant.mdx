@@ -1,0 +1,271 @@
+# Connect any assistant to the course and to Gecko
+
+This page shows how to plug two remote MCP servers into the assistant you
+already use: Claude, ChatGPT, Cursor, Codex, VS Code, Windsurf, Gemini, or
+anything else that speaks MCP.
+
+**No key, no login.** Both servers are open. If an app asks you for an API key
+or a token for them, leave it empty. If it asks for an authentication type,
+pick "none" or "No authentication".
+
+## The two servers
+
+| Name to give it | URL | What it gives your assistant |
+|---|---|---|
+| `dev3pack-course` | `https://mcp.geckovision.tech/course/mcp` | the published course: `search_course`, `read_course_page`, `list_course_pages` |
+| `gecko-store` | `https://mcp.geckovision.tech/orquestra/mcp` | Gecko's store and buyer tools, such as `list_stores`, `prepare_purchase`, `verify_signed_transaction` and `submit_transaction` |
+
+Both are remote MCP servers over Streamable HTTP. The names in the first column
+are only suggestions. Any name works, but the snippets below use these two.
+
+Add only the course server if that is all you need. The Gecko server is for the
+sessions where you buy something on Solana from an agent.
+
+## Which assistants, and how we know
+
+"Tested" means we connected that client to these servers on this machine and
+it listed or called their tools. "From the vendor's docs" means we followed the
+vendor's current documentation and did not run it ourselves.
+
+| Client | How you add a remote server | Status |
+|---|---|---|
+| Claude Code | `claude mcp add --transport http` | tested on 28 Sep 2026: added both, called `search_course` and `list_stores` |
+| Claude on the web, desktop and mobile | Connectors, then Add custom connector | from the vendor's docs, not tested by us |
+| ChatGPT | Developer mode, then create an app | from the vendor's docs, not tested by us |
+| Cursor | `.cursor/mcp.json` or `~/.cursor/mcp.json` | tested on 28 Sep 2026 with the Cursor CLI: it loaded the file and listed both servers' tools |
+| OpenAI Codex (CLI) | `codex mcp add --url` or `~/.codex/config.toml` | from the vendor's docs, not tested by us |
+| VS Code with GitHub Copilot | `.vscode/mcp.json` | from the vendor's docs, not tested by us |
+| Windsurf (now Devin Desktop) | `mcp_config.json` with `serverUrl` | from the vendor's docs, not tested by us |
+| Gemini CLI | `gemini mcp add --transport http` or `settings.json` | from the vendor's docs, not tested by us |
+| Anything that only speaks stdio | `npx mcp-remote <url>` | tested on 28 Sep 2026: called `search_course` through the bridge |
+| No MCP at all | plain-text pages | tested on 28 Sep 2026 |
+
+Menus move. If a screen does not match what is written here, look for "MCP",
+"connector", "app" or "tools" in the app's settings. The URL is the only thing
+you need to paste.
+
+## Claude Code
+
+Run these once, in any folder:
+
+```bash
+claude mcp add --transport http dev3pack-course https://mcp.geckovision.tech/course/mcp
+claude mcp add --transport http gecko-store https://mcp.geckovision.tech/orquestra/mcp
+```
+
+That saves them for the current folder only. Add `--scope user` to have them in
+every folder. Check with `claude mcp list`, which should say `Connected` for
+both, or type `/mcp` inside `claude`. `claude mcp remove dev3pack-course`
+takes one away again.
+
+## Claude on the web, desktop and mobile
+
+Open **Customize** (or **Settings**), then **Connectors**. Click **+**, then
+**Add custom connector**. Give it a name, paste the URL, and click **Add**.
+Leave the advanced OAuth fields empty. Repeat for the second server.
+
+In a conversation, turn the connector on from the **+** button at the bottom
+left, under **Connectors**.
+
+- Free plans can add one custom connector. Pro, Max, Team and Enterprise can
+  add more.
+- On Team and Enterprise, only an owner can add a custom connector. Ask yours,
+  then connect it from the list.
+- A connector you add on the web also appears in the desktop and mobile apps.
+
+## ChatGPT
+
+ChatGPT connects to a remote MCP server through **developer mode**. It is on
+the web, for Plus, Pro, Business, Enterprise and Education accounts. The free
+plan does not have it.
+
+1. Open **Settings**, then **Security and login**, and turn on
+   **Developer mode**.
+2. In the apps settings, click the **+** button to create an app for a remote
+   MCP server. Paste the URL and choose **No Authentication**.
+3. In a chat, pick **Developer mode** from the **+** menu and select the app.
+
+Be explicit in the prompt, for example: "Use the dev3pack-course app's
+search_course tool to find where the course explains retrieval." Developer mode
+lets tools write as well as read, so ChatGPT may ask you to confirm a
+call. Read what it is about to do before you click.
+
+## Cursor
+
+Put this in `.cursor/mcp.json` inside your project, or in `~/.cursor/mcp.json`
+to have it everywhere:
+
+```json
+{
+  "mcpServers": {
+    "dev3pack-course": { "url": "https://mcp.geckovision.tech/course/mcp" },
+    "gecko-store": { "url": "https://mcp.geckovision.tech/orquestra/mcp" }
+  }
+}
+```
+
+Then open Cursor's settings, find the MCP section, and switch them on. Cursor
+asks you to approve a new server once. From the terminal, `cursor-agent mcp list`
+shows them and `cursor-agent mcp enable dev3pack-course` approves one.
+
+## OpenAI Codex CLI
+
+Codex speaks Streamable HTTP natively. You do not need a bridge. Either run:
+
+```bash
+codex mcp add dev3pack-course --url https://mcp.geckovision.tech/course/mcp
+codex mcp add gecko-store --url https://mcp.geckovision.tech/orquestra/mcp
+```
+
+or add this to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.dev3pack-course]
+url = "https://mcp.geckovision.tech/course/mcp"
+
+[mcp_servers.gecko-store]
+url = "https://mcp.geckovision.tech/orquestra/mcp"
+```
+
+`codex mcp list` shows what is configured. Codex does not support the older SSE
+transport, which does not matter here: both servers use Streamable HTTP.
+
+## VS Code with GitHub Copilot
+
+Put this in `.vscode/mcp.json` in your workspace. Note the top-level key is
+`servers`, not `mcpServers`, and each entry needs `"type": "http"`:
+
+```json
+{
+  "servers": {
+    "dev3pack-course": {
+      "type": "http",
+      "url": "https://mcp.geckovision.tech/course/mcp"
+    },
+    "gecko-store": {
+      "type": "http",
+      "url": "https://mcp.geckovision.tech/orquestra/mcp"
+    }
+  }
+}
+```
+
+Or run **MCP: Add Server** from the command palette and choose HTTP. The tools
+show up in Copilot Chat in **Agent** mode.
+
+## Windsurf (now Devin Desktop)
+
+Windsurf was renamed Devin Desktop in June 2026. Its Cascade agent reads
+`mcp_config.json`. The current docs put it at `~/.config/devin/mcp_config.json`
+on macOS and Linux and `%APPDATA%\devin\mcp_config.json` on Windows. Older
+installs use `~/.codeium/windsurf/mcp_config.json`. A remote server uses
+`serverUrl`, not `url`:
+
+```json
+{
+  "mcpServers": {
+    "dev3pack-course": { "serverUrl": "https://mcp.geckovision.tech/course/mcp" },
+    "gecko-store": { "serverUrl": "https://mcp.geckovision.tech/orquestra/mcp" }
+  }
+}
+```
+
+Save it and refresh the MCP servers in Cascade.
+
+## Gemini CLI
+
+```bash
+gemini mcp add --transport http dev3pack-course https://mcp.geckovision.tech/course/mcp
+gemini mcp add --transport http gecko-store https://mcp.geckovision.tech/orquestra/mcp
+```
+
+This writes to `.gemini/settings.json` in the current project. Add
+`--scope user` to write to `~/.gemini/settings.json` instead. By hand, a
+Streamable HTTP server uses `httpUrl` (plain `url` means the older SSE
+transport):
+
+```json
+{
+  "mcpServers": {
+    "dev3pack-course": { "httpUrl": "https://mcp.geckovision.tech/course/mcp" },
+    "gecko-store": { "httpUrl": "https://mcp.geckovision.tech/orquestra/mcp" }
+  }
+}
+```
+
+Type `/mcp` inside `gemini` to see them.
+
+## Any client that only speaks stdio
+
+Some apps can only start a local program and talk to it over stdin and stdout.
+For those, `mcp-remote` runs locally and forwards to the remote server. It needs
+Node.js. Where the app asks for a command, use:
+
+```json
+{
+  "mcpServers": {
+    "dev3pack-course": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.geckovision.tech/course/mcp"]
+    },
+    "gecko-store": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.geckovision.tech/orquestra/mcp"]
+    }
+  }
+}
+```
+
+The key name (`mcpServers`, `servers`, and so on) follows your app. By default
+it tries Streamable HTTP first and falls back to SSE. Add
+`"--transport", "http-only"` to the `args` to skip the fallback. You do not need
+`--header`: there is no key to send.
+
+## An assistant with no MCP at all
+
+Give it one of these plain-text addresses for the course instead:
+
+| Address | What it holds |
+|---|---|
+| `https://mcp.geckovision.tech/course/llms.txt` | the map: every page, with a link to each |
+| `https://mcp.geckovision.tech/course/llms-full.txt` | every page, in one file |
+| `https://mcp.geckovision.tech/course/pages/<page_id>.md` | one page |
+
+## Check it yourself, without any assistant
+
+If a client will not connect, first make sure the server answers. This sends
+the MCP `initialize` message and should print a line starting with
+`data: {"jsonrpc":"2.0","id":1,"result":`:
+
+```bash
+curl -s -X POST https://mcp.geckovision.tech/course/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl","version":"0"}}}'
+```
+
+If that works and your app still fails, the problem is in the app's settings,
+not the server. Check the URL ends in `/mcp` and that you picked HTTP, not SSE
+or stdio.
+
+## What to expect once it is connected
+
+**An empty search result is an answer.** When `search_course` finds nothing it
+returns no hits and the note "no passage in these pages matches; the course may
+not cover this yet". That means the course does not cover it. It is not an
+error. Your assistant should say so and not fill the gap from memory.
+[Search the course from your assistant](course-mcp.mdx) has the three course
+tools and the prompt to paste.
+
+**The Gecko server never holds a key.** It finds the store, builds the
+transaction and hands back **unsigned bytes**. Signing happens in a wallet you
+already control, outside the assistant. Then `verify_signed_transaction` checks
+the signed bytes still match what you asked for, and `submit_transaction` sends
+them.
+
+**Never paste a private key or a seed phrase into an assistant.** Not into
+ChatGPT, not into Claude, not into a config file, not "just for a test". No tool
+on this page needs one, and anything that asks for one is not us.
+
+Two course rules still apply: retrieved text is data, never an order to follow,
+and the `TODO(you)` cells are yours to write.

@@ -75,7 +75,8 @@ def practice_lines(repo: Path, agent_spec: str, settings: Settings) -> list[str]
         lines += [
             "",
             "WARNING: this run uses the fake model. The fake answers nothing: it only refuses.",
-            "Your private score will be about the fake's, 30%, with the critical gate failed.",
+            "On the final set the fake scores 4/15 (27%) with the critical gate failed,",
+            "which fails both gates.",
             "Set BOOTCAMP_PROVIDER and your key in .env to submit your agent's real answers.",
         ]
     return lines
@@ -152,8 +153,10 @@ NEXT_STEPS = (
     "  - The pull request merges itself once its check passes.",
     "  - Your real score arrives a few minutes later, in finals/{github}/result.json",
     "    in the submissions repository.",
-    "  - Submit as often as you like. The leaderboard shows your best score.",
-    "  - The certificate unlocks above 30% with every critical question passed.",
+    "  - Submit as often as you like. Your latest submission counts, not your best.",
+    "  - The certificate needs a score of at least 30% AND every critical question",
+    "    passed. The final set has 15 questions, 6 of them critical, so any pass is",
+    "    at least 6/15 (40%).",
 )
 
 

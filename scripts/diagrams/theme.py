@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 # The light figures the course pages link by raw GitHub URL, and the dark deck
 # they are re-rendered into. A light path never moves.
 UNIT_08 = "units/en/unit2/session-08-loops-and-graphs/img"
+UNIT_12 = "units/en/unit3/session-12-mcp-architecture/img"
 DECK_08 = "docs/instructor/sessions/session-08-loops-and-graphs/img"
 # Decks with no course page behind them: these figures are dark only.
 DECK_04 = "docs/instructor/sessions/session-04-bounded-tools/img"
@@ -31,6 +32,7 @@ DECK_07 = "docs/instructor/sessions/session-07-grounding-metrics/img"
 DECK_09 = "docs/instructor/sessions/session-09-trace-and-evaluate/img"
 DECK_10 = "docs/instructor/sessions/session-10-skills-and-adr/img"
 DECK_11 = "docs/instructor/sessions/session-11-state-and-memory/img"
+DECK_12 = "docs/instructor/sessions/session-12-mcp-architecture/img"
 
 
 @dataclass(frozen=True)

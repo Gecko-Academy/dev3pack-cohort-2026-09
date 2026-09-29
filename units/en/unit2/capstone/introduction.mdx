@@ -1,10 +1,15 @@
-# Capstone: the source-grounded research assistant
+# The final assignment: the source-grounded research assistant
 
 **No date, no two-hour flow · built between sessions from week 2 · 5 checks, scored**
 
-**Your capstone lives in its own repository, not in the course folder.** You clone
-[the capstone repository](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project), make it yours, build in it and hand it in from it
-with `bootcamp capstone submit`. Its [`CAPSTONE.md`](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project/blob/main/CAPSTONE.md) is the complete tutorial.
+**The final assignment is your research assistant.** It is graded on a private
+question set and earns the certificate. It lives in its own repository, not in
+the course folder: from the course folder, `uv run bootcamp final new ../my-final-assignment`
+creates it, and you hand it in from inside it with `uv run bootcamp final submit`.
+The [final assignment tutorial](tutorial.mdx) has every command.
+
+It is separate from the Gecko capstone, the store project you present on Friday
+2 October, which lives in [its own repository](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project).
 
 ## Outcome
 
@@ -12,16 +17,16 @@ You ship a research assistant that answers developer questions from a small
 versioned corpus, names the documents behind each claim, and refuses when the
 corpus supports nothing. It calls a bounded read-only tool, it exposes a skill
 file another assistant can load, and it arrives with a regression test and an
-evaluation report whose numbers you produced. Five checks judge the behaviour.
-Session 15 judges you: you demo it, and then diagnose a failure you did not
-prepare for, from your own traces.
+evaluation report whose numbers you produced. Five checks in the `cap01`
+notebook mark the behaviour. The private question set judges your agent: a
+score of at least 30% **and** every critical question earns the certificate.
 
 ## Contract and threat boundary
 
 | | |
 |---|---|
-| Input | The six markdown documents in `data/corpus/`, under version control and written to by nothing you build. One question at a time. One model behind the `LLMClient` seam — `FakeLLM` offline, the lane your `.env` names when you have one. |
-| Output | An `AgentResult`: a `ResearchAnswer` (`answer`, `citations`, `confidence`, `needs_human_review`) and the trace of the run. Every id in `citations` is one retrieval returned for that question. When nothing supports an answer, the shape does not change — `needs_human_review` is true and `citations` is empty. |
+| Input | The six markdown documents in `data/corpus/`, under version control and written to by nothing you build. One question at a time. One model behind the `LLMClient` seam: `FakeLLM` offline, the lane your `.env` names when you have one. |
+| Output | An `AgentResult`: a `ResearchAnswer` (`answer`, `citations`, `confidence`, `needs_human_review`) and the trace of the run. Every id in `citations` is one retrieval returned for that question. When nothing supports an answer, the shape does not change: `needs_human_review` is true and `citations` is empty. |
 | Budget | One model call per question, one corrective retry, then a refusal. Tools read; none writes, spends or mutates. No new dependency, no database, no network in the answer path. Every check runs offline on `FakeLLM`, so the verdict is the same on every machine. |
 | Failures the project must handle | **A question the corpus does not answer.** Retrieval comes back empty and the run refuses before a model call is spent. **A citation for a document retrieval never returned.** Stripped from the answer, confidence dropped, flagged for a human. **An instruction inside retrieved text.** Passages are data to quote, never orders to follow. **A provider that hangs.** A flagged refusal the caller can read, not a traceback. |
 
@@ -41,13 +46,13 @@ increment is never a blank page.
 
 1. **After session 6.** Load `data/corpus/` with the strict loader and run
    `retrieve` over it, so a supported question returns chunks and an unsupported
-   one returns nothing at all — checkpoints 1 and 2 both stand on that.
+   one returns nothing at all. Checkpoints 1 and 2 both stand on that.
 2. **After session 7.** Run the golden set, write the pass rate down as your
    baseline, and note the weakness you found in the evaluator itself; the report
    needs a "before" and an honest caveat, and today is when both are cheap.
-3. **After session 8.** Pick the shape of the run — chain, loop, or graph — and
+3. **After session 8.** Pick the shape of the run (chain, loop, or graph) and
    record the model calls each one cost, because that count is the architecture
-   decision you defend in minute 4 of the demo.
+   decision your README and your ADR have to justify.
 4. **After session 9.** Turn the trace on for a whole run, rerun `run_evals`,
    and put the first failure in a named bucket with the trace line that decided
    it. `cap01-e3` and `cap01-e4` already pass on the course's reference pipeline; this is the session that teaches you to read them, and to see the same trace and eval from your own agent.
@@ -55,9 +60,9 @@ increment is never a blank page.
    runs, and the decision record for the choice you made in step 3, including
    the measurement that would reverse it.
 6. **After session 11.** Decide what a session remembers, cap it, and write the
-   retention policy — including the line naming what you refuse to store.
+   retention policy, including the line naming what you refuse to store.
 7. **After session 12.** Classify every tool your assistant can reach as reading
-   or mutating, and keep only the readers wired to the capstone.
+   or mutating, and keep only the readers wired to your agent.
 8. **After session 13.** Work one external surface in the recorded lane, and
    write down the provenance of anything you carry back from it.
 9. **After session 14.** Harden: the injection test, the timeout, and the
@@ -65,7 +70,7 @@ increment is never a blank page.
    from before and after the fix saved side by side.
 
 Ranked issue list first, fixes second. An unfinished item you have diagnosed is
-worth more on demo day than a finished one you cannot explain.
+worth more than a finished one you cannot explain.
 
 ## Evidence
 
@@ -77,8 +82,9 @@ uv run bootcamp submit cap01 --github <you>    # hands it in as it stands
 Four of the five checks are gates over code that already exists: `cap01-e1`
 reads a cited answer, `cap01-e2` reads a refusal and the model-call count beside
 it, `cap01-e3` reads the trace kinds, `cap01-e4` reads the eval report.
-`cap01-e5` is the one you write — the ranked issue list, which is also session
-14's backlog and demo day's honest limitation.
+`cap01-e5` is the one you write: the top 3 rows of `docs/ISSUES.md` in your
+repository, which is also session 14's backlog and your README's honest
+limitation.
 
 <!-- navigation:start -->
 [Previous: Skills and an architecture decision record](../session-10-skills-and-adr/introduction.mdx) · [Next: State and memory](../../unit3/session-11-state-and-memory/introduction.mdx)

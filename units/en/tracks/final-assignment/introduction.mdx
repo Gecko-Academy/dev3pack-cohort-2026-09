@@ -1,32 +1,41 @@
 # Final assignment
 
-A template agent you make your own, graded against a question set, with a
-certificate when you pass. **It lives in its own repository, not in the course
-folder.** The complete tutorial is [`CAPSTONE.md`](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project/blob/main/CAPSTONE.md), in the capstone
-repository; this is the short version.
+**The final assignment is your research assistant**: a template agent you make
+your own, graded privately on a question set, which earns the certificate when
+you pass. **It lives in its own repository, not in the course folder.** The
+[final assignment tutorial](../../unit2/capstone/tutorial.mdx) has every
+command; this is the short version.
+
+It is separate from the Gecko capstone, the store project you present on Friday
+2 October, which lives in
+[its own repository](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project).
 
 ## What happens
 
-1. **Clone the capstone repository and make it yours**, next to your course folder,
-   never inside it:
+1. **Create your repository and publish it**, from your course folder. It is
+   made beside the course folder, never inside it:
 
    ```bash
-   git clone https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project.git my-capstone
-   cd my-capstone
-   git remote rename origin upstream
-   gh repo create my-capstone --public --source . --remote origin --push
+   uv run bootcamp final new ../my-final-assignment
+   cd ../my-final-assignment
    uv sync
+   git add uv.lock && git commit -m "Lock the course package"
+   gh repo create my-final-assignment --public --source . --push
    ```
 
-2. **Improve the agent** in `agent.py`. As shipped it scores 30% on the offline
-   fake model by refusing correctly and answering nothing, which is deliberate: the
-   default answer is honest and insufficient.
+   Commit `uv.lock`: submit refuses a repository with anything uncommitted.
 
-3. **Practise**, as often as you like, inside that repository:
+2. **Improve the agent** in `agent.py`. As shipped it refuses correctly and
+   answers nothing, which is deliberate: the default answer is honest and
+   insufficient. On the offline fake model it scores 3/10 (30%) on the practice
+   set and 4/15 (27%) on the final set, and fails the critical gate on both.
+
+3. **Practise**, as often as you like, inside that repository. Put a real model
+   in `.env` first (`cp .env.example .env`), or your agent can only refuse.
 
    ```bash
    uv run pytest
-   uv run bootcamp capstone grade
+   uv run bootcamp final grade
    ```
 
 4. **Hand it in** from inside that repository, after you commit and push. It opens
@@ -34,11 +43,16 @@ repository; this is the short version.
 
    ```bash
    export DEV3PACK_API_BASE=https://app.geckovision.tech
-   uv run bootcamp capstone submit --github <you>
+   uv run bootcamp final submit --github <you> --dry-run
+   uv run bootcamp final submit --github <you>
    ```
 
    Your agent runs on your machine. Only its answers travel, and nothing you wrote
    is executed by the course.
+
+5. **Read your score** once the pull request merges, at
+   `https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/finals/<you>/result.json`.
+   Submit as often as you like: your latest submission counts, not your best.
 
 Session exercises and the `cap01` notebook are different: they stay in the course
 folder and go in with `uv run bootcamp submit chNN --github <you> --push`.
@@ -49,12 +63,13 @@ Two gates, and the second is the one that matters.
 
 | Gate | Rule |
 |---|---|
-| Aggregate | 30% of questions pass |
+| Aggregate | a score of at least 30% |
 | **Critical safety** | **every question marked critical passes, at any score** |
 
-The starter meets the first on refusals alone and still cannot certify. You have
-to answer with support, refuse what nothing supports, and not follow an
-instruction buried in retrieved text.
+The final set has 15 questions, and 6 of them are critical. Since all 6 must
+pass, any pass is at least 6/15 (40%). The starter scores 4/15 (27%) on the
+final set, so it fails both gates. You have to answer with support, refuse
+what nothing supports, and not follow an instruction buried in retrieved text.
 
 ## The certificate
 

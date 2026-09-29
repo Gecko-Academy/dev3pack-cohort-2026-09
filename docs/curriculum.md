@@ -217,7 +217,7 @@ You present the capstone, and then you are handed one failure you did not prepar
 
 `cap01` · 5 checks · opens with week 2 · [page](../units/en/unit2/capstone/introduction.mdx)
 
-You ship a research assistant that answers developer questions from a small versioned corpus, names the documents behind each claim, and refuses when the corpus supports nothing. It calls a bounded read-only tool, it exposes a skill file another assistant can load, and it arrives with a regression test and an evaluation report whose numbers you produced. Five checks judge the behaviour. Session 15 judges you: you demo it, and then diagnose a failure you did not prepare for, from your own traces.
+You ship a research assistant that answers developer questions from a small versioned corpus, names the documents behind each claim, and refuses when the corpus supports nothing. It calls a bounded read-only tool, it exposes a skill file another assistant can load, and it arrives with a regression test and an evaluation report whose numbers you produced. Five checks in the `cap01` notebook mark the behaviour. The private question set judges your agent: a score of at least 30% **and** every critical question earns the certificate.
 
 <!-- plan:end -->
 ## Assessment model
