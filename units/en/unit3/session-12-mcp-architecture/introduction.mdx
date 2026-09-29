@@ -1,6 +1,6 @@
 # MCP architecture and primitives
 
-**Tuesday, September 29, 2026 · 2h**
+**Tuesday, September 29, 2026 · 1h**
 
 ## Outcome
 
@@ -32,32 +32,33 @@ it.
 
 ## Session flow
 
-1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. From
-   week 0: name the three parts and say which one starts which. Then the harder
-   one — which part decides that a tool is safe to call, and which part has no
-   say in it at all.
-2. **Contract and threat boundary (15m).** The contract table above, read aloud.
-   Then list the MCP servers your own assistant is configured with, and for each
-   one write down the tool count and who runs it. Most people cannot finish the
-   second column.
-3. **Concept and live implementation (30m).** Host, client, server, and which of
-   the three you are writing today. The four primitives and the one that points
-   back at you. Then capabilities against collections, live, on a listing that
-   announces more than it has.
-4. **Guided lab (35m).** The notebook: `describe_surface` over a listing with an
-   announced empty drawer (`ch12-e2`), then the sixteen tools split into what can
-   change state and what only builds bytes (`ch12-e1`).
-5. **Failure injection (15m).** Section 4. Print four tool descriptions as the
+This week every class is one hour. The class does what needs a room, and the rest
+of the lab is self-study: the [follow-along](follow-along.mdx) lists exactly what
+to finish, and where. Stuck on it? Ask the course MCP.
+
+1. **Before we start (3m).** Pull, sync, preflight cell green on every screen.
+2. **Host, client and server, and the four primitives (10m).** Which part owns
+   the model, which part owns the capability, and which part owns the judgement.
+   The four primitives, and the one that points back at you. Capabilities (what a
+   server claims) against collections (what it lists).
+3. **Live: a surface you did not write (7m).** Section 1: sixteen tool names
+   recorded off a hosted MCP surface. The room guesses which of them can move
+   money, and holds the guess for the lab.
+4. **Guided lab (20m).** `describe_surface` over a listing with an announced
+   empty drawer (`ch12-e2`), then the sixteen tools split into what can change
+   state and what only builds bytes (`ch12-e1`). Whatever is not green by the end
+   of the block moves to self-study.
+5. **Failure injection (10m).** Section 4: print four tool descriptions as the
    model receives them and read the third one out loud. Then write `review_tool`
-   (`ch12-e3`) and run it over all four. The one that gets refused is not the one
-   that writes.
-6. **Evaluation and artifact receipt (10m).** `check("ch12-e2", ...)`,
-   `check("ch12-e1", ...)`, `check("ch12-e3", ...)`, then `review("ch12")`. The
-   artifact is the capability map and the refusal list. Read one refusal reason
-   out loud and say what you would do about it.
-7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
-   next action. Homework: finish the server inventory from the warm-up — every
-   server your assistant can reach, its tool count, and who runs it.
+   (section 5) and run it over those four. Getting `ch12-e3` green against the
+   check's own tools is self-study.
+6. **The final assignment (7m).** From your own repository to a certificate: make
+   it, lock it, publish it, practise, and hand it in. It is separate from the
+   capstone you present on Friday.
+7. **Hand it in, and the exit ticket (3m).** `submit ch12` with what you have.
+   One thing that works, one thing that is unclear, your next action. Homework:
+   finish the lab, and list every MCP server your assistant can reach, its tool
+   count, and who runs it.
 
 ## Evidence
 
@@ -73,8 +74,8 @@ surface, a server with an announced empty drawer, a quiet one that lists
 resources it never announced, and one whose printed totals disagree with what it
 listed. `ch12-e1` reads which two of the sixteen tools can change state, and says
 why `prepare_purchase` is not one of them. `ch12-e3` drives your `review_tool`
-with eight tool definitions, five of them safe and four of those written to fail
-a word search.
+with nine tool definitions: five safe, four of those written to fail a word
+search, and four that are not safe, one of them for two reasons.
 
 <!-- navigation:start -->
 [Previous: State and memory](../session-11-state-and-memory/introduction.mdx) · [Next: Build and secure an MCP server](../session-13-secure-mcp-server/introduction.mdx)

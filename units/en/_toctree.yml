@@ -277,6 +277,8 @@
       title: "The four primitives, and what each one is for"
     - local: unit3/session-12-mcp-architecture/concepts-3
       title: "Reading a surface you did not write"
+    - local: unit3/session-12-mcp-architecture/follow-along
+      title: "Follow along: today's class"
     - local: unit3/session-12-mcp-architecture/quiz
       title: "Quick quiz (ungraded)"
     - local: unit3/session-12-mcp-architecture/conclusion
