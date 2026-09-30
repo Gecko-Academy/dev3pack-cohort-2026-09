@@ -10,7 +10,7 @@ description: Use when a learner wants to start, grade, hand in, or check the sco
 The learner says "start my final assignment", "grade my agent", "submit the
 final", "where is my score", or pastes an error from `bootcamp final` or
 `bootcamp capstone` (the older name of the same command). The full tutorial,
-with every step explained, is `units/en/unit2/capstone/tutorial.mdx` in the
+with every step explained, is `units/en/unit3/final-assignment.mdx` in the
 course folder. Read it before you start, and send the learner to it.
 
 **The final assignment is not the Gecko capstone.** The final assignment is the

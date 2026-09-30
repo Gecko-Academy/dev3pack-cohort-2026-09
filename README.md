@@ -190,7 +190,7 @@ folder. Every link below opens the file itself, not a folder to search.
 | **learn Jupyter from zero** | [`demos/06_jupyter_for_beginners.ipynb`](demos/06_jupyter_for_beginners.ipynb) — cells, run order, errors, in fifteen minutes |
 | **use a coding assistant well** | [Your coding assistant, step by step](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/coding-assistant/introduction) — Claude Code 101, five prompts, and where the line is |
 | **learn git, and contribute anywhere** | [Git, and your first contribution](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/first-contribution/introduction) — the nine commands, the errors, and where to find a first issue |
-| **ship your capstone** | [The capstone tutorial](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit2/capstone/tutorial): create, grade, submit, and read your score |
+| **ship your capstone** | [The capstone tutorial](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit3/final-assignment): create, grade, submit, and read your score |
 | **hand in** | `uv run bootcamp submit chNN --github <you> --push` — see [Handing in](#handing-in) |
 | **see the leaderboard** | [`TRACK.md` in the submissions repository](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md) |
 | **run a model on a small laptop** | [`demos/04_ollama_on_colab.ipynb`](demos/04_ollama_on_colab.ipynb) |
@@ -412,7 +412,7 @@ Session 13 uses an instructor-hosted Gecko MCP surface; the URL is handed out in
 
 ## Final assignment and certificate
 
-**The final assignment** is a **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. It is graded privately and earns the certificate. You build it in your own public repository: from the course folder, `uv run bootcamp final new ../my-final-assignment`, then `cd ../my-final-assignment`, `uv sync`, commit `uv.lock`, and `gh repo create my-final-assignment --public --source . --push`. Practise with `uv run pytest` and `uv run bootcamp final grade`, and hand in with `uv run bootcamp final submit --github <you>`. Brief: [units/en/unit2/capstone/](units/en/unit2/capstone/). Every command, to your final score: [the final assignment tutorial](units/en/unit2/capstone/tutorial.mdx).
+**The final assignment** is a **source-grounded developer research assistant**: it answers from `data/corpus/`, cites document ids, and refuses when nothing supports the claim. It is graded privately and earns the certificate. You build it in your own public repository: from the course folder, `uv run bootcamp final new ../my-final-assignment`, then `cd ../my-final-assignment`, `uv sync`, commit `uv.lock`, and `gh repo create my-final-assignment --public --source . --push`. Practise with `uv run pytest` and `uv run bootcamp final grade`, and hand in with `uv run bootcamp final submit --github <you>`. Brief: [units/en/unit2/capstone/](units/en/unit2/capstone/). Every command, to your final score: [the final assignment tutorial](units/en/unit3/final-assignment.mdx).
 
 It is separate from the Gecko capstone, the store project presented on Friday 2 October, which lives in [its own repository](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project).
 

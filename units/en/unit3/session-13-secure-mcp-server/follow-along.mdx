@@ -55,6 +55,17 @@ not one capability. It is every capability the network offers, handed to whateve
 text reached the model's context. [The smallest honest server](concepts-1.mdx)
 has the four things a server declares, and the one thing it must never hold.
 
+**The demo.** On screen, `demos/13_the_narrowest_tool.ipynb`: two servers that read a
+shop's pages. One takes any URL; the other takes a page name, one of three. Both get the
+cloud metadata address. The wide one accepts it. The narrow one refuses before its code
+runs, because the argument was not one of the three names. **Before you check an
+argument, shrink it.** When the job really needs a URL, the checking comes back as code,
+and that code is today's lab. Run it yourself:
+
+```bash
+uv run jupyter lab demos/13_the_narrowest_tool.ipynb
+```
+
 ## 2. The guard decides on the string
 
 `read_page` cannot fetch a URL and then decide whether it should have. By then

@@ -42,7 +42,7 @@ certificate when you pass.
    private score is what counts, and your latest submission is the one that
    counts, not your best. You hand it in from your own repository with
    `uv run bootcamp final submit`; the
-   [final assignment tutorial](../units/en/unit2/capstone/tutorial.mdx) has
+   [final assignment tutorial](../units/en/unit3/final-assignment.mdx) has
    every command.
 
 ## What decides a pass

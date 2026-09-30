@@ -197,7 +197,10 @@ UNIT0_ORDER = (
 WEEK3_START = (
     "unit3/start-here",
     "unit0/week3",
+    "unit3/final-assignment",
     "unit3/gecko-capstone",
+    "unit3/capstone-tutorial",
+    "unit3/agents-md",
     "unit0/connect-your-assistant",
     "unit0/course-mcp",
 )

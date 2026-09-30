@@ -21,6 +21,7 @@ intent.
 | [10 · Your store, and a buyer](10_your_store_and_buyer.ipynb) | Weekly challenge 2 and step 1 of the final project: the store rules refusing a store that looks fine, then your store and your buyer to write. Scores 0/500 as shipped, and says why |
 | [11 · Memory at scale](11_memory_at_scale.ipynb) | Session 11's store at 20,000 memories. Exact search against HNSW: how much faster, and how many of the right memories it misses. A setting the index reports and does not use. The owner as a filter, so ana never gets bruno's |
 | [12 · Meet a stranger](12_meet_a_stranger.ipynb) | Build a 25-line MCP server that lies a little, connect to it as a client, catch the description that gives orders, then ask the course MCP a real question and a made-up one. Also in your own assistant, with `claude mcp add` |
+| [13 · The narrowest tool](13_the_narrowest_tool.ipynb) | Two MCP servers doing the same job: one takes any URL, one takes a page name from a list of three. Send both the metadata-service address and watch the type refuse it before any code runs. Offline, no key |
 
 ## They run offline
 

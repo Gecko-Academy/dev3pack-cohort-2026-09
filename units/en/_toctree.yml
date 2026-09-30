@@ -245,8 +245,14 @@
       title: "Start here: this week"
     - local: unit0/week3
       title: "Week 3 — State, MCP, deployment, defense"
+    - local: unit3/final-assignment
+      title: "Final assignment tutorial"
     - local: unit3/gecko-capstone
       title: "The Gecko capstone"
+    - local: unit3/capstone-tutorial
+      title: "The Gecko capstone, step by step"
+    - local: unit3/agents-md
+      title: "Give your assistant the rules: AGENTS.md"
     - local: unit0/connect-your-assistant
       title: "Connect any assistant to the course and to Gecko"
     - local: unit0/course-mcp

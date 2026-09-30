@@ -1,0 +1,62 @@
+# Give your assistant the rules: AGENTS.md
+
+Every repository you work in this week has an `AGENTS.md` at its root. It tells a
+coding assistant what the repository is, what it may and may not do there, and which
+commands to run. Point your assistant at it before you ask for anything, and it stops
+guessing.
+
+## Where the file is
+
+| Repository | The file | What it says |
+|---|---|---|
+| The course folder, `dev3pack-cohort-2026-09` | `AGENTS.md` at the root, and `CLAUDE.md` beside it | how to help with a session without writing your answers |
+| Your final assignment, `my-final-assignment` | `AGENTS.md` at the root, and `CLAUDE.md` beside it | the research agent, the contract tests, and never tuning on the final questions |
+| Your Gecko capstone, `my-gecko-buyer` | `AGENTS.md` at the root, and `CLAUDE.md` beside it | the buyer, the order of the Gecko calls, and the key rules |
+
+One file, read by every assistant. Open it once yourself: it is short, and it is the
+same rules your assistant is following.
+Why a file of rules works at all is session 1's subject:
+[configuring your assistant](../unit1/session-01-assistant-configuration/concepts-1.mdx).
+
+## How each assistant finds it
+
+| Assistant | What it reads | What you do |
+|---|---|---|
+| Claude Code | `CLAUDE.md`, which imports `AGENTS.md` with its first line, `@AGENTS.md` | nothing: start `claude` in the repository's folder |
+| OpenAI Codex | `AGENTS.md`, natively | nothing: start `codex` in the repository's folder |
+| Cursor | `AGENTS.md`, natively | open the repository's folder as the project |
+| GitHub Copilot in VS Code | `AGENTS.md` | open the repository's folder as the workspace |
+| Gemini CLI | `GEMINI.md` by default | add `.gemini/settings.json` with `{"context": {"fileName": ["AGENTS.md", "GEMINI.md"]}}`, then start `gemini` in the folder |
+| A chat with no file access (Claude web, ChatGPT) | nothing on its own | paste the contents of `AGENTS.md` as your first message |
+
+**Start the assistant inside the repository's folder.** An assistant started in your
+home folder reads nobody's `AGENTS.md`.
+
+**A repository made before 30 September** may have no `CLAUDE.md` or no `AGENTS.md`.
+Claude Code from version 2.1.277 reads `AGENTS.md` when there is no `CLAUDE.md`; on an
+older version, add a `CLAUDE.md` whose first line is `@AGENTS.md`. The
+[final assignment tutorial](final-assignment.mdx) has the two commands that copy both
+files in.
+
+## The first prompt
+
+Paste this first, in any assistant, inside the repository's folder:
+
+> Read AGENTS.md and tell me, in five lines: what this repository is, what you must not
+> do here, and the command that checks my work. Then wait for my first question.
+
+If the answer does not match the file, the assistant did not load it. Check that you
+started it in the right folder, then paste the file instead.
+
+## Two more things your assistant should have
+
+- **The course.** Connect the course MCP so it answers from the course pages and names
+  the page: [connect any assistant](../unit0/connect-your-assistant.mdx).
+- **For the capstone, Gecko's store tools.** The same page shows how to add
+  `https://mcp.geckovision.tech/orquestra/mcp`.
+
+## What it will not do for you
+
+The rules say **explain before writing**. Ask it why a check failed and it will point
+at the file and the session; ask it to write the answer and it will explain the idea
+instead. The checks are yours, and on Friday you explain your own code.

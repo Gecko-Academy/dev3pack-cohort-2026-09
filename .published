@@ -29,6 +29,8 @@ capstone-template/.env.example
 capstone-template/.github/workflows/check.yml
 capstone-template/.gitignore
 capstone-template/.python-version
+capstone-template/AGENTS.md
+capstone-template/CLAUDE.md
 capstone-template/README.md
 capstone-template/agent.py
 capstone-template/docs/EVAL_REPORT.md
@@ -76,6 +78,8 @@ demos/10_your_store_and_buyer.ipynb
 demos/11_memory_at_scale.ipynb
 demos/12_meet_a_stranger.ipynb
 demos/12_tiny_server.py
+demos/13_the_narrowest_tool.ipynb
+demos/13_two_servers.py
 demos/README.md
 demos/fixtures/rag-recorded.json
 demos/fixtures/telegram-getupdates.json
@@ -462,6 +466,9 @@ units/en/unit2/session-10-skills-and-adr/introduction.mdx
 units/en/unit2/session-10-skills-and-adr/notebook.ipynb
 units/en/unit2/session-10-skills-and-adr/quiz.mdx
 units/en/unit2/session-10-skills-and-adr/weekly-challenge.mdx
+units/en/unit3/agents-md.mdx
+units/en/unit3/capstone-tutorial.mdx
+units/en/unit3/final-assignment.mdx
 units/en/unit3/gecko-capstone.mdx
 units/en/unit3/session-11-state-and-memory/concepts-1.mdx
 units/en/unit3/session-11-state-and-memory/concepts-2.mdx
