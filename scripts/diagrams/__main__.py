@@ -24,6 +24,7 @@ from diagrams import (  # noqa: E402
     SESSION_11,
     SESSION_12,
     SESSION_13,
+    WEEK3_PROJECTS,
     capstone,
     loop_vs_graph,
     model_rag_agent_team,
@@ -51,6 +52,7 @@ def main() -> None:
         + SESSION_11
         + SESSION_12[2:]
         + SESSION_13[2:]
+        + WEEK3_PROJECTS
     ):
         dark_only(DARK)
     # one road per session day: the badge moves, the geometry does not

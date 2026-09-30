@@ -197,6 +197,7 @@ scripts/diagrams/session_13.py
 scripts/diagrams/slide.py
 scripts/diagrams/terminal.py
 scripts/diagrams/theme.py
+scripts/diagrams/week3_projects.py
 scripts/fill_notebooks.py
 scripts/inline_slide_images.py
 scripts/notebook_colab.py

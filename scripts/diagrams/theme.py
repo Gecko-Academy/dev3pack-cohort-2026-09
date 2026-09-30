@@ -35,6 +35,9 @@ DECK_10 = "docs/instructor/sessions/session-10-skills-and-adr/img"
 DECK_11 = "docs/instructor/sessions/session-11-state-and-memory/img"
 DECK_12 = "docs/instructor/sessions/session-12-mcp-architecture/img"
 DECK_13 = "docs/instructor/sessions/session-13-secure-mcp-server/img"
+#: Week 3's two projects share one deck, outside any session: the Gecko capstone and
+#: the final assignment, divided.
+DECK_PROJECTS = "docs/instructor/decks/week3-projects/img"
 
 
 @dataclass(frozen=True)

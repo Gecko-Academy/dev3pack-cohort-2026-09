@@ -203,6 +203,35 @@ answer against it.
 | 7 | An **external tools** section in your project instructions: allowed hosts, data handling, who approves what | the notebook's exit ticket |
 | 8 | Your Gecko capstone, project 03: your check as a small MCP server with the same guard | the capstone repository's `projects/03-the-part-that-says-no` |
 
+## Test your two projects
+
+**The Gecko capstone**, in `my-gecko-buyer`. The first four need no key, no network and
+no money:
+
+```bash
+uv run buyer --cases --recorded                     # the five cases and the trap: 0/6 on day one
+uv run buyer --cards --recorded                     # Friday's four cards: 0/4 on day one
+uv run pytest                                       # each x is one of your TODOs
+uv run python projects/03-the-part-that-says-no/check.py   # today's local score
+uv run buyer "one espresso" --devnet                # live: a receipt in receipts/
+```
+
+**The final assignment**, in `my-final-assignment`. A pass is at least 30% **and**
+every critical question:
+
+```bash
+uv run pytest                                       # the contract
+uv run bootcamp final grade                         # the practice score, out of 10
+uv run bootcamp final trace "<one practice question>"   # every step for one question
+export DEV3PACK_API_BASE=https://app.geckovision.tech
+uv run bootcamp final submit --github <you> --dry-run   # the 15 final questions, no pull request
+```
+
+On the fake model, `grade` says `3/10 (30%) ... NOT YET` with the critical gate
+failed: it only refuses. Set `BOOTCAMP_PROVIDER` and your key in `.env` first. Every
+step, to your score: [the final assignment tutorial](../final-assignment.mdx) and
+[the capstone, step by step](../capstone-tutorial.mdx).
+
 ## Tomorrow
 
 Session 14, deploy and operate. Today you wrote the part of a server that says no;
