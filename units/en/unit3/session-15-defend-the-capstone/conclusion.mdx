@@ -1,28 +1,28 @@
 # Conclusion
 
-You built a source-grounded assistant over three weeks, one abstraction at a
-time, and then defended it while something was breaking.
+You opened a store on Solana devnet, wrote a buyer that pins what was asked before any
+bytes exist, and defended it while the judge tried to make it sign something else.
 
 ## What you can now do
 
 A short list, because each item is real:
 
-- put a contract in front of a model and enforce it
-- give an agent a tool that refuses
-- run a loop that stops
-- measure retrieval rather than trusting it
-- attack your own evaluator
-- keep a trace you can read under pressure
+- read a program's accounts through Gecko instead of guessing them
+- pin a request before anything can change it
+- compare a prepared transaction with the request, field by field, as addresses and
+  whole numbers
+- sign only after every check agrees, with a key that never leaves your machine
+- prove a purchase landed from two ledger reads, not from a success message
+- serve your check as a small MCP server that refuses a private URL
 - say what would change your mind
 
 ## What this course did not make you
 
-Someone who has run this in production for a year. The capstone is a bounded
-prototype with its controls visible, which is a different and more honest claim
-than "production ready".
+Someone who has run a payment system in production for a year. The capstone is a bounded
+prototype with its controls visible: one unit per purchase, three espressos on mainnet,
+and a check that trusts your pin. That is a more honest claim than "production ready".
 
 ## What comes next
 
-The next steps are yours to pick, and the depth track, the cookbook and the
-optional bonus units are all still here after the cohort ends. So is the
-repository.
+Your store stays on devnet, and your repository is yours. The depth track, the cookbook
+and the optional bonus units are all still here after the cohort ends.

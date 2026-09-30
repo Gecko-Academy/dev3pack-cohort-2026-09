@@ -183,16 +183,17 @@ and a README that opens with one sentence and the explorer link. No key anywhere
 **Behind on the week?** The minimum defence is projects 01 and 02 offline, and one
 refusal explained. Every project runs on recorded answers.
 
-### Friday on mainnet (demo-day participants only)
+### Friday on mainnet (finalists only)
 
-You may buy one espresso from `geckocoffee` on mainnet, live, with a wallet you make on
+The finalists are the students the instructor names to present. You may buy one espresso from `geckocoffee` on mainnet, live, with a wallet you make on
 your own machine. Its key never leaves it. Do this before Friday; it takes ten minutes
 plus the wait for funding.
 
 1. `uv run python scripts/mainnet_wallet.py create`: the wallet, outside the repository.
-2. `uvx --from gecko-surf gecko login --email <you>`: your Gecko key, in your keychain.
-3. Send that email to your instructor, who grants it.
-4. `uv run python scripts/mainnet_wallet.py register`: sends the address, proven by a signature.
+2. Your instructor sends you a Gecko key privately, already granted.
+3. `uv run python scripts/mainnet_wallet.py register`: paste the key at the prompt; it sends
+   the address, proven by a signature.
+4. Tell your instructor it printed `registered`.
 5. After funding, `uv run python scripts/mainnet_wallet.py show`.
 6. Friday: `uv run buyer "one espresso" --mainnet --store geckocoffee`.
 

@@ -1,12 +1,12 @@
 # Quick quiz (ungraded)
 
-### Q1: Your injected failure makes the agent produce a traceback on screen. What is the best answer?
+### Q1: The judge draws the tampered-bytes card, and your buyer prints `STOP` at verify instead of `NO`. What is the best answer?
 
 <Question
   choices={[
-    { text: "Say the demo environment is misconfigured and move on", explain: "It might be. But you cannot show that in the moment, and the room heard a claim you did not support." },
-    { text: "Read the trace, name the contract that should have caught it, and say what you would fix", explain: "Correct. Failing safely is a pass; diagnosing accurately is the skill being judged.", correct: true },
-    { text: "Re-run it until it works", explain: "A run that works on the fourth attempt is evidence about the first three." },
+    { text: "Run it again until it says NO", explain: "A refusal that appears on the third attempt is evidence about the first two." },
+    { text: "Read the line: STOP means a step could not reach what it needed. Say nothing was submitted, and switch to the recorded lane", explain: "Correct. Nothing was sent either way, and naming the difference between STOP and NO is the diagnosis being judged.", correct: true },
+    { text: "Say the network is flaky and move on", explain: "It might be. But the room heard a claim you did not show." },
   ]}
 />
 
@@ -24,13 +24,13 @@
 
 ---
 
-### Q3: A trace with no event between 'retrieved' and 'answered' means what?
+### Q3: Your buyer printed `submit ... slot 506053275`. Is that proof the purchase landed as asked?
 
 <Question
   choices={[
-    { text: "Nothing happened between them", explain: "That is what it READS as, and that is exactly the danger." },
-    { text: "You cannot tell, and the gap itself is the finding", explain: "Correct. A missing span is not evidence of absence; it is absence of evidence.", correct: true },
-    { text: "The agent was fast", explain: "Latency is a field, not an inference from silence." },
+    { text: "Yes, a slot means it confirmed", explain: "It means something confirmed. It does not say what moved, or to whom." },
+    { text: "Only with the receipt: two ledger reads, the deltas, and total_purchases going from n to n+1", explain: "Correct. The ledger, read before and after, is what says what moved.", correct: true },
+    { text: "Yes, if the explorer link opens", explain: "The link shows the transaction exists, not that it matches what was pinned." },
   ]}
 />
 
@@ -40,8 +40,8 @@
 
 <Question
   choices={[
-    { text: "A hit rate measured on a labeled set", explain: "That is evidence." },
-    { text: "A trace showing a refusal and why", explain: "That is evidence." },
-    { text: "A polished interface and a smooth run-through", explain: "Correct. The rubric grades evidence of engineering practice, not chat-interface polish.", correct: true },
+    { text: "A refusal file naming the field and both values", explain: "That is evidence." },
+    { text: "A receipt with the ledger deltas and the explorer link", explain: "That is evidence." },
+    { text: "A polished interface and a smooth run-through", explain: "Correct. The rubric grades what your repository and your buyer's output show, not polish.", correct: true },
   ]}
 />

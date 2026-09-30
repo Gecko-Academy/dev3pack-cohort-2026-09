@@ -55,19 +55,20 @@ product for every one.
 
 Falling behind still works: every project runs on recorded answers.
 
-## Friday on mainnet
+## Friday on mainnet (finalists only)
 
-Presenting on Friday? You can make one real purchase on mainnet, from geckocoffee. Your
-wallet is made on your own machine and its key never leaves it:
+The finalists, the students the instructor names to present, may make one real purchase
+on mainnet, from geckocoffee. The wallet is made on your own machine and its key never
+leaves it:
 
 1. `uv run python scripts/mainnet_wallet.py create`
-2. Get a Gecko key: `uvx --from gecko-surf gecko login --email <you>`, and send that email to
-   your instructor, who grants it.
-3. `uv run python scripts/mainnet_wallet.py register`
+2. Your instructor sends you a Gecko key privately, already granted.
+3. `uv run python scripts/mainnet_wallet.py register`, and paste the key at the prompt.
 4. Wait for the instructor to fund it (3 espressos), then `uv run python scripts/mainnet_wallet.py show`.
+5. Friday: `uv run buyer "one espresso" --mainnet --store geckocoffee`
 
 The budget is the cap: your signer refuses anything above it. Never share or commit the
-wallet file.
+wallet file. Everyone else presents on devnet, and that is the whole defence.
 
 ## Stuck?
 

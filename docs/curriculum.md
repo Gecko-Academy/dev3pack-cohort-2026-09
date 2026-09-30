@@ -211,7 +211,7 @@ You put the capstone behind a request boundary and run it as a service you start
 
 `ch15` · no notebook · [page](../units/en/unit3/session-15-defend-the-capstone/introduction.mdx)
 
-You present the capstone, and then you are handed one failure you did not prepare for. You diagnose it from your own traces, and either recover or fail safely in front of the room. A demo that only shows the happy path proves that the happy path exists, which nobody doubted.
+You present your Gecko capstone, your own store and a buyer that pays or says why not, from your own repository. Then the judge draws one card you did not choose, and your buyer has to refuse it on its own, by field, while the room watches. A purchase that lands proves the plumbing. A purchase refused by field proves you.
 
 ## Capstone: the source-grounded research assistant
 

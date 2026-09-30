@@ -2,39 +2,37 @@
 
 ## The difference
 
-A demonstration shows that something can work. A defence shows that you know
-when it does not, and what happens then. Only the second is evidence, because
-the first is satisfied by one lucky run.
+A demonstration shows that something can work. A defence shows that you know when it
+does not, and what happens then. Only the second is evidence, because the first is
+satisfied by one lucky run.
 
-Every session in this course closed the same way: something worked, then it was
-broken on purpose, and the interesting part was what the system did next. Demo
-day is that shape one more time, in front of people.
+Your buyer landing an espresso is the demonstration. The card is the defence: the judge
+changes the ask, the budget or the bytes, and your code has to notice without you.
 
 ## What a defence sounds like
 
 Weak, and common:
 
-> It handles unsupported questions well. Let me show you.
+> It checks everything before it signs. Let me show you.
 
 Better, and what the rubric rewards:
 
-> It refuses when retrieval returns nothing above the score floor. Here is the
-> trace for that. It does **not** catch a document that is retrieved, cited,
-> and does not actually support the claim: I found that in session 7 with the
-> cite-everything test, and it is the top item on my list.
+> It compares seven fields of the prepared bytes against the pin I wrote before the
+> bytes existed. Here it refused on `quantity`: I asked for 2, Gecko prepared 1. It
+> does **not** know whether my pin was right: if I pin the wrong product, it faithfully
+> buys the wrong product. That is rank 1 in my `docs/ISSUES.md`.
 
-The second answer is shorter on confidence and much longer on information. It
-names a mechanism, points at evidence, and states a known limit before anybody
-has to find it.
+The second answer names the mechanism, points at the refusal file, and states a limit
+before anybody has to find it.
 
 ## The three questions you will be asked
 
-Whatever the demo, the room converges on these. Have the answer ready with a
-file or a number attached.
+Whatever the demo, the room converges on these. Have the answer ready with a file
+attached.
 
-1. **How do you know?** Not "it seemed right" — the evaluation report, the hit
-   rate, the trace.
-2. **What would change your mind?** The measurement that would reverse your
-   architecture decision. If nothing would, it was a preference, not a decision.
-3. **What breaks it?** You already know one thing. Say it before the failure
-   you drew makes it obvious.
+1. **How do you know it landed?** Not "the terminal said so". The receipt: two ledger
+   reads, the deltas, `total_purchases` going from n to n+1, and the explorer link.
+2. **What would change your mind?** The measurement that would reverse your ADR. If
+   nothing would, it was a preference, not a decision.
+3. **What breaks it?** You already know one thing. Say it before the card makes it
+   obvious.
