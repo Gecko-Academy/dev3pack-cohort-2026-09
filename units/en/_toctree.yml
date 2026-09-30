@@ -301,6 +301,8 @@
       title: "The fetch guard, and why a check after the request is not a guard"
     - local: unit3/session-13-secure-mcp-server/concepts-3
       title: "The applied case: a surface that says where its answers came from"
+    - local: unit3/session-13-secure-mcp-server/follow-along
+      title: "Follow along: today's class"
     - local: unit3/session-13-secure-mcp-server/quiz
       title: "Quick quiz (ungraded)"
     - local: unit3/session-13-secure-mcp-server/conclusion

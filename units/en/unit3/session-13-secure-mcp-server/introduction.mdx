@@ -1,6 +1,6 @@
 # Build and secure an MCP server
 
-**Wednesday, September 30, 2026 · 2h · Thread: interface engineering**
+**Wednesday, September 30, 2026 · 1h · Thread: interface engineering**
 
 ## Outcome
 
@@ -27,29 +27,25 @@ and the guard is the only thing standing between the argument and the socket.
 
 ## Session flow
 
-1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. One
-   sentence: the last tool you gave an agent that could reach any URL, and what
-   stopped it reaching the wrong one.
-2. **Contract and threat boundary (15m).** The contract table above, read
-   aloud. Then the three rules in order — scheme, address, allowlist — and the
-   argument about which one runs first, settled before any code.
-3. **Concept and live implementation (30m).** Why a check after the request is
-   not a guard. `ipaddress` against a hand-rolled prefix test. `urlsplit`
-   against reading the host off the string. The two encodings that beat both.
-4. **Guided lab (35m).** The notebook: write `fetch_guard` (`ch13-e4`), walk a
-   recorded redirect chain through it, then read the recorded Orquestra surface
-   and place the lanes (`ch13-e2`).
-5. **Failure injection (15m).** Section 3 of the notebook: two allowed hops,
-   then a `302` to `169.254.169.254`. Guard the first URL only, then guard
-   every hop, and say what the first version would have put in the model's
-   context.
-6. **Evaluation and artifact receipt (10m).** `check("ch13-e4", fetch_guard)`,
-   `check("ch13-e2", lanes)`, `check("ch13-e1", checklist)`, then
-   `review("ch13")`. Read one refusal reason out loud; the reason is the
-   receipt.
-7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
-   next action. Homework: an **external tools** section in your project
-   instructions — allowed hosts, data handling, who approves what.
+This week every class is one hour. What does not fit is self-study, listed in the
+[follow-along](follow-along.mdx).
+
+1. **Before we start (3m).** Pull, sync both extras, preflight green.
+2. **You are on the other side now (7m).** Section 1: the smallest honest server.
+   One tool, one argument, an allowlist a caller cannot widen. Excess scope is the
+   failure this shape prevents.
+3. **The guard decides on the string (8m).** Why a check after the request is not
+   a guard. The three rules, scheme, address, allowlist, in that order, and why the
+   order is graded.
+4. **The lab (20m).** Section 2: write `fetch_guard` (`ch13-e4`). Finishing it
+   against the check's thirty-one URLs is self-study.
+5. **Break it on purpose (7m).** Section 3: a recorded redirect chain whose third
+   hop is the cloud metadata service. The guard runs on every hop.
+6. **The applied case (12m).** Sections 4 to 7 and 10: the recorded surface, the
+   four lanes (`ch13-e2`), and the safety checklist (`ch13-e1`).
+7. **Hand it in (3m).** `bootcamp check ch13`, `submit`, exit ticket. Homework: an
+   **external tools** section in your project instructions: allowed hosts, data
+   handling, who approves what.
 
 ## Evidence
 

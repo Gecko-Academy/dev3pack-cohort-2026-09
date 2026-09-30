@@ -189,6 +189,7 @@ scripts/diagrams/session_09.py
 scripts/diagrams/session_10.py
 scripts/diagrams/session_11.py
 scripts/diagrams/session_12.py
+scripts/diagrams/session_13.py
 scripts/diagrams/slide.py
 scripts/diagrams/terminal.py
 scripts/diagrams/theme.py
@@ -487,6 +488,9 @@ units/en/unit3/session-13-secure-mcp-server/conclusion.mdx
 units/en/unit3/session-13-secure-mcp-server/fixtures/find-start-recorded.json
 units/en/unit3/session-13-secure-mcp-server/fixtures/list-stores-recorded.json
 units/en/unit3/session-13-secure-mcp-server/fixtures/orquestra-tools.json
+units/en/unit3/session-13-secure-mcp-server/follow-along.mdx
+units/en/unit3/session-13-secure-mcp-server/img/every-hop.png
+units/en/unit3/session-13-secure-mcp-server/img/guard-before-the-socket.png
 units/en/unit3/session-13-secure-mcp-server/introduction.mdx
 units/en/unit3/session-13-secure-mcp-server/notebook.ipynb
 units/en/unit3/session-13-secure-mcp-server/quiz.mdx

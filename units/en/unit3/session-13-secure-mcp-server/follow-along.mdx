@@ -1,0 +1,199 @@
+# Follow along: today's class
+
+Keep this page open during the session. Every step says what to open and what to
+run, in the order we run it in class.
+
+**This week every class is one hour.** The class does the parts that need a room:
+the picture, the start of the lab, the redirect, and the lanes. The rest moves to
+self-study, and every self-study item names the notebook section it lives in.
+Stuck? Ask the course MCP first, then bring what is left to tomorrow's class.
+
+| Part | What | Time |
+|---|---|---|
+| [0](#0-before-we-start) | Before we start: pull, sync, preflight green | 3 min |
+| [1](#1-you-are-on-the-other-side-now) | You are on the other side now: the smallest honest server | 7 min |
+| [2](#2-the-guard-decides-on-the-string) | The guard decides on the string: three rules, in order | 8 min |
+| [3](#3-the-lab-the-fetch-guard) | The lab: `ch13-e4`, the fetch guard | 20 min |
+| [4](#4-break-it-on-purpose-the-redirect) | Break it on purpose: the redirect | 7 min |
+| [5](#5-the-applied-case-lanes-and-the-checklist) | The applied case: `ch13-e2`, the lanes, and `ch13-e1`, the checklist | 12 min |
+| [6](#6-hand-it-in) | Hand it in, and the exit ticket | 3 min |
+| [A](#ask-the-course) | Ask the course: three questions about today | self-study |
+| [K](#keep-going-on-your-own) | Keep going on your own: what to finish after class | self-study |
+
+## 0. Before we start
+
+From your course folder:
+
+```bash
+git stash push -m "my work before today's update"
+git pull
+uv sync --extra projects --extra agents
+uv run jupyter lab units/en/unit3/session-13-secure-mcp-server/notebook.ipynb
+```
+
+Run the preflight cell. Hands up when it is green. **No model, no key and no
+network today**: every verdict is reached by parsing and arithmetic.
+
+## 1. You are on the other side now
+
+Yesterday you judged a server somebody else wrote. Today you write one, and the
+stranger is whoever sends it a URL.
+
+Notebook section 1. Run the cell. It prints:
+
+```
+read_page takes ['url']
+read-only: True
+allowed hosts: example.com, docs.python.org (and their subdomains)
+```
+
+That is the smallest honest server: **one tool, one argument, an allowlist a
+caller cannot widen**, and a refusal that names the rule that fired.
+
+**The failure it prevents is excess scope.** A `fetch` tool that takes any URL is
+not one capability. It is every capability the network offers, handed to whatever
+text reached the model's context. [The smallest honest server](concepts-1.mdx)
+has the four things a server declares, and the one thing it must never hold.
+
+## 2. The guard decides on the string
+
+`read_page` cannot fetch a URL and then decide whether it should have. By then
+the request has left, the inside service has answered, and the answer is in the
+model's context. **The decision happens on the string, before the socket opens.**
+
+![Two panels. Checked after the request: the request leaves, the inside service answers, the answer is in context, and the check says no too late. Checked on the string: fetch_guard refuses with a code before any socket or DNS, and nothing leaves the machine](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit3/session-13-secure-mcp-server/img/guard-before-the-socket.png)
+
+Three rules, in this order, and the first one that fires decides:
+
+| # | Rule | Refuses | Code |
+|---|---|---|---|
+| 1 | scheme | anything that is not `http` or `https` | `scheme` |
+| 2 | address | a host that IS an address, unless it is public | `not-public` |
+| 3 | allowlist | a host that is not a declared domain or a subdomain of one | `not-allowlisted` |
+
+**Why the order matters,** when rule 3 would refuse an inside address anyway: the
+address rule is the one that survives the day the allowlist is widened, and the
+code is what the next person acts on. `not-allowlisted` sends them to add an
+entry, when the real answer was that the URL pointed at the machine the server
+runs on.
+
+[The fetch guard](concepts-2.mdx) walks every way the address rule gets written
+wrong. Read it before the lab, not during.
+
+## 3. The lab: the fetch guard
+
+Notebook section 2. **100 of today's 300 marks.** Write
+`fetch_guard(url) -> {"allowed": bool, "reason": str}`: the three rules above,
+with `reason` starting with the rule's code and your own detail after a colon.
+
+As shipped, the six probe lines all print `REFUSE ... not-allowlisted: no rules
+written yet`, and the check says:
+
+```
+❌ ch13-e4: https://example.com/pricing was refused ('not-allowlisted: no rules written yet'), and it has to be allowed. ...
+```
+
+**A guard that refuses everything is not a guard. It is an outage.** The check
+drives your function with thirty-one URLs of its own and reads the reason as well
+as the verdict: refused for the wrong reason is a failure.
+
+**The three that catch people:**
+
+- **The allowlist by suffix.** A host that merely ends with an allowed domain is
+  not a subdomain of it. Compare whole labels.
+- **The host read off the string.** Use a URL parser (`urlsplit`) for the host,
+  never string slicing.
+- **An address written in a form `ip_address()` does not accept.** The notebook's
+  instructions name the two the check tries, and `concepts-2` explains why a
+  guard that shrugs at them lets them through.
+
+**Every string gets a verdict.** A guard that raises on a bad URL hands the
+decision back to a caller with no rules to decide it with.
+
+**In class:** your first probes behaving. **Not green yet?** It moves to
+self-study: notebook section 2, listed in [keep going on your own](#keep-going-on-your-own).
+
+## 4. Break it on purpose: the redirect
+
+Notebook section 3. A guard that runs once runs on the URL you were given, not on
+the URL you end up fetching. A public host answers `302`, names the next hop, and
+the next hop is the cloud metadata service. Nothing about the first URL was wrong.
+
+The cell walks a recorded chain of three hops, one at a time, through your guard.
+Nothing is fetched: the hops are a list, and the guard is a function of a string.
+With a working guard, the first two hops are allowed and the third is refused
+with `not-public`, and the walk stops there.
+
+**The question for the room:** if only the first URL had been checked, what would
+the third hop have put in the model's context?
+
+![Two panels. Guard once: only hop 1 is checked, and hop 3, the metadata service, is fetched. Guard every hop: hops 1 and 2 are allowed, hop 3 is refused not-public and the walk stops](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit3/session-13-secure-mcp-server/img/every-hop.png)
+
+**The rule to take away:** the guard runs on **every hop**, and the number of hops
+is capped.
+
+## 5. The applied case: lanes and the checklist
+
+Notebook sections 4 to 7, then 10. The recorded surface in `fixtures/` is the
+Gecko store tools you met yesterday, dated: a tool list from 3 September and two
+read-only responses from 19 August.
+
+**`ch13-e2`, the lanes (section 7).** Four lanes: `recorded`, `public-read-only`,
+`fork`, `never`. For each activity, pick the **lowest** lane that can do it.
+`never` is an answer. [The applied case](concepts-3.mdx) has the table of what
+each lane needs and what a recording is, and is not, evidence of.
+
+**`ch13-e1`, the safety checklist (section 10).** Four boxes to tick, then two
+honest answers:
+
+- `ran_the_fork_lane`: `True` or `False`. Most people answer `False`, and that is fine.
+- `why_nothing_could_spend`: in your own words, why nothing you ran could have
+  spent real money.
+
+As shipped, the check prints `these are not ticked: [...]; do not leave the room
+until they are`.
+
+## 6. Hand it in
+
+Save the notebook, then:
+
+```bash
+uv run bootcamp check ch13
+uv run bootcamp submit ch13 --github <your-github-name> --push
+```
+
+Not all three green yet? Submit what you have now, and submit again when they are.
+
+**Exit ticket.** One thing that works now, one thing that is still unclear, your
+next action.
+
+## Ask the course
+
+Connected yesterday? Ask your assistant to use the course tools for each:
+
+1. "Why does a fetch guard decide on the string instead of after the request?"
+2. "Why is the order of the three guard rules graded?"
+3. "Which lane can sign, and why is that not mainnet?"
+
+Each answer should name a page from today, such as
+`units/en/unit3/session-13-secure-mcp-server/concepts-2`. Open it and check the
+answer against it.
+
+## Keep going on your own
+
+| # | What | Where |
+|---|---|---|
+| 1 | `ch13-e4` green, against the check's thirty-one URLs | notebook section 2; `concepts-2` |
+| 2 | Run the redirect walk with your finished guard | notebook section 3 |
+| 3 | `ch13-e2` and `ch13-e1` green | notebook sections 7 and 10; `concepts-3` |
+| 4 | Browse and comprehend the recorded surface | notebook sections 5 and 6 |
+| 5 | Optional: the live surface, read-only | notebook section 8 |
+| 6 | `review("ch13")` shows 3/3, then submit again | the last cell of the notebook |
+| 7 | An **external tools** section in your project instructions: allowed hosts, data handling, who approves what | the notebook's exit ticket |
+| 8 | Your Gecko capstone, project 03: your check as a small MCP server with the same guard | the capstone repository's `projects/03-the-part-that-says-no` |
+
+## Tomorrow
+
+Session 14, deploy and operate. Today you wrote the part of a server that says no;
+tomorrow it runs as a service, with a smoke test that can say "bad" and a sentence
+that says how to roll back.
