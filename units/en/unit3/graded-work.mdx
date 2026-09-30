@@ -1,0 +1,120 @@
+# Everything that is graded, in one place
+
+Two kinds of grading, and they never mix:
+
+| | The track | The final assignment |
+|---|---|---|
+| What | **15 marked items**: sessions 1 to 14, and the `cap01` notebook | your research agent, on 15 private questions |
+| Worth | **5,100 marks** in all | a pass or not, and the certificate |
+| Where you see it | [the track](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md), one row per student | `dev3pack-submissions/finals/<you>/result.json` |
+| How you hand it in | `uv run bootcamp submit <item> --github <you> --push`, from your course folder | `uv run bootcamp final submit --github <you>`, from `my-final-assignment` |
+
+The Gecko capstone, your store and buyer, is neither: it is judged at the presentation
+on Friday 2 October. Session 15 has no notebook.
+
+## The 15 marked items
+
+Every item is handed in the same way, from your course folder, after `git pull` and
+`uv sync --extra projects --extra agents`:
+
+```bash
+uv run bootcamp check ch07                         # see what passes, before you hand in
+uv run bootcamp submit ch07 --github <you> --push  # hand it in
+```
+
+Replace `ch07` with the item. **Save the notebook first**: `submit` reads the file as
+saved on disk. You can hand an item in again at any time.
+
+### Week 1
+
+| Item | Session | Exercises | Marks | Open |
+|---|---|---|---|---|
+| `ch01` | 1. Configure the assistant | `ch01-e1` | 100 | [page](../unit1/session-01-assistant-configuration/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit1/session-01-assistant-configuration/notebook.ipynb) |
+| `ch02` | 2. Call a model through the adapter | `ch02-e1` to `e4` | 400 | [page](../unit1/session-02-model-adapter/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit1/session-02-model-adapter/notebook.ipynb) |
+| `ch03` | 3. Structured outputs | `ch03-e1` to `e3` | 300 | [page](../unit1/session-03-structured-outputs/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit1/session-03-structured-outputs/notebook.ipynb) |
+| `ch04` | 4. Bounded tools | `ch04-e1` to `e3` | 300 | [page](../unit1/session-04-bounded-tools/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit1/session-04-bounded-tools/notebook.ipynb) |
+| `ch05` | 5. A deterministic mini-agent, **plus the week 1 challenge** | `ch05-e1`, `ch05-e2`, and up to 500 | 700 | [page](../unit1/session-05-deterministic-mini-agent/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit1/session-05-deterministic-mini-agent/notebook.ipynb) · [challenge](../unit1/session-05-deterministic-mini-agent/weekly-challenge.mdx) |
+
+### Week 2
+
+| Item | Session | Exercises | Marks | Open |
+|---|---|---|---|---|
+| `ch06` | 6. A retrieval baseline | `ch06-e1` to `e3` | 300 | [page](../unit2/session-06-retrieval-baseline/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/session-06-retrieval-baseline/notebook.ipynb) |
+| `ch07` | 7. Retrieval and grounding metrics | `ch07-e1` to `e3` | 300 | [page](../unit2/session-07-grounding-metrics/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/session-07-grounding-metrics/notebook.ipynb) |
+| `ch08` | 8. Loops and graphs | `ch08-e1` to `e3` | 300 | [page](../unit2/session-08-loops-and-graphs/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/session-08-loops-and-graphs/notebook.ipynb) |
+| `ch09` | 9. Trace and evaluate an agent | `ch09-e1`, `ch09-e2` | 200 | [page](../unit2/session-09-trace-and-evaluate/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/session-09-trace-and-evaluate/notebook.ipynb) |
+| `ch10` | 10. Skills and an ADR, **plus the week 2 challenge** | `ch10-e1`, `ch10-e2`, and up to 500 | 700 | [page](../unit2/session-10-skills-and-adr/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/session-10-skills-and-adr/notebook.ipynb) · [challenge](../unit2/session-10-skills-and-adr/weekly-challenge.mdx) |
+| `cap01` | The final assignment's notebook | `cap01-e1` to `e5` | 500 | [page](../unit2/capstone/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit2/capstone/notebook.ipynb) |
+
+### Week 3
+
+| Item | Session | Exercises | Marks | Open |
+|---|---|---|---|---|
+| `ch11` | 11. State and memory | `ch11-e1` to `e3` | 300 | [page](session-11-state-and-memory/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit3/session-11-state-and-memory/notebook.ipynb) |
+| `ch12` | 12. MCP architecture and primitives | `ch12-e1` to `e3` | 300 | [page](session-12-mcp-architecture/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit3/session-12-mcp-architecture/notebook.ipynb) |
+| `ch13` | 13. Build and secure an MCP server | `ch13-e1`, `ch13-e2`, `ch13-e4` | 300 | [page](session-13-secure-mcp-server/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit3/session-13-secure-mcp-server/notebook.ipynb) |
+| `ch14` | 14. Deploy and operate | `ch14-e3` | 100 | [page](session-14-deploy-and-operate/introduction.mdx) · [notebook](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit3/session-14-deploy-and-operate/notebook.ipynb) |
+
+The exercise ids are the ones the checks use. Session 13 has no `e3`, and session 14's
+one exercise is `e3`: that is how they are numbered, not a missing exercise.
+
+## The three that need more than the notebook
+
+**The weekly challenges (`ch05` and `ch10`, up to 500 each).** You build the challenge in
+its demo notebook: [demo 8](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/08_the_weekly_challenge.ipynb) for week 1,
+[demo 10](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/10_your_store_and_buyer.ipynb) for week 2. Save it after the line
+`week 1 challenge: N/500` (or `week 2 ...`) has printed. Then
+`uv run bootcamp submit ch05 --github <you> --push` carries the saved demo with your
+hand-in, and the track reads your points from that line. The demo as shipped earns
+nothing: the points need code that is yours.
+
+**`cap01`, the final assignment's notebook (500).** It lives in the course folder, under
+unit 2. It is scored on the track like a session. It is **not** the final assignment's
+grade: that is the 15 private questions below.
+[The final assignment tutorial](final-assignment.mdx) shows how `cap01` connects to
+your repository.
+
+**`ch01`, session 1 (100).** It changes settings on your own machine, so the course
+cannot re-run it for you. Hand in the notebook as it says; the track counts the
+hand-in.
+
+## Reading the track
+
+Your row on [the track](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md)
+shows each item as `earned/possible`. An empty cell means nothing was handed in yet,
+which is not the same as a zero. `200/700` on `ch05` or `ch10` means the session is
+done and the challenge is not. **5,100/5,100 is every item, including both challenges.**
+
+A pull request that is green merges on its own, and the track updates after the merge.
+No checks, or it never merges? [Handing work in](../unit0/how-to-submit.mdx) has what to
+do.
+
+## The final assignment: graded separately
+
+Yes, it is graded, and it is the one that earns the certificate. It is not a column on
+the track.
+
+- **What:** your research agent answers 15 private questions, 6 of them critical.
+- **Pass:** a score of at least 30% **and** every critical question passed.
+- **Hand in:** from `my-final-assignment`, `uv run bootcamp final submit --github <you>`.
+  Rehearse first with `--dry-run`.
+- **Your result:** `dev3pack-submissions/finals/<you>/result.json`, a few minutes after
+  the pull request merges. The latest submission counts.
+
+Every step: [the final assignment tutorial](final-assignment.mdx).
+
+## Share it
+
+Your work is public on purpose, so it is worth showing:
+
+- **Your track row.** The track is public: link it and point at your row. Each score
+  sits next to the notebook that earned it, in `submissions/<you>/`.
+- **Your final assignment repository.** It is your showcase: its README shows a demo, your
+  measured results and the command that produced them
+  ([section 12 of the tutorial](final-assignment.mdx)).
+- **Your certificate**, once the course issues it. It is signed, and anyone can verify
+  it: [the final assignment page](../tracks/final-assignment/introduction.mdx) shows how.
+  Add it to your LinkedIn profile under *Licenses and certifications*, and post it with
+  the link to your repository.
+- **Your capstone presentation.** A two-minute clip of your buyer refusing the judge's
+  card, with the explorer link to your devnet receipt, says more than any badge.
