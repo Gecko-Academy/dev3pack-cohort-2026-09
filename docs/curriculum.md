@@ -220,21 +220,6 @@ You present your Gecko capstone, your own store and a buyer that pays or says wh
 You ship a research assistant that answers developer questions from a small versioned corpus, names the documents behind each claim, and refuses when the corpus supports nothing. It calls a bounded read-only tool, it exposes a skill file another assistant can load, and it arrives with a regression test and an evaluation report whose numbers you produced. Five checks in the `cap01` notebook mark the behaviour. The private question set judges your agent: a score of at least 30% **and** every critical question earns the certificate.
 
 <!-- plan:end -->
-## Assessment model
-
-Grade evidence of engineering practice, not chat-interface polish.
-
-| Area | Weight | Evidence |
-|---|---:|---|
-| Environment and assistant workflow | 15% | Reproducible setup, project instructions, reviewed diffs, safe task loop |
-| Python and application foundations | 15% | Typed code, configuration, error handling, tests |
-| Grounding and tool use | 20% | Retrieval/tool contracts, citations, unsupported-question behavior, boundary tests |
-| Reliability and evaluation | 20% | Evaluation set, traces, error analysis, regression test, measured change |
-| Skills/MCP integration | 15% | Reusable skill, safe-mode MCP connection, provenance inspection, safety checklist |
-| Capstone explanation | 15% | Clear demo, architecture, limitation, next-step reasoning |
-
-Per-area descriptors: instructor/assessment-rubric.md — not in your copy.
-
 ## Deliberately out of the core schedule
 
 Semantic caching, long-term memory implementations, knowledge-graph

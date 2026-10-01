@@ -35,20 +35,3 @@ the network, Gecko, or a file. Say so, and switch to the recorded lane with
 Run all four before Friday: `uv run buyer --cards --recorded` offline, then each one live
 on devnet. You will find at least one you did not expect. That is the point of finding it
 on Thursday rather than on stage.
-
-## The rubric
-
-Six areas, each scored 0 to 3 from what you show and what is in your repository.
-
-| Area | 3 looks like |
-|---|---|
-| Environment and assistant workflow | `store/store.json` and your devnet store; one command per lane; your assistant connected; no key anywhere in the repository |
-| Grounding and tool use | every pin in `intents/` written before its prepare; a receipt with the explorer link, the ledger deltas and `total_purchases` n to n+1 |
-| Reliability and evaluation | at least four refusals in `refusals/`, each naming the field and both values; the card refused live; `docs/EVAL_REPORT.md` with the five cases |
-| Python foundations | tests that trigger every refusal offline, green; lint clean |
-| Skills and MCP integration | `verify_signed_transaction` before every submit; your check served as an MCP server with its guard |
-| Capstone explanation | the six minutes on time; the ADR with what would reverse it; one real incident in `docs/ISSUES.md`, said before anyone asks |
-
-**The minimum defence** passes with projects 01 and 02 offline and one refusal explained
-well. Presenting from the recorded lane after a network failure is not penalised when you
-say that is what you are doing.

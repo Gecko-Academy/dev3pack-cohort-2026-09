@@ -1,8 +1,7 @@
 # What done means [[done]]
 
-Done is three things, and they are judged by three different readers: five
-checks judged by code, a six-minute defence judged by the room, and a rubric
-judged on evidence.
+Done is two things, and they are judged by two different readers: five checks
+judged by code, and a six-minute defence judged by the room.
 
 ## The five checks
 
@@ -63,30 +62,9 @@ caller can read, a trace showing where the run stopped, and one accurate
 sentence about what you would fix. Claiming it worked when the trace says
 otherwise is the one answer that fails.
 
-## The rubric
-
-You are graded on the assessment rubric: six areas,
-each scored 0 to 3, weighted. Evidence, not polish. Here is what the capstone
-puts in front of each area.
-
-| Area | Weight | What the capstone shows |
-|---|---:|---|
-| Environment and assistant workflow | 15% | Doctor green, project instructions that describe this repository, and a diff you reviewed. A 3 needs instructions you improved after they failed you, and one unsafe change you refused, written down. |
-| Python and application foundations | 15% | Typed signatures, typed exceptions, failure cases tested. A 3 needs clean seams — the provider behind a Protocol — and tests that read as documentation of behaviour. |
-| Grounding and tool use | 20% | Citations checked against retrieval, tools that validate their inputs, unsupported questions refused. A 3 needs boundary tests for every tool and a fabricated-citation case caught by a test. |
-| Reliability and evaluation | 20% | A reproducible eval command, failures classified, one targeted fix with numbers before and after. A 3 needs a regression test guarding that fix, and the evaluator itself inspected for false positives. |
-| Skills/MCP integration | 15% | A skill with when-to-use, workflow and failure rules, its before/after evidence, and an MCP connection made in safe mode. A 3 needs a skill improved from an observed failure and the provenance of the external surface explained. |
-| Capstone explanation | 15% | The demo meeting all five requirements above. A 3 also names one honest limitation with a concrete, prioritised next step. |
-
-Read the last row against `cap01-e5`. The ranked issue list you wrote in the
-notebook *is* the honest limitation, already prioritised, already written down
-weeks before anyone asked for it. Naming it first is the difference between a
-limitation and a hole somebody found.
-
 ## Recap
 
 | Reader | Asks | Answered by |
 |---|---|---|
 | The checks | Does it behave? | `uv run bootcamp check cap01` |
 | The room | Can you explain it while it breaks? | Six minutes, and your traces |
-| The rubric | Is there evidence? | Tests, numbers, the skill file, the ADR, the issue list |
