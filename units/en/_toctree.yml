@@ -253,6 +253,8 @@
       title: "The Gecko capstone"
     - local: unit3/capstone-tutorial
       title: "The Gecko capstone, step by step"
+    - local: unit3/capstone-with-your-agent
+      title: "Build your capstone with your agent, step by step"
     - local: unit3/agents-md
       title: "Give your assistant the rules: AGENTS.md"
     - local: unit0/connect-your-assistant
