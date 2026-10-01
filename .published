@@ -80,6 +80,7 @@ demos/12_meet_a_stranger.ipynb
 demos/12_tiny_server.py
 demos/13_the_narrowest_tool.ipynb
 demos/13_two_servers.py
+demos/14_the_way_back.ipynb
 demos/README.md
 demos/fixtures/rag-recorded.json
 demos/fixtures/telegram-getupdates.json
@@ -194,6 +195,7 @@ scripts/diagrams/session_10.py
 scripts/diagrams/session_11.py
 scripts/diagrams/session_12.py
 scripts/diagrams/session_13.py
+scripts/diagrams/session_14.py
 scripts/diagrams/slide.py
 scripts/diagrams/terminal.py
 scripts/diagrams/theme.py
@@ -507,6 +509,9 @@ units/en/unit3/session-14-deploy-and-operate/concepts-1.mdx
 units/en/unit3/session-14-deploy-and-operate/concepts-2.mdx
 units/en/unit3/session-14-deploy-and-operate/concepts-3.mdx
 units/en/unit3/session-14-deploy-and-operate/conclusion.mdx
+units/en/unit3/session-14-deploy-and-operate/follow-along.mdx
+units/en/unit3/session-14-deploy-and-operate/img/four-deployments.png
+units/en/unit3/session-14-deploy-and-operate/img/rosy-vs-report.png
 units/en/unit3/session-14-deploy-and-operate/introduction.mdx
 units/en/unit3/session-14-deploy-and-operate/notebook.ipynb
 units/en/unit3/session-14-deploy-and-operate/quiz.mdx

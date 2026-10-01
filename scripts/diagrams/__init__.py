@@ -27,6 +27,7 @@ from .session_10 import SESSION_10
 from .session_11 import SESSION_11
 from .session_12 import SESSION_12
 from .session_13 import SESSION_13
+from .session_14 import SESSION_14
 from .slide import Slide
 from .terminal import Terminal
 from .theme import (
@@ -89,6 +90,7 @@ __all__ = [
     "SESSION_11",
     "SESSION_12",
     "SESSION_13",
+    "SESSION_14",
     "UNIT_08",
     "WEEK3_PROJECTS",
     "Canvas",

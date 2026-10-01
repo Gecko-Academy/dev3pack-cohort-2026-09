@@ -325,6 +325,8 @@
       title: "Four failures, and what each one looks like from outside"
     - local: unit3/session-14-deploy-and-operate/concepts-3
       title: "The smoke test as a contract"
+    - local: unit3/session-14-deploy-and-operate/follow-along
+      title: "Follow along: today's class"
     - local: unit3/session-14-deploy-and-operate/quiz
       title: "Quick quiz (ungraded)"
     - local: unit3/session-14-deploy-and-operate/conclusion

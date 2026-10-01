@@ -1,6 +1,6 @@
 # Deploy and operate the capstone
 
-**Thursday, October 1, 2026 · 2h · Thread: harness engineering**
+**Thursday, October 1, 2026 · 1h · Thread: harness engineering**
 
 ## Outcome
 
@@ -30,27 +30,22 @@ garbage also prints. A test that can only pass has measured nothing.
 
 ## Session flow
 
-1. **Warm-up and diagnostic (10m).** Preflight cell green on every screen. One
-   sentence: the last time something worked on your machine and not on somebody
-   else's, and what the difference turned out to be.
-2. **Contract and threat boundary (15m).** The report's four fields, read aloud.
-   For each one, say what a wrong value would hide. Then the table above.
-3. **Concept and live implementation (30m).** `local_service` in the notebook:
-   the capstone with a boundary around it, two routes, a body that validates or
-   is refused. Then the four deployments, and what each looks like from outside
-   — status, latency, body.
-4. **Guided lab (35m).** `notebook.ipynb`, section 3: write `smoke` and run it
-   against all four (`ch14-e3`). Then point the same function at
-   `local_service`, which is your own code, and read that report.
-5. **Failure injection (15m).** Section 5: `rosy`, the smoke test everybody
-   writes first. It reports the lax deployment healthy. Say out loud how long
-   that report would have stayed believed.
-6. **Evaluation and artifact receipt (10m).** `check("ch14-e3", smoke)`, then
-   `review("ch14")`. Read your rollback sentence out; it goes into the README
-   today, not tomorrow.
-7. **Exit ticket (5m).** One thing that works, one thing that is unclear, your
-   next action. Homework: run `smoke` against your own capstone and bring the
-   one deployment failure you cannot yet handle.
+This week every class is one hour. What does not fit is self-study, listed in the
+[follow-along](follow-along.mdx).
+
+1. **Before we start (3m).** Pull, sync both extras, preflight green.
+2. **A deployment is a boundary (8m).** Demo 14, the way back, timed. Then section 1:
+   `local_service`, two routes and a body that validates or is refused.
+3. **Four ways to be wrong (6m).** Section 2: warm, cold, lax and killed, each seen from
+   outside: status, latency, body.
+4. **The lab (20m).** Section 3: write `smoke` (`ch14-e3`). Pointing it at
+   `local_service` (section 4) is self-study.
+5. **Break it on purpose (5m).** Section 5: `rosy`, the smoke test everybody writes first,
+   reports the lax deployment healthy.
+6. **Your capstone, and Friday (13m).** Project 04 in your `my-gecko-buyer`:
+   `make smoke` live on devnet, `make smoke-recorded` as the rollback, and the six
+   minutes of `docs/DEFENCE.md`.
+7. **Hand it in (5m).** `check ch14`, `submit ch14`, exit ticket.
 
 ## Evidence
 

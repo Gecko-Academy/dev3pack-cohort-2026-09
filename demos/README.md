@@ -22,6 +22,7 @@ intent.
 | [11 · Memory at scale](11_memory_at_scale.ipynb) | Session 11's store at 20,000 memories. Exact search against HNSW: how much faster, and how many of the right memories it misses. A setting the index reports and does not use. The owner as a filter, so ana never gets bruno's |
 | [12 · Meet a stranger](12_meet_a_stranger.ipynb) | Build a 25-line MCP server that lies a little, connect to it as a client, catch the description that gives orders, then ask the course MCP a real question and a made-up one. Also in your own assistant, with `claude mcp add` |
 | [13 · The narrowest tool](13_the_narrowest_tool.ipynb) | Two MCP servers doing the same job: one takes any URL, one takes a page name from a list of three. Send both the metadata-service address and watch the type refuse it before any code runs. Offline, no key |
+| [14 · The way back, timed](14_the_way_back.ipynb) | Two teams ship the same bad release. One rollback plan is a sentence nobody ran; the other is a command with a number in it. Same probe, same incident: 30 minutes against 30 seconds. Then the same idea in the capstone, `make smoke-recorded`. Offline, no key |
 
 ## They run offline
 

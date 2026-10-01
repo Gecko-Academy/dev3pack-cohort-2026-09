@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 UNIT_08 = "units/en/unit2/session-08-loops-and-graphs/img"
 UNIT_12 = "units/en/unit3/session-12-mcp-architecture/img"
 UNIT_13 = "units/en/unit3/session-13-secure-mcp-server/img"
+UNIT_14 = "units/en/unit3/session-14-deploy-and-operate/img"
 DECK_08 = "docs/instructor/sessions/session-08-loops-and-graphs/img"
 # Decks with no course page behind them: these figures are dark only.
 DECK_04 = "docs/instructor/sessions/session-04-bounded-tools/img"
@@ -35,6 +36,7 @@ DECK_10 = "docs/instructor/sessions/session-10-skills-and-adr/img"
 DECK_11 = "docs/instructor/sessions/session-11-state-and-memory/img"
 DECK_12 = "docs/instructor/sessions/session-12-mcp-architecture/img"
 DECK_13 = "docs/instructor/sessions/session-13-secure-mcp-server/img"
+DECK_14 = "docs/instructor/sessions/session-14-deploy-and-operate/img"
 #: Week 3's two projects share one deck, outside any session: the Gecko capstone and
 #: the final assignment, divided.
 DECK_PROJECTS = "docs/instructor/decks/week3-projects/img"

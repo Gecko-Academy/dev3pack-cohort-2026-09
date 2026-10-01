@@ -25,14 +25,30 @@ Better:
 The second answer names the mechanism, points at the refusal file, and states a limit
 before anybody has to find it.
 
-## The three questions you will be asked
+## The seven questions you will be asked
 
 Whatever the demo, the room converges on these. Have the answer ready with a file
-attached.
+attached. The same list is in your capstone repository's `docs/DEFENCE.md`.
+
+**The evidence**
 
 1. **How do you know it landed?** Not "the terminal said so". The receipt: two ledger
    reads, the deltas, `total_purchases` going from n to n+1, and the explorer link.
-2. **What would change your mind?** The measurement that would reverse your ADR. If
-   nothing would, it was a preference, not a decision.
-3. **What breaks it?** You already know one thing. Say it before the card makes it
+2. **What does your receipt not prove?** It proves what moved. It cannot prove that you
+   asked for the right thing. Have the limit ready in `docs/ISSUES.md`.
+3. **Your buyer refused. How does the person at the chat know it was right to?** The
+   refusal names one field and both values, and `refusals/<stamp>-<field>.json` keeps it.
+
+**The design**
+
+4. **Why does Gecko never hold your key, and what would change if it did?** Know where
+   your key lives, and which step in `buyer/signer.py` uses it.
+5. **Which of your seven checks would you drop first, and what risk would you accept?**
+   Answer from `buyer/check.py`, field by field.
+6. **What would change your mind about your ADR?** The measurement that would reverse
+   it. If nothing would, it was a preference, not a decision.
+
+**The limits**
+
+7. **What breaks it?** You already know one thing. Say it before the card makes it
    obvious.

@@ -24,6 +24,7 @@ from diagrams import (  # noqa: E402
     SESSION_11,
     SESSION_12,
     SESSION_13,
+    SESSION_14,
     WEEK3_PROJECTS,
     capstone,
     loop_vs_graph,
@@ -39,7 +40,14 @@ def main() -> None:
     model_rag_agent_team()
     project_02()
     capstone()
-    for both in (loop_vs_graph, rag_family, vector_indexes, *SESSION_12[:2], *SESSION_13[:2]):
+    for both in (
+        loop_vs_graph,
+        rag_family,
+        vector_indexes,
+        *SESSION_12[:2],
+        *SESSION_13[:2],
+        *SESSION_14[:2],
+    ):
         both()
         both(DARK)
     for dark_only in (
@@ -52,6 +60,7 @@ def main() -> None:
         + SESSION_11
         + SESSION_12[2:]
         + SESSION_13[2:]
+        + SESSION_14[2:]
         + WEEK3_PROJECTS
     ):
         dark_only(DARK)

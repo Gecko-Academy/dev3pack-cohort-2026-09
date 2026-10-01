@@ -1,0 +1,181 @@
+# Follow along: today's class
+
+Keep this page open during the session. Every step says what to open and what to
+run, in the order we run it in class.
+
+**This week every class is one hour.** The class does the parts that need a room:
+the picture, the start of the lab, the failure that agrees with you, and your
+capstone's smoke. The rest moves to self-study, and every self-study item names the
+notebook section it lives in. Stuck? Ask the course MCP first.
+
+**Tomorrow is the presentation.** Part 5 is the last time we rehearse it together.
+
+| Part | What | Time |
+|---|---|---|
+| [0](#0-before-we-start) | Before we start: pull, sync, preflight green | 3 min |
+| [1](#1-a-deployment-is-a-boundary) | A deployment is a boundary: demo 14, then `local_service` | 8 min |
+| [2](#2-four-ways-to-be-wrong) | Four ways to be wrong: warm, cold, lax, killed | 6 min |
+| [3](#3-the-lab-the-smoke-test) | The lab: `ch14-e3`, the smoke test | 20 min |
+| [4](#4-break-it-on-purpose-the-test-that-agrees) | Break it on purpose: the test that agrees | 5 min |
+| [5](#5-your-capstone-and-friday) | Your capstone: `make smoke`, the rollback, and Friday | 13 min |
+| [6](#6-hand-it-in) | Hand it in, and the exit ticket | 5 min |
+| [A](#ask-the-course) | Ask the course: three questions about today | self-study |
+| [K](#keep-going-on-your-own) | Keep going on your own: what to finish tonight | self-study |
+
+## 0. Before we start
+
+From your course folder:
+
+```bash
+git stash push -m "my work before today's update"
+git pull
+uv sync --extra projects --extra agents
+uv run jupyter lab units/en/unit3/session-14-deploy-and-operate/notebook.ipynb
+```
+
+Run the preflight cell. Hands up when it is green. **No network, no key and no
+hosting account today**: the deployments are a process you start and four fakes, and a
+delay is a number in the response, never a wait.
+
+## 1. A deployment is a boundary
+
+**The demo.** On screen, `demos/14_the_way_back.ipynb`: two teams ship the same bad
+release at 16:40. One rollback plan is a sentence nobody has run; the other is a command
+somebody ran on Monday, with a number in it. Same probe, same incident: one team is
+still guessing after 30 minutes, the other is back in 30 seconds. **Write the way back
+while nothing is broken, and run it once before you need it.** Run it yourself:
+
+```bash
+uv run jupyter lab demos/14_the_way_back.ipynb
+```
+
+Then notebook section 1. `local_service` is the capstone with a boundary drawn around
+it: two routes and a body that either validates or is refused. It prints:
+
+```
+health    {'status': 200, 'body': {'ok': True, 'documents': 6}, 'elapsed_ms': 0}
+answer    200
+malformed {'status': 400, 'body': {'error': "'question' must be a non-empty string"}, 'elapsed_ms': 0}
+```
+
+That `elapsed_ms: 0` is the part a real deployment takes away from you.
+[Deploying a bounded agent](concepts-1.mdx) has the five-minute checklist.
+
+## 2. Four ways to be wrong
+
+Notebook section 2. Four deployments behind one call shape:
+
+![Four rows. warm: first call 30 ms, health 200, malformed body refused 400. cold: first call 1900 ms, health 200, refused 400. lax: 70 ms, health 200, malformed body answered 200 Yes that is correct. killed: 110 ms, health 503, 503 memory limit](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit3/session-14-deploy-and-operate/img/four-deployments.png)
+
+**Look at `lax`.** It answers `/health` with 200. Only the probe nobody sends first, a
+body with a typo for a field name, shows that it stopped validating.
+[Four failures](concepts-2.mdx) walks through what each looks like from outside.
+
+## 3. The lab: the smoke test
+
+Notebook section 3. **100 marks, today's only exercise.** Write
+`smoke(request) -> dict` with four fields:
+
+| Field | True when |
+|---|---|
+| `cold_start_ms` | the `elapsed_ms` of your **first** call, as an int |
+| `malformed_rejected` | the malformed body came back 4xx. A 200 is a `false`, not a pass |
+| `healthy` | `/health` answered 200, the good question answered 200 with all four answer fields, and the malformed body was refused |
+| `rollback` | one sentence naming the way back: an action, a number, a unit |
+
+As shipped, every report is zeros and the check says:
+
+```
+❌ ch14-e3: the warm deployment: you never sent a well-formed question to '/answer'; hint: 'healthy' means it served a real request, so send one
+```
+
+**The three that catch people:**
+
+- **Stopping early.** Send all three probes to every deployment, whatever the first one
+  answers. A smoke test that crashes on the broken deployment reports nothing exactly
+  when the report was the point.
+- **Reading the body instead of the status.** `killed` returns a body too.
+- **A rollback with no number.** "Roll back if it breaks" fails. Name the action, and
+  put a number with a unit in it.
+
+**In class:** your first two deployments reporting the right verdicts. **Not green yet?**
+It moves to self-study, notebook section 3, listed below.
+
+## 4. Break it on purpose: the test that agrees
+
+Notebook section 5. `rosy` is the smoke test everybody writes first: it asks whether
+anything answered.
+
+![Two panels for the lax deployment. rosy sends health and one good question, reports malformed_rejected True and healthy True: green and wrong. The report sends all three probes and reports malformed_rejected False and healthy False: bad news reported as bad news](https://raw.githubusercontent.com/Gecko-Academy/dev3pack-cohort-2026-09/main/units/en/unit3/session-14-deploy-and-operate/img/rosy-vs-report.png)
+
+**The question for the room:** how long would `rosy`'s green have stayed believed?
+
+## 5. Your capstone, and Friday
+
+Switch to your `my-gecko-buyer` folder. This is
+[project 04, smoke and rollback](https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project/blob/main/projects/04-smoke-and-rollback/README.md):
+the same idea as the lab, on your own buyer.
+
+```bash
+git pull upstream main
+make smoke             # the five cases and the trap, LIVE on devnet: one lands, five refuse
+make smoke-recorded    # the rollback: the same smoke, on recorded answers
+```
+
+`make smoke` needs the class tokens on your buyer (ask your instructor) and your steps
+written. With a finished buyer it printed `6/6` in 25 seconds on devnet on 30 September.
+`make smoke-recorded` is your plan B, tested today: `GECKO_SOURCE=recorded` is the switch.
+
+**Then Friday.** Open `docs/DEFENCE.md` and fill in the six minutes. Rehearse the four
+cards the judge may draw:
+
+```bash
+uv run buyer --cards --recorded                      # 4/4 offline
+uv run buyer "one espresso" --devnet --card stale    # about 40 s live: say what it waits for
+```
+
+If a lane fails on stage, step down one rung and say so: mainnet (finalists), devnet with
+your store, devnet with the class store, recorded. Everything about Friday:
+[defend the capstone](../session-15-defend-the-capstone/introduction.mdx).
+
+## 6. Hand it in
+
+Save the notebook, then:
+
+```bash
+uv run bootcamp check ch14
+uv run bootcamp submit ch14 --github <your-github-name> --push
+```
+
+Not green yet? Submit what you have now, and submit again when it is.
+
+**Exit ticket.** One thing that works, one thing that is unclear, your next action.
+
+## Ask the course
+
+Connected already? Ask your assistant to use the course tools for each:
+
+1. "Why should a smoke test send a malformed request on purpose?"
+2. "What makes a rollback sentence good enough?"
+3. "What do I do on Friday if devnet is down?"
+
+Each answer should name a page, such as
+`units/en/unit3/session-14-deploy-and-operate/concepts-3`. Open it and check the answer
+against it.
+
+## Keep going on your own
+
+| # | What | Where |
+|---|---|---|
+| 1 | `ch14-e3` green against all four deployments | notebook section 3; `concepts-3` |
+| 2 | Point `smoke` at `local_service`, the service you actually run | notebook section 4 |
+| 3 | Optional: serve it on a port and set `SMOKE_URL` | notebook section 4 |
+| 4 | `review("ch14")` shows 1/1, then submit again | the last cell of the notebook |
+| 5 | Capstone project 04: `make smoke`, `make smoke-recorded`, one real incident in `docs/ISSUES.md` | `projects/04-smoke-and-rollback` |
+| 6 | `docs/DEFENCE.md` filled in, and one timed rehearsal of the six minutes | your capstone repository |
+| 7 | Finalists: `mainnet_wallet.py show` prints 300000 raw USDC | your capstone repository's README |
+
+## Tomorrow
+
+Session 15, the presentation. Six minutes each, one card drawn at 3:15, and everything
+you show ends in a receipt or a refusal.
