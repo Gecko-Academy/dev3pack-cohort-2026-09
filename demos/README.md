@@ -23,6 +23,7 @@ intent.
 | [12 · Meet a stranger](12_meet_a_stranger.ipynb) | Build a 25-line MCP server that lies a little, connect to it as a client, catch the description that gives orders, then ask the course MCP a real question and a made-up one. Also in your own assistant, with `claude mcp add` |
 | [13 · The narrowest tool](13_the_narrowest_tool.ipynb) | Two MCP servers doing the same job: one takes any URL, one takes a page name from a list of three. Send both the metadata-service address and watch the type refuse it before any code runs. Offline, no key |
 | [14 · The way back, timed](14_the_way_back.ipynb) | Two teams ship the same bad release. One rollback plan is a sentence nobody ran; the other is a command with a number in it. Same probe, same incident: 30 minutes against 30 seconds. Then the same idea in the capstone, `make smoke-recorded`. Offline, no key |
+| [15 · The final submission, end to end](15_the_final_submission.ipynb) | Every command from an empty folder to your final score, run for real: `final new`, publish, the contract, a real (local) model, `grade`, `trace`, the dry run, the real pull request, the merge and `result.json`. The starter agent as shipped scores 8/15 and fails the critical gate, and the page says which two questions and why. Creates a public repository and a real pull request, so CI does not run it |
 
 ## They run offline
 

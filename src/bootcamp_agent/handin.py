@@ -123,6 +123,23 @@ def push(
     # branch, and hard-coding `main` turns that into "pathspec did not match".
     head = run(["git", "symbolic-ref", "--short", "refs/remotes/origin/HEAD"], work)
     default = head.out.strip() if head.code == 0 and "/" in head.out else "origin/main"
+    # FROM THE SUBMISSIONS REPOSITORY ITSELF, NOT THE FORK. A fork's main is frozen on
+    # the day it was made, so a resubmission of an item already merged upstream added
+    # files upstream already had: the pull request conflicted, no check ran, and it
+    # never merged. The fork's default branch is only the fallback when the
+    # submissions repository cannot be fetched.
+    upstream = run(
+        [
+            "git",
+            "fetch",
+            "--depth=1",
+            f"https://github.com/{SUBMISSIONS_REPO}.git",
+            "+refs/heads/main:refs/remotes/upstream/main",
+        ],
+        work,
+    )
+    if upstream.code == 0:
+        default = "upstream/main"
     started = run(["git", "checkout", "-B", branch, default], work)
     if started.code != 0:
         raise HandInError(f"could not start a branch from {default} in your fork:\n{started.out}")
@@ -143,7 +160,14 @@ def push(
     if committed.code != 0 and "nothing to commit" not in committed.out.lower():
         raise HandInError(f"could not commit your submission:\n{committed.out}")
 
-    pushed = run(["git", "push", "--force-with-lease", "origin", branch], work)
+    # The clone tracks only the default branch, so a branch left on the fork by an
+    # earlier hand-in of this item has no remote-tracking ref here, and a bare
+    # --force-with-lease refuses it as "stale info": every resubmission fell back to
+    # the manual route. Ask the fork where the branch is, and lease exactly that
+    # (an empty lease means "only if it does not exist yet").
+    remote = run(["git", "ls-remote", "origin", f"refs/heads/{branch}"], work)
+    current = remote.out.split()[0] if remote.code == 0 and remote.out.strip() else ""
+    pushed = run(["git", "push", f"--force-with-lease={branch}:{current}", "origin", branch], work)
     if pushed.code != 0:
         raise HandInError(f"could not push to your fork:\n{pushed.out}")
 

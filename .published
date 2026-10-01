@@ -81,6 +81,7 @@ demos/12_tiny_server.py
 demos/13_the_narrowest_tool.ipynb
 demos/13_two_servers.py
 demos/14_the_way_back.ipynb
+demos/15_the_final_submission.ipynb
 demos/README.md
 demos/fixtures/rag-recorded.json
 demos/fixtures/telegram-getupdates.json
