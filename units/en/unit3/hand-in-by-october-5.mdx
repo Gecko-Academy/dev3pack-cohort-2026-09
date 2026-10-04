@@ -1,0 +1,75 @@
+# Hand in by 5 October: your Gecko capstone and your final
+
+Two things are due on **Monday 5 October**. They are handed in separately, and both
+end up on one row of the [Finish line](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md#finish-line).
+
+| | The Gecko capstone | The final submission |
+|---|---|---|
+| What | your own `my-gecko-buyer`: store, buyer, receipts, refusals | your research agent, on the private questions |
+| What you hand in | **a link** to your repository | the answers your agent gave |
+| How | [paste the link into this form](https://github.com/Gecko-Academy/dev3pack-submissions/issues/new?template=gecko-capstone.yml) | `uv run bootcamp final submit --github <you>` |
+| Where it shows | Finish line: a link to your commit | Finish line: your score, and whether you are eligible |
+
+You can hand in either one again until the deadline. The latest one counts.
+
+## The Gecko capstone link
+
+### 1. Push your evidence first
+
+The bot records the **newest commit** on your repository, and that commit is what the
+judges read. In `my-gecko-buyer`:
+
+```bash
+git add receipts intents refusals smoke-report.json docs
+git commit -m "Capstone hand-in"
+git push
+```
+
+| The judges look for | Made by |
+|---|---|
+| `receipts/<sig8>.md` | `uv run buyer "one espresso" --devnet` |
+| `refusals/` | `make smoke` (or the cards) |
+| `smoke-report.json` | `make smoke`, or `make smoke-recorded` |
+| `docs/DEFENCE.md`, `docs/ADR*`, `docs/ISSUES.md` | you |
+
+**Never** commit a key. `python3 scripts/scan_secrets.py` must find nothing.
+
+### 2. Paste your link
+
+Open **[Hand in my Gecko capstone](https://github.com/Gecko-Academy/dev3pack-submissions/issues/new?template=gecko-capstone.yml)**, paste
+`https://github.com/<you>/my-gecko-buyer`, and press **Submit new issue**. That is all:
+it works from a phone too.
+
+Within a minute a bot answers on the issue:
+
+| The bot says | Do this |
+|---|---|
+| **Recorded**, with a commit | done. Your row in the [Finish line](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md#finish-line) links to it |
+| Recorded, but lists missing receipts, refusals or smoke report | push them, then edit the issue (any change) to record the newer commit |
+| `belongs to` somebody else | paste the repository under **your** account |
+| the course template | make it yours: `git remote rename origin upstream`, then `gh repo create my-gecko-buyer --public --source . --remote origin --push`; edit the issue with the new link |
+| private, or does not exist | make the repository public, then edit the issue |
+
+Pushed more after handing in? Edit the issue, and the newest commit replaces the old one.
+
+**Prefer the terminal?** From your course folder, after `git pull && uv sync`:
+`uv run bootcamp gecko submit --repo ../my-gecko-buyer --github <you>`. It prints the
+same file and how to open its pull request. Either route ends in the same place.
+
+## The final submission
+
+Unchanged: [the final assignment](final-assignment.mdx) has every step. In short,
+from `my-final-assignment`:
+
+```bash
+export DEV3PACK_API_BASE=https://app.geckovision.tech
+uv run bootcamp final grade                       # practise
+uv run bootcamp final submit --github <you>       # hand in
+```
+
+Your score arrives a few minutes after the merge, in
+`finals/<you>/result.json`, and on the Finish line.
+
+## Stuck?
+
+Post in the cohort chat with the pull request link, or the line the check printed.

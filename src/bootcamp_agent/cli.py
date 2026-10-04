@@ -639,6 +639,24 @@ def _capstone_submit(args: argparse.Namespace) -> int:
     return 0 if args.dry_run or done.pr_url else 1
 
 
+def _gecko_submit(args: argparse.Namespace) -> int:
+    """The Gecko capstone: hand in the link to your own my-gecko-buyer."""
+    from bootcamp_agent.gecko_submit import SubmitError, submit
+
+    try:
+        done = submit(
+            Path(args.repo),
+            github=args.github,
+            push=args.push,
+            dry_run=args.dry_run,
+            into=Path(args.into) if args.into else None,
+        )
+    except SubmitError as error:
+        print(f"{FAIL} {error}", file=sys.stderr)
+        return 2
+    return 0 if args.dry_run or not args.push or done.pr_url else 1
+
+
 def bootcamp(argv: list[str] | None = None) -> int:
     """The participant's own command: check the setup, a chapter, or everything."""
     parser = argparse.ArgumentParser(
@@ -675,6 +693,22 @@ def bootcamp(argv: list[str] | None = None) -> int:
         action="store_true",
         help="fork, commit and open the pull request for you (needs the gh CLI)",
     )
+    gecko = sub.add_parser("gecko", help="your Gecko capstone: hand in the link to my-gecko-buyer")
+    gecko_sub = gecko.add_subparsers(dest="gecko_command")
+    linker = gecko_sub.add_parser(
+        "submit", help="hand in your my-gecko-buyer repository and the commit to judge"
+    )
+    linker.add_argument(
+        "--repo", required=True, help="your capstone folder, for example ../my-gecko-buyer"
+    )
+    linker.add_argument("--github", required=True, help="your GitHub username")
+    linker.add_argument(
+        "--push",
+        action="store_true",
+        help="fork, commit and open the pull request for you (needs the gh CLI)",
+    )
+    linker.add_argument("--dry-run", action="store_true", help="print the file, hand in nothing")
+    linker.add_argument("--into", help="where to write the file (default ~/.bootcamp/gecko)")
     # "final" is the name the pages use for the final assignment; "capstone" is
     # the older name and keeps working. One parser under two names, so the
     # handlers and flags cannot drift apart.
@@ -747,6 +781,11 @@ def bootcamp(argv: list[str] | None = None) -> int:
         return _read(args.port, args.build_only)
     if args.command == "submit":
         return _submit(args.chapter, args.github, args.cohort, args.into, args.push)
+    if args.command == "gecko":
+        if args.gecko_command == "submit":
+            return _gecko_submit(args)
+        gecko.print_help()
+        return 2
     if args.command in ("final", "capstone"):
         if args.capstone_command == "new":
             return _capstone_new(args.folder, args.github, args.course_ref)

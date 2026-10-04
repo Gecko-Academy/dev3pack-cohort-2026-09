@@ -197,6 +197,7 @@ UNIT0_ORDER = (
 WEEK3_START = (
     "unit3/start-here",
     "unit0/week3",
+    "unit3/hand-in-by-october-5",
     "unit3/graded-work",
     "unit3/final-assignment",
     "unit3/gecko-capstone",

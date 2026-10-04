@@ -234,6 +234,7 @@ src/bootcamp_agent/evals.py
 src/bootcamp_agent/final_grade.py
 src/bootcamp_agent/final_practice.jsonl
 src/bootcamp_agent/final_run.py
+src/bootcamp_agent/gecko_submit.py
 src/bootcamp_agent/handin.py
 src/bootcamp_agent/hints.py
 src/bootcamp_agent/llm.py
@@ -476,6 +477,7 @@ units/en/unit3/capstone-with-your-agent.mdx
 units/en/unit3/final-assignment.mdx
 units/en/unit3/gecko-capstone.mdx
 units/en/unit3/graded-work.mdx
+units/en/unit3/hand-in-by-october-5.mdx
 units/en/unit3/session-11-state-and-memory/concepts-1.mdx
 units/en/unit3/session-11-state-and-memory/concepts-2.mdx
 units/en/unit3/session-11-state-and-memory/concepts-3.mdx

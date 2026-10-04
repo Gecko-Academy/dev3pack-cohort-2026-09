@@ -245,6 +245,8 @@
       title: "Start here: this week"
     - local: unit0/week3
       title: "Week 3 — State, MCP, deployment, defense"
+    - local: unit3/hand-in-by-october-5
+      title: "Hand in by 5 October: your Gecko capstone and your final"
     - local: unit3/graded-work
       title: "Everything that is graded, in one place"
     - local: unit3/final-assignment

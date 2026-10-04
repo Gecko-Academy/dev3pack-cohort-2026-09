@@ -52,15 +52,42 @@ class RepoState:
     commit: str
 
 
-def check_repo(repo: Path) -> RepoState:
-    """The public link and the commit, or a refusal that says what to run."""
-    head = _git(repo, "rev-parse", "--verify", "HEAD")
-    if head.returncode != 0 or not _FULL_SHA.fullmatch(head.stdout.strip()):
-        raise SubmitError(
+#: What each kind of hand-in calls its repository, and how a student makes one
+#: theirs. The checks are the same; only the words a refusal uses differ.
+_REPO_WORDS = {
+    "final": {
+        "missing": (
             "this is not a final assignment repository with a commit in it. Run this "
             "inside the folder `uv run bootcamp final new` made (for example "
             "../my-final-assignment), after your first commit."
-        )
+        ),
+        "make_it_yours": (
+            "    git remote rename origin upstream\n"
+            "    gh repo create my-final-assignment --public --source . --remote origin --push\n"
+            "The final assignment starts in its own repository: from the course folder,\n"
+            "    uv run bootcamp final new ../my-final-assignment"
+        ),
+    },
+    "gecko": {
+        "missing": (
+            "this is not your Gecko capstone repository with a commit in it. Pass the "
+            "folder you cloned the capstone template into, for example "
+            "--repo ../my-gecko-buyer, after your first commit."
+        ),
+        "make_it_yours": (
+            "    git remote rename origin upstream\n"
+            "    gh repo create my-gecko-buyer --public --source . --remote origin --push"
+        ),
+    },
+}
+
+
+def check_repo(repo: Path, kind: str = "final") -> RepoState:
+    """The public link and the commit, or a refusal that says what to run."""
+    words = _REPO_WORDS[kind]
+    head = _git(repo, "rev-parse", "--verify", "HEAD")
+    if head.returncode != 0 or not _FULL_SHA.fullmatch(head.stdout.strip()):
+        raise SubmitError(words["missing"])
     commit = head.stdout.strip()
     status = _git(repo, "status", "--porcelain")
     if status.returncode != 0 or status.stdout.strip():
@@ -95,11 +122,7 @@ def check_repo(repo: Path) -> RepoState:
     if url.split("/")[3].lower() == COURSE_ORG:
         raise SubmitError(
             f"`origin` is a course repository ({url}), not yours. The submission "
-            "links to your code. Make it yours first:\n"
-            "    git remote rename origin upstream\n"
-            "    gh repo create my-final-assignment --public --source . --remote origin --push\n"
-            "The final assignment starts in its own repository: from the course folder,\n"
-            "    uv run bootcamp final new ../my-final-assignment"
+            "links to your code. Make it yours first:\n" + words["make_it_yours"]
         )
     pushed = _git(
         repo, "for-each-ref", "--contains", commit, "--format=%(refname)", "refs/remotes/origin"

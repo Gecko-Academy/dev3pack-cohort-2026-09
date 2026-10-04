@@ -161,6 +161,10 @@ def read_tree(root: Path, cohort: str = "2026-09", verified: frozenset[str] = fr
         return Track(cohort=cohort, entries=(), problems=(f"no submissions tree at {root}",))
 
     for claim_path in sorted(root.glob("*/*/submission.json")):
+        # The final and the Gecko capstone link are not track items: they are read
+        # by the submissions repository's own Finish line, never scored here.
+        if claim_path.parent.name in {"final", "gecko"}:
+            continue
         try:
             entries.append(read_entry(claim_path, verified_hashes=verified))
         except ValueError as error:

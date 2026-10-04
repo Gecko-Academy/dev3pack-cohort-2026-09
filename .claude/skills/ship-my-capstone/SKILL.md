@@ -18,7 +18,10 @@ research assistant: graded on a private question set, it earns the certificate.
 The Gecko capstone is the store project presented on Friday 2 October, in
 https://github.com/Gecko-Academy/Dev3Pack-Gecko-Capstone-Project. This skill is
 only about the final assignment. If the learner means the store project, say so
-and send them to that repository.
+and send them to that repository. To hand in the store project's LINK (due
+5 October), the command is `uv run bootcamp gecko submit --repo ../my-gecko-buyer
+--github <you> --push`, run from the course folder; the browser route is in
+`units/en/unit3/hand-in-by-october-5.mdx`.
 
 ## Two repositories, and they are easy to mix up
 
