@@ -1,7 +1,8 @@
 # What done means [[done]]
 
-Done is two things, and they are judged by two different readers: five checks
-judged by code, and a six-minute defence judged by the room.
+Done is two things, judged by two different readers: five checks in the `cap01`
+notebook, judged by code, and the private question set, scored by the course
+when you run `uv run bootcamp final submit`.
 
 ## The five checks
 
@@ -38,33 +39,17 @@ They run your code and read its behaviour. They do not read your wording, and
 they cannot tell you the answer was right — `cap01-e4` says eight cases met a
 pass condition you can attack, and session 7 already showed you how. Nor is the
 scorecard your grade. It is formative, and what it is good for is finding the
-gap you would rather not meet on stage.
+gap you would rather not meet in the private set.
 
-## The defence, in session 15
+## No defence
 
-Six minutes, hard-timed, and the last one is not yours to plan.
-
-| Minute | What |
-|---:|---|
-| 1 | The problem, and who has it |
-| 2–3 | The demo: one supported answer with citations, one refusal |
-| 4 | The architecture decision you would defend, and what would reverse it |
-| 5 | Measured evidence: your evaluation report, not an impression |
-| 6 | The injected failure, drawn at the start of your slot, diagnosed from your traces |
-
-Every injected failure is one you already met: empty retrieval, a citation that
-supports nothing, a tool that times out mid-loop, an instruction inside
-retrieved text, a call that repeats until the budget ends it, an illegal state
-transition.
-
-Recovery is not the only pass. **Failing safely is a pass**: a refusal the
-caller can read, a trace showing where the run stopped, and one accurate
-sentence about what you would fix. Claiming it worked when the trace says
-otherwise is the one answer that fails.
+The final assignment has no defence: it is judged on the private questions alone.
+Session 15's presentation is for the Gecko capstone, a separate project in your own
+`my-gecko-buyer` repository.
 
 ## Recap
 
 | Reader | Asks | Answered by |
 |---|---|---|
 | The checks | Does it behave? | `uv run bootcamp check cap01` |
-| The room | Can you explain it while it breaks? | Six minutes, and your traces |
+| The private questions | Does it answer, cite and refuse on questions it never saw? | `uv run bootcamp final submit` |

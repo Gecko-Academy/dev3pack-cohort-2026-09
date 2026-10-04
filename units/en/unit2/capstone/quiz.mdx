@@ -4,13 +4,13 @@
 
 <Question
   choices={[
-    { text: "To confirm the model was warm before the question arrived", explain: "Nothing in the capstone needs a warm model, and `FakeLLM` has no warm-up." },
+    { text: "To confirm the model was warm before the question arrived", explain: "Nothing in the final assignment needs a warm model, and `FakeLLM` has no warm-up." },
     { text: "Because the refusal alone says nothing about when it happened; an empty `calls` list is the evidence retrieval decided it", explain: "Correct. A refusal after a model call is still a refusal, but it paid for something retrieval already knew for free.", correct: true },
     { text: "Because a refusal is only valid if the model agreed with it", explain: "The deterministic door is the reliable one. Asking the model to confirm an empty retrieval adds a cost and a way to be talked out of it." },
   ]}
 />
 
-### Q2: The model returns a good sentence and cites a document retrieval never returned. What does the capstone do with it?
+### Q2: The model returns a good sentence and cites a document retrieval never returned. What does the final assignment do with it?
 
 <Question
   choices={[

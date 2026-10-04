@@ -2,7 +2,7 @@
 
 ## Six behaviours, and the contract each one has to meet
 
-The capstone is one program with six required behaviours. Each one has a
+The final assignment is one program with six required behaviours. Each one has a
 contract, and the contract is what a reviewer checks — not the wording of the
 answer.
 
@@ -21,7 +21,7 @@ Retrieval returns overlap. A score of `3.18` says the query and the chunk share
 tokens this corpus treats as rare. It says nothing about whether the chunk
 supports the claim you are about to make from it.
 
-So grounding is two separate jobs, and the capstone does both:
+So grounding is two separate jobs, and the final assignment does both:
 
 1. **Constrain the generation.** The prompt carries only the retrieved passages,
    and the system instruction says to answer from them alone.
@@ -70,7 +70,7 @@ decision to a caller who may not make it. Fail into a value.
 
 ## Read-only, on purpose
 
-Nothing the capstone can call writes, spends, or mutates. That is not a
+Nothing the final assignment can call writes, spends, or mutates. That is not a
 limitation to apologise for on demo day. It is what makes it safe to run the
 thing unattended in front of a room, and it is the reason session 12 has you
 classify every tool as reading or mutating before wiring any of them in.
@@ -84,7 +84,7 @@ The bounds are per tool, and each one is testable on its own:
 | Name the valid options in the error | an unknown `doc_id` comes back with `sorted(by_id)` in the message |
 | No side effects | every tool reads the corpus; none of them touches it |
 
-## What the capstone is not
+## What the final assignment is not
 
 It is a bounded prototype with its controls visible. It is not a system that has
 run in production for a year, and claiming otherwise on demo day is the one

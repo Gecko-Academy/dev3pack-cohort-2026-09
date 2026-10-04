@@ -267,17 +267,17 @@ def _capstone_block() -> list[str]:
         "",
         "**Lesson title**",
         "",
-        "> Capstone: the source-grounded research assistant",
+        f"> {CAPSTONE.title}",
         "",
         "**Lesson content (markdown)**",
         "",
         "> A research assistant that answers from `data/corpus/`, cites document ids,",
         "> and refuses when nothing supports the claim. Built in the hours between",
-        "> sessions; defended on demo day.",
+        "> sessions; scored on private questions. Not the Gecko capstone.",
         "",
         "**Resource title** · **URL**",
         "",
-        "> Capstone — the brief",
+        "> Final assignment — the brief",
         f"> `{_link(CAPSTONE.unit, CAPSTONE.dirname, 'introduction.mdx')}`",
         "",
         "**Exercises** — one row per `Add exercise`",
@@ -294,7 +294,7 @@ def _capstone_block() -> list[str]:
         "",
         "**Module resource** · Title · URL",
         "",
-        "> Capstone — all pages and the notebook",
+        "> Final assignment — all pages and the notebook",
         f"> `{COHORT}/units/en/{CAPSTONE.unit}/{CAPSTONE.dirname}/`",
         "",
     ]
@@ -370,9 +370,9 @@ def rows() -> list[dict[str, str]]:
                 content=(
                     "A research assistant that answers from `data/corpus/`, cites document "
                     "ids, and refuses when nothing supports the claim. Built in the hours "
-                    "between sessions; defended on demo day."
+                    "between sessions; scored on private questions. Not the Gecko capstone."
                 ),
-                resource_title="Capstone — the brief",
+                resource_title="Final assignment — the brief",
                 resource_url=_link(CAPSTONE.unit, CAPSTONE.dirname, "introduction.mdx"),
             )
             for key, what in _exercises(CAPSTONE.prefix):
@@ -386,7 +386,7 @@ def rows() -> list[dict[str, str]]:
             add(
                 **common,
                 section="MODULE_RESOURCE",
-                resource_title="Capstone — all pages and the notebook",
+                resource_title="Final assignment — all pages and the notebook",
                 resource_url=f"{COHORT}/units/en/{CAPSTONE.unit}/{CAPSTONE.dirname}/",
             )
     return out

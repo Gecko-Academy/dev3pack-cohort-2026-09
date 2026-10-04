@@ -87,7 +87,7 @@ Mon 28 Sep to Fri 02 Oct
 
 ## Capstone
 
-[Capstone: the source-grounded research assistant](../units/en/unit2/capstone/) opens with week
+[Final assignment notebook (cap01): the source-grounded research assistant](../units/en/unit2/capstone/) opens with week
 2 and is built between sessions. 5 checks, scored.
 
 ## Totals

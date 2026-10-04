@@ -213,7 +213,7 @@ You put the capstone behind a request boundary and run it as a service you start
 
 You present your Gecko capstone, your own store and a buyer that pays or says why not, from your own repository. Then the judge draws one card you did not choose, and your buyer has to refuse it on its own, by field, while the room watches. A purchase that lands proves the plumbing. A purchase refused by field proves you.
 
-## Capstone: the source-grounded research assistant
+## Final assignment notebook (cap01): the source-grounded research assistant
 
 `cap01` · 5 checks · opens with week 2 · [page](../units/en/unit2/capstone/introduction.mdx)
 

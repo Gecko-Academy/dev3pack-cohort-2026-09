@@ -260,7 +260,7 @@ class Project:
 
     prefix: str = "cap01"
     slug: str = "capstone"
-    title: str = "Capstone: the source-grounded research assistant"
+    title: str = "Final assignment notebook (cap01): the source-grounded research assistant"
     opens_in_week: int = 2
 
     @property

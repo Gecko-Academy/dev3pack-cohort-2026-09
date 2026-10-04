@@ -230,7 +230,7 @@
     - local: unit2/capstone/guide
       title: "The final assignment guide"
     - local: unit2/capstone/road
-      title: "The road to the capstone"
+      title: "The road to the final assignment"
     - local: unit2/capstone/tutorial
       title: "Final assignment tutorial"
     - local: unit2/capstone/quiz
