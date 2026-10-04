@@ -148,15 +148,25 @@ def check_github(github: str) -> str:
     return github
 
 
+#: No number in here may read like the student's own result: "6/15 (40%)" did, and a
+#: student read it as her score (4 Oct 2026). The score is only ever in result.json.
 NEXT_STEPS = (
     "What happens next:",
     "  - The pull request merges itself once its check passes.",
-    "  - Your real score arrives a few minutes later, in finals/{github}/result.json",
-    "    in the submissions repository.",
+    "  - Your score is NOT shown here. It arrives a few minutes after the merge, in",
+    "    finals/{github}/result.json in the submissions repository.",
     "  - Submit as often as you like. Your latest submission counts, not your best.",
-    "  - The certificate needs a score of at least 30% AND every critical question",
-    "    passed. The final set has 15 questions, 6 of them critical, so any pass is",
-    "    at least 6/15 (40%).",
+    "  - To earn the certificate: a score of at least 30% AND every critical",
+    "    question passed. One failed critical question means no certificate,",
+    "    whatever the score.",
+)
+
+#: The last line a FAILED hand-in prints. The error sits above the manual route, and a
+#: student who reads only the end must still see that nothing reached the course.
+NOT_HANDED_IN = (
+    "NOT handed in: no pull request was opened, so nothing will be scored.\n"
+    "The reason is printed above, after the practice run. Fix it and run this again,\n"
+    "or hand in from the browser as described above."
 )
 
 
@@ -288,7 +298,7 @@ def submit(
                 command=f"uv run {SUBMIT_COMMAND} --github {github}",
             )
         )
-        say("\n" + next_steps(github))
+        say("\n" + NOT_HANDED_IN)
         return Submitted(where, None, run.flagged)
     say(f"\nhanded in: {url}\n")
     say(next_steps(github))
