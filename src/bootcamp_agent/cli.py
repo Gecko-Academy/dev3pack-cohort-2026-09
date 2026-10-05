@@ -639,6 +639,19 @@ def _capstone_submit(args: argparse.Namespace) -> int:
     return 0 if args.dry_run or done.pr_url else 1
 
 
+def _status(github: str) -> int:
+    """What is done and what is missing for the certificate, with the command for each."""
+    from bootcamp_agent.status import StatusError, read_status
+
+    try:
+        status = read_status(github)
+    except StatusError as error:
+        print(f"{FAIL} {error}", file=sys.stderr)
+        return 2
+    print(status.rendered())
+    return 0
+
+
 def _gecko_submit(args: argparse.Namespace) -> int:
     """The Gecko capstone: hand in the link to your own my-gecko-buyer."""
     from bootcamp_agent.gecko_submit import SubmitError, submit
@@ -693,6 +706,10 @@ def bootcamp(argv: list[str] | None = None) -> int:
         action="store_true",
         help="fork, commit and open the pull request for you (needs the gh CLI)",
     )
+    stat = sub.add_parser(
+        "status", help="what is done and what is missing for your certificate, and how to finish"
+    )
+    stat.add_argument("--github", required=True, help="your GitHub username")
     gecko = sub.add_parser("gecko", help="your Gecko capstone: hand in the link to my-gecko-buyer")
     gecko_sub = gecko.add_subparsers(dest="gecko_command")
     linker = gecko_sub.add_parser(
@@ -781,6 +798,8 @@ def bootcamp(argv: list[str] | None = None) -> int:
         return _read(args.port, args.build_only)
     if args.command == "submit":
         return _submit(args.chapter, args.github, args.cohort, args.into, args.push)
+    if args.command == "status":
+        return _status(args.github)
     if args.command == "gecko":
         if args.gecko_command == "submit":
             return _gecko_submit(args)

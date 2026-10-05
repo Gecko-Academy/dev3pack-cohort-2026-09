@@ -265,6 +265,7 @@ src/bootcamp_agent/shipit/bonus_checks.py
 src/bootcamp_agent/shipit/borsh_store.py
 src/bootcamp_agent/shipit/server.py
 src/bootcamp_agent/shipit/storefront.py
+src/bootcamp_agent/status.py
 src/bootcamp_agent/submission.py
 src/bootcamp_agent/submit_checks.py
 src/bootcamp_agent/tools.py
