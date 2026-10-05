@@ -100,7 +100,10 @@ def push(
     branch = f"submit/{item_id}"
 
     # Idempotent: gh says "already exists" and exits 0 when the fork is there.
-    forked = run(["gh", "repo", "fork", SUBMISSIONS_REPO, "--clone=false", "--remote=false"])
+    # No --remote flag: with a repository named, newer gh refuses it outright
+    # ("the --remote flag is unsupported when a repository argument is provided",
+    # 5 Oct 2026), and with --clone=false gh adds no remote anyway.
+    forked = run(["gh", "repo", "fork", SUBMISSIONS_REPO, "--clone=false"])
     if forked.code != 0 and "already exists" not in forked.out.lower():
         raise HandInError(f"could not fork {SUBMISSIONS_REPO}:\n{forked.out}")
 
